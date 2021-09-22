@@ -7,24 +7,113 @@ using Microsoft.Office.Interop.Excel; //Библиотека для чтения
 
 namespace ExportFromExcelToDatabase.Classes
 {
+    /// <summary>
+    /// Excel-файл.
+    /// </summary>
+    public class ExcelFile
+    {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Атрибуты*/
+
+        /// <summary>
+        /// Путь к файлу.
+        /// </summary>
+        private string _pathFile;
+        /// <summary>
+        /// Наименования страниц.
+        /// </summary>
+        private List<string> _titleSheet;
+        /// <summary>
+        /// Страницы файла.
+        /// </summary>
+        private List<string[,]> _sheetsFile;
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Свойства*/
+
+        /// <summary>
+        /// Расположение файла.
+        /// </summary>
+        public string PathFile {
+            get {
+                return _pathFile;
+            }
+        }
+
+        /// <summary>
+        /// Количество страниц в файле.
+        /// </summary>
+        public int CountSheet {
+            get {
+                return _titleSheet.Count;
+            }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Public методы*/
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="pathFile">Путь к файлу.</param>
+        /// <param name="titleSheet">Наименование страниц.</param>
+        /// <param name="sheetFile">Страницы файла.</param>
+        public ExcelFile(string pathFile, List<string> titleSheet, List<string[,]> sheetFile) {
+            _pathFile = pathFile ?? "";
+            _titleSheet = titleSheet ?? new List<string>();
+            _sheetsFile = sheetFile ?? new List<string[,]>();
+        }
+
+        /// <summary>
+        /// Получить наименование страницы.
+        /// </summary>
+        /// <param name="numberSheet">Номер страницы с 0.</param>
+        /// <returns>Наименование страницы, либо исключение.</returns>
+        public string getTitleSheet(int numberSheet) {
+            if (numberSheet >= _titleSheet.Count) {
+                throw new Exception($"Попытка обратиться к странице {numberSheet + 1} при количестве страниц {_titleSheet.Count}, путь к файлу: {_pathFile}");
+            }
+            return _titleSheet[numberSheet];
+        }
+
+        /// <summary>
+        /// Получить содержимое странциы файла.
+        /// </summary>
+        /// <param name="numberSheet">Номер страницы.</param>
+        /// <returns>Содержимое странциы в виде матрицы ячеек, либо исключение.</returns>
+        public string[,] getSheet(int numberSheet) {
+            if (numberSheet >= _titleSheet.Count) {
+                throw new Exception($"Попытка обратиться к странице {numberSheet + 1} при количестве страниц {_sheetsFile.Count}, путь к файлу: {_pathFile}");
+            }
+            return _sheetsFile[numberSheet];
+        }
+
+    }
+
+    /// <summary>
+    /// Класс для чтения Excel-файла.
+    /// </summary>
     public class ReaderExcelFile
     {
         /// <summary>
         /// Чтение файла.
         /// </summary>
         /// <param name="pathFile">Путь к файлу.</param>
-        /// <returns>Список листов, представленных в виде матрицы ячеек</returns>
-        public List<string[,]> readFile(string pathFile) {
+        /// <returns>Список листов, представленных в виде матрицы ячеек.</returns>
+        public ExcelFile readFile(string pathFile) {
             //Запуск экселя.
             Application application = new Application();
             //Класс работы с файлом.
             Workbook workBook = application.Workbooks.Open(pathFile, 0, true, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             //Список листов.
+            List<string> titleSheet = new List<string>();
             List<string[,]> sheetsFile = new List<string[,]>();
             //Чтение листов.
             for (int iSheet = 1; iSheet <= workBook.Sheets.Count; iSheet++) {
                 //Класс работы с листами.
                 Worksheet workSheet = (Worksheet)workBook.Sheets[iSheet];
+                //Наименование страницы.
+                titleSheet.Add(workSheet.Name);
                 //Последняя заполненная строка в столбце А.
                 int iLastRow = workSheet.Cells[workSheet.Rows.Count, "A"].End[XlDirection.xlUp].Row;
                 //Чтение данных с листа.
@@ -43,7 +132,8 @@ namespace ExportFromExcelToDatabase.Classes
             workBook.Close(false, Type.Missing, Type.Missing);
             //Выход из экселя.
             application.Quit();
-            return sheetsFile;
+            //Возвращение результата.
+            return new ExcelFile(pathFile, titleSheet, sheetsFile);
         }
     }
 }
