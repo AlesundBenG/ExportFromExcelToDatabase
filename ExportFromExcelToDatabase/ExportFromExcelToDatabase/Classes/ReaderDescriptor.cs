@@ -8,130 +8,183 @@ namespace ExportFromExcelToDatabase.Classes
 {
     public class ReaderDescriptor
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Атрибуты*/
 
-        public List<DescriptorObject> read(string descriptor) {
-            List<DescriptorObject> listDescriptor = new List<DescriptorObject>();
-            List<string> objectsPart = splitDescriptorOnObjectsPart(descriptor);
-            for (int i = 0; i < objectsPart.Count; i++) {
-                listDescriptor.Add(getDescriptorObject(objectsPart[i]));
+        //Символы пробелов.
+        private readonly char[] symbolsSpace = new char[] { ' ', '\t' };
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Public методы*/
+
+
+        /// <summary>
+        /// Получить список дескрипторов объектов из строки.
+        /// </summary>
+        /// <param name="descriptor">Строка, в которой содержатся дескрипторы объектов</param>
+        /// <returns>Список дескипторов объектов</returns>
+        public List<DescriptorObject> getListDescriptors(string descriptorText) {
+            List<DescriptorObject> listDescriptors = new List<DescriptorObject>();
+            int currentPosition = 0;
+            while (currentPosition < descriptorText.Length) {
+                currentPosition = goWhileMeetThoseSymbols(descriptorText, currentPosition, symbolsSpace);
+                if (currentPosition == -1) {
+                    break;
+                }
+                string descriptorObjectText = getObjectPath(descriptorText, currentPosition);
+                DescriptorObject descriptorObject = getDescriptorObject(descriptorObjectText);
+                listDescriptors.Add(descriptorObject);
+                currentPosition = currentPosition + descriptorObjectText.Length;
             }
-            return listDescriptor;
+            return listDescriptors;
         }
 
-        /// <param name="objectsPart">Pattert part: <tag>...</tag></param>
+        /// <summary>
+        /// Сформировать дескриптор объекта из строки, которая является дескриптором в символьном представлении.
+        /// </summary>
+        /// <param name="objectsPart">Символьное представление дескриптора объекта, которое имеет следующий шаблон: <nameTag>...Tokens...</nameTag>.</param>
+        /// <returns>Дескриптор объекта, сформированный из символьного представления</returns>
         private DescriptorObject getDescriptorObject(string objectsPart) {
-            DescriptorObject descriptor = new DescriptorObject();
-            descriptor.NameObject = objectsPart.Substring(1, objectsPart.IndexOf('>') - 1);
-            List<string> tokens = splitObjectsPartOnToken(objectsPart.Replace($"<{descriptor.NameObject}>", "").Replace($"</{descriptor.NameObject}>", ""));
-            for (int i = 0; i < tokens.Count; i++) {
-                descriptor.addToken(getToken(tokens[i]));
+            DescriptorObject descriptor = new DescriptorObject {
+                NameObject = objectsPart.Substring(1, objectsPart.IndexOf('>') - 1)
+            };
+            char[] symbolsSpace = new char[] { ' ', '\t' }; //Символы пробелов.
+            string clouseTag = $"</{descriptor.NameObject}>";
+            //string objectsPartWithoutTag = objectsPart.Replace($"<{descriptor.NameObject}>", "").Replace($"</{descriptor.NameObject}>", "");
+            //Позиция значащих символов.
+            int currentPosition = goWhileMeetThoseSymbols(objectsPart, descriptor.NameObject.Length + 2, symbolsSpace);
+            while (currentPosition < objectsPart.Length) {
+                currentPosition = goWhileMeetThoseSymbols(objectsPart, currentPosition, symbolsSpace);
+                if (currentPosition == -1) {
+                    break;
+                }
+                //Тег.
+                if (objectsPart[currentPosition] == '<') {
+                    //Конец.
+                    if (objectsPart.Substring(currentPosition, descriptor.NameObject.Length + 3) == clouseTag) {
+                        return descriptor;
+                    }
+                    else {
+                        string nestedObjectText = getObjectPath(objectsPart, currentPosition);
+                        DescriptorObject nestedObject = getDescriptorObject(nestedObjectText);
+                        descriptor.addNestedObject(nestedObject);
+                        currentPosition = currentPosition + nestedObjectText.Length;
+                    }
+                }
+                //Токен.
+                else {
+                    string tokenPath = getTokenPath(objectsPart, currentPosition);
+                    Token tokenObject = getToken(tokenPath);
+                    descriptor.addToken(tokenObject);
+                    currentPosition = currentPosition + tokenPath.Length;
+                }
             }
             return descriptor;
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /// <summary>
+        /// Получение токена из строки определенного паттерна.
+        /// </summary>
+        /// <param name="pathToken">Строка с паттерном: Имя токена : значение; Имя и значение без пробелов, иначе нужно заключать в кавычки.</param>
+        /// <returns>Токен: Имя и значение.</returns>
         private Token getToken(string pathToken) {
-            int startPosition = getPositionAfterSpace(pathToken, 0);
-            int endPosition = getPositionNextSpace(pathToken, startPosition) - 1;
-            string name = pathToken.Substring(startPosition, endPosition - startPosition - 1);
-            string value = getStringBetweenQuotation(pathToken, endPosition);
+            string name, value; //Получаемые значения.
+            int startPosition, endPosition; //Вспомогательные указатели.
+            char[] symbolsSpace = new char[] { ' ', '\t'}; //Символы пробелов.
+            char[] symbolsBetweenNameAndValue = new char[] { ' ', ':', '\t' }; //Символы, которые могут встретиться между именем токена и значением.
+            //Проход до значащих символов.
+            startPosition = goWhileMeetThoseSymbols(pathToken, 0, symbolsSpace);
+            //Имя токена одним словом.
+            if (pathToken[startPosition] != '\"') {
+                endPosition = goWhileNotMeetThoseSymbols(pathToken, startPosition, symbolsSpace);
+                name = pathToken.Substring(startPosition, endPosition - startPosition + 1);
+            }
+            //Имя токена в несколько слов.
+            else {
+                name = getStringBetweenQuotation(pathToken, startPosition);
+                endPosition = startPosition + name.Length + 2; //+2 Это квычки.
+            }
+            //Проход до значащих символов после имени токена.
+            startPosition = endPosition;
+            startPosition = goWhileMeetThoseSymbols(pathToken, startPosition, symbolsBetweenNameAndValue);
+            //Значение токена одним словом.
+            if (pathToken[startPosition] != '\"') {
+                endPosition = goWhileNotMeetThoseSymbols(pathToken, startPosition, symbolsSpace);
+                value = pathToken.Substring(startPosition, endPosition - startPosition + 1);
+            }
+            //Имя токена в несколько слов.
+            else {
+                value = getStringBetweenQuotation(pathToken, startPosition);
+            }
             return new Token() {
                 Name = name,
                 Value = value
             };
         }
 
-        private List<string> splitObjectsPartOnToken(string objectsPath) {
-            List<string> listPart = new List<string>();
-            string part = "";
-            int startPosition = 0;
-            int currentPosition = 0;
-            bool betweenQuotation = false;
-            while (currentPosition < objectsPath.Length) {
-                if (objectsPath[currentPosition] == '\"') {
-                    betweenQuotation = !betweenQuotation;
+        /// <summary>
+        /// Идти по строке, пока встречаются указанные символы.
+        /// </summary>
+        /// <param name="text">Исходная строка</param>
+        /// <param name="startPosition">Начальна позиция</param>
+        /// <param name="symbol">Массив символов</param>
+        /// <returns>Позиция, на которой встречен иной символ. Если дошли до конца строки, то  -1</returns>
+        private int goWhileMeetThoseSymbols(string text, int startPosition, char[] symbol) {
+            int currentPosition = startPosition;
+            bool foundSymbol;
+            while (currentPosition < text.Length) {
+                foundSymbol = false;
+                for (int i = 0; i < symbol.Length; i++) {
+                    if (text[currentPosition] == symbol[i]) {
+                        currentPosition++;
+                        foundSymbol = true;
+                        break;
+                    }
                 }
-                else if ((objectsPath[currentPosition] == ';') && (!betweenQuotation)) {
-                    part = objectsPath.Substring(startPosition, currentPosition - startPosition + 1);
-                    listPart.Add(part);
-                    startPosition = currentPosition + 1;
+                if (!foundSymbol) {
+                    return currentPosition;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Идти по строке, пока не встретются указанные символы.
+        /// </summary>
+        /// <param name="text">Исходная строка</param>
+        /// <param name="startPosition">Начальна позиция</param>
+        /// <param name="symbol">Массив символов</param>
+        /// <returns>Позиция, на которой встречен один из указанных символов. Если дошли до конца строки, то  -1</returns>
+        private int goWhileNotMeetThoseSymbols(string text, int startPosition, char[] symbol) {
+            int currentPosition = startPosition;
+            while (currentPosition < text.Length) {
+                for (int i = 0; i < symbol.Length; i++) {
+                    if (text[currentPosition] == symbol[i]) {
+                        return currentPosition;
+                    }
                 }
                 currentPosition++;
             }
-            part = objectsPath.Substring(startPosition, currentPosition - startPosition);
-            if (part.Replace('\t', ' ').Replace(" ", "").Length > 0) {
-                listPart.Add(part);
-            }
-            return listPart;
-        }
-
-        private List<string> splitDescriptorOnObjectsPart(string descriptor) {
-            List<string> listPart = new List<string>();
-            string tag;
-            int startPosition = 0;
-            int endTag = 0;
-            int endPosition = 0;
-            while (startPosition < descriptor.Length) {
-                startPosition = getPositionAfterSpace(descriptor, startPosition);
-                if (startPosition == -1) {
-                    break;
-                }
-                //Read tag.
-                if (descriptor[startPosition] != '<') {
-                    throw new Exception($"ReaderDescriptor: the \"<\" was expected but was found {descriptor[startPosition]} (position {startPosition})");
-                }
-                endTag = descriptor.IndexOf('>', startPosition);
-                if (endTag == -1) {
-                    throw new Exception($"ReaderDescriptor: not found the \">\"");
-                }
-                else {
-                    tag = descriptor.Substring(startPosition + 1, endTag - startPosition - 1);
-                }
-                //Search end object's part.
-                endPosition = descriptor.IndexOf($"</{tag}>", endTag + 1) + tag.Length + 3;
-                if (endPosition == -1) {
-                    throw new Exception($"ReaderDescriptor: not found the <\\{tag}>");
-                }
-                else {
-                    listPart.Add(descriptor.Substring(startPosition, endPosition - startPosition));
-                    startPosition = endPosition;
-                }
-            }
-            return listPart;
-        }
-
-
-        private int getPositionAfterSpace(string text, int startPosition) {
-            int currentPosition = startPosition;
-            while (currentPosition < text.Length) {
-                if ((text[currentPosition] == ' ') || (text[currentPosition] == '\t')) {
-                    currentPosition++;
-                }
-                else {
-                    return currentPosition;
-                }
-            }
             return -1;
         }
 
-        private int getPositionNextSpace(string text, int startPosition) {
-            int currentPosition = startPosition;
-            while (currentPosition < text.Length) {
-                if ((text[currentPosition] == ' ') || (text[currentPosition] == '\t')) {
-                    return currentPosition;
-                }
-                else {
-                    currentPosition++;
-                }
-            }
-            return -1;
-        }
-
+        /// <summary>
+        /// Получить строку между кавычками, стоящими после начальной позиции.
+        /// </summary>
+        /// <param name="text">Текст</param>
+        /// <param name="startPosition">Начальная позиция</param>
+        /// <returns>Строка между кавычками, либо исключение, если одна из кавычек не была найдена.</returns>
         private string getStringBetweenQuotation(string text, int startPosition) {
             int currentPosition = startPosition;
             int firstQuotationPosition = currentPosition;
             bool foundFirst = false;
             while (currentPosition < text.Length) {
-                if (text[currentPosition] == '\"')  {
+                if (text[currentPosition] == '\"') {
                     if ((text[currentPosition - 1] != '\\') && (!foundFirst)) {
                         foundFirst = true;
                         firstQuotationPosition = currentPosition;
@@ -143,11 +196,73 @@ namespace ExportFromExcelToDatabase.Classes
                 currentPosition++;
             }
             if (foundFirst) {
-                throw new Exception($"Not found second quotation: \"{text.Substring(firstQuotationPosition, text.Length - firstQuotationPosition)}");
+                throw new Exception($"ReaderDescriptor: Не найдена вторая кавычка: \"{text.Substring(firstQuotationPosition, text.Length - firstQuotationPosition)}");
             }
             else {
-                throw new Exception($"Not found first quotation: \"{text.Substring(startPosition, text.Length - startPosition)}");
+                throw new Exception($"ReaderDescriptor: Не найдена первая кавычка: \"{text.Substring(startPosition, text.Length - startPosition)}");
             }
         }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /// <summary>
+        /// Возвращение токена в символьном представлении.
+        /// </summary>
+        /// <param name="objectsPath">Дескриптор объекта в символьном представлении</param>
+        /// <param name="startPosition">Начальная позиция токена</param>
+        /// <returns>Токен в символьном представлении</returns>
+        private string getTokenPath(string objectsPath, int startPosition) {
+            int currentPosition = startPosition;
+            bool betweenQuotation = false;
+            while (currentPosition < objectsPath.Length) {
+                if (objectsPath[currentPosition] == '\"') {
+                    betweenQuotation = !betweenQuotation;
+                }
+                else if ((objectsPath[currentPosition] == ';') && (!betweenQuotation)) {
+                    return objectsPath.Substring(startPosition, currentPosition - startPosition + 1);
+                }
+                else if ((objectsPath[currentPosition] == '<') && (!betweenQuotation)) {
+                    throw new Exception("ReaderDescriptor: Не найден символ \";\" после объявления свойства.");
+                }
+                currentPosition++;
+            }
+            throw new Exception("ReaderDescriptor: Не найден символ \";\" после объявления свойства.");
+        }
+
+        /// <summary>
+        /// Возвращение объекта в символьном представлении.
+        /// </summary>
+        /// <param name="descriptor">Дескриптор всех объектов.</param>
+        /// <param name="startPosition">Начальная позиция.</param>
+        /// <returns></returns>
+        private string getObjectPath(string descriptor, int startPosition) {
+            int currentPosition = goWhileMeetThoseSymbols(descriptor, startPosition, symbolsSpace);
+            string tag;
+            //Чтение тега.
+            if (descriptor[startPosition] != '<') {
+                throw new Exception($"ReaderDescriptor: the \"<\" was expected but was found {descriptor[currentPosition]} (position {currentPosition})");
+            }
+            int endTagPosition = descriptor.IndexOf('>', startPosition);
+            if (endTagPosition == -1) {
+                throw new Exception($"ReaderDescriptor: не найден парный символ \">\"");
+            }
+            else {
+                tag = descriptor.Substring(startPosition + 1, endTagPosition - startPosition - 1);
+            }
+            //Поиск закрывающего тега.
+            endTagPosition = descriptor.IndexOf($"</{tag}>", endTagPosition + 1) + tag.Length + 3;
+            if (endTagPosition == -1) {
+                throw new Exception($"ReaderDescriptor: не найден закрывающий тег <\\{tag}>");
+            }
+            else {
+                return descriptor.Substring(startPosition, endTagPosition - startPosition);
+            }
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+
     }
 }
