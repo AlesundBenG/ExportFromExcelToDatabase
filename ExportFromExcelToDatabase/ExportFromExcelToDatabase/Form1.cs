@@ -22,7 +22,7 @@ namespace ExportFromExcelToDatabase
             string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\test.txt");
             string file = String.Join(" ", linesFile);
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();
-            readerDescriptor.read(file);
+            readerDescriptor.getListDescriptors(file);
         }
     }
 }
