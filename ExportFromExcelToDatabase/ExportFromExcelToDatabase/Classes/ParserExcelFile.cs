@@ -16,10 +16,10 @@ namespace ExportFromExcelToDatabase.Classes
     ///    SHEET_NUMBER: номер страницы, отсчет с единицы (Если не указано, то номер не учиытвается)
     ///    SHEET_NAME: название странциы (Если не указано, то имя не учиытвается)
     ///    SECTION_NAME: раздел на странице (для уточнения, если несколько полей с одним и тем же текстом)
-    ///    SECTION_BOTTOM: (1 - поиск от раздела до нижнего края, 0 - поиск с верхнего края до нижнего края, изначально 0)
-    ///    SECTION_UP: (1 - поиск с верхнего края и до раздела, 0 - поиск с верхнего края до нижнего края, изначально 0)
-    ///    SECTION_LEFT: (1 - поиск с левого края и до раздела, 0 - поиск с левого края до правого края, изначально 0)
-    ///    SECTION_RIGHT: (1 - поиск от раздела и до правого края, 0 - поиск с левого края до правого края, изначально 0)
+    ///    SECTION_BOTTOM: (1 - поиск от раздела до нижнего края)
+    ///    SECTION_UP: (1 - поиск с верхнего края и до раздела)
+    ///    SECTION_LEFT: (1 - поиск с левого края и до раздела)
+    ///    SECTION_RIGHT: (1 - поиск от раздела и до правого края)
     ///    FIELD: текст ячейки, относительно которой ищется значение.
     ///    CODE: условный код этого значения (для идентификации этого значения).
     ///    OFFEST_ROW: смещение по строке относительно ячейки с текстом (начальное значение 0)
@@ -55,7 +55,13 @@ namespace ExportFromExcelToDatabase.Classes
             public int lineFrom, columnFrom, lineTo, columnTo;
         }
 
-         public void parser(List<DescriptorObject> descriptors, ExcelFile file) {
+        /// <summary>
+        /// Получить данные из файла по дескриптору.
+        /// </summary>
+        /// <param name="descriptors">Дескриптор.</param>
+        /// <param name="file">Файл, представленный списком страниц в виде матрицы ячеек.</param>
+        /// <returns>Список одиночных значений и список таблиц.</returns>
+        public ParserResult parser(List<DescriptorObject> descriptors, ExcelFile file) {
             ParserResult result = new ParserResult();
             result.singleValue = new List<Token>();
             result.table = new List<System.Data.DataTable>();
@@ -69,6 +75,7 @@ namespace ExportFromExcelToDatabase.Classes
 
                 }
             }
+            return result;
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,8 +108,9 @@ namespace ExportFromExcelToDatabase.Classes
             int OFFEST_ROW = ((getValueToken(descriptor, "OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_ROW"));
             int OFFEST_COLUMN = ((getValueToken(descriptor, "OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_COLUMN"));
             for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
-                for (int iLine = 0; iLine < sheetForSearch[iSheet].GetLength(0); iLine++) {
-                    for (int iColumn = 0; iColumn < sheetForSearch[iSheet].GetLength(1); iColumn++) {
+                CoordinatesPlace coordinatesPlace = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[iSheet]);
+                for (int iLine = coordinatesPlace.lineFrom; iLine < coordinatesPlace.lineTo; iLine++) {
+                    for (int iColumn = coordinatesPlace.columnFrom; iColumn < coordinatesPlace.columnTo; iColumn++) {
                         if (sheetForSearch[iSheet][iLine, iColumn] == FIELD) {
                             return sheetForSearch[iSheet][iLine + OFFEST_ROW, iColumn + OFFEST_COLUMN];
                         }

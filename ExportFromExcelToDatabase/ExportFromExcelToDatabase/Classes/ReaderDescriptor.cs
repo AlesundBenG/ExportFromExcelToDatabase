@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ExportFromExcelToDatabase.Classes
 {
+    /// <summary>
+    /// Класс для чтения дескриптора Excel-файла.
+    /// </summary>
     public class ReaderDescriptor
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +52,6 @@ namespace ExportFromExcelToDatabase.Classes
             DescriptorObject descriptor = new DescriptorObject {
                 NameObject = objectsPart.Substring(1, objectsPart.IndexOf('>') - 1)
             };
-            char[] symbolsSpace = new char[] { ' ', '\t' }; //Символы пробелов.
             string clouseTag = $"</{descriptor.NameObject}>";
             //string objectsPartWithoutTag = objectsPart.Replace($"<{descriptor.NameObject}>", "").Replace($"</{descriptor.NameObject}>", "");
             //Позиция значащих символов.
@@ -95,7 +97,6 @@ namespace ExportFromExcelToDatabase.Classes
         private Token getToken(string pathToken) {
             string name, value; //Получаемые значения.
             int startPosition, endPosition; //Вспомогательные указатели.
-            char[] symbolsSpace = new char[] { ' ', '\t'}; //Символы пробелов.
             char[] symbolsBetweenNameAndValue = new char[] { ' ', ':', '\t' }; //Символы, которые могут встретиться между именем токена и значением.
             //Проход до значащих символов.
             startPosition = goWhileMeetThoseSymbols(pathToken, 0, symbolsSpace);
