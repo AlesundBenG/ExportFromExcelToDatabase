@@ -12,6 +12,9 @@ namespace ExportFromExcelToDatabase.Classes
     /// </summary>
     public class ReaderExcelFile
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Public методы*/
+
         /// <summary>
         /// Чтение файла.
         /// </summary>
@@ -39,7 +42,7 @@ namespace ExportFromExcelToDatabase.Classes
                 string[,] sheet = new string[arrData.GetLength(0), arrData.GetLength(1)];
                 for (int i = 1; i < sheet.GetLength(0); i++) {
                     for (int j = 1; j < sheet.GetLength(1); j++) {
-                        sheet[i - 1, j - 1] = arrData[i, j].ToString() ?? "";
+                        sheet[i - 1, j - 1] = (arrData[i, j] ?? "").ToString() ;
                     }
                 }
                 //Добавление листа в список листов.

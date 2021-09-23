@@ -19,10 +19,17 @@ namespace ExportFromExcelToDatabase
 
         private void Form1_Load(object sender, EventArgs e) {
             ReaderTextFile readerFile = new ReaderTextFile();
+            ReaderExcelFile readerExcelFile = new ReaderExcelFile();
+
             string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\test.txt");
+            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\batas\\Desktop\\test.xls");
             string file = String.Join(" ", linesFile);
+
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();
-            readerDescriptor.getListDescriptors(file);
+            List<DescriptorObject> descriptors = readerDescriptor.getListDescriptors(file);
+
+            ParserExcelFile parserExcelFile = new ParserExcelFile();
+            parserExcelFile.parser(descriptors, excelFile);
         }
     }
 }

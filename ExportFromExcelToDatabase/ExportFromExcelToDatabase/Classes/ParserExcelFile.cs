@@ -56,9 +56,14 @@ namespace ExportFromExcelToDatabase.Classes
         }
 
          public void parser(List<DescriptorObject> descriptors, ExcelFile file) {
+            ParserResult result = new ParserResult();
+            result.singleValue = new List<Token>();
+            result.table = new List<System.Data.DataTable>();
             for (int i = 0; i < descriptors.Count; i++) {
                 if (descriptors[i].NameObject == "singleValue") {
-                    getSingleValue(descriptors[i], file);
+                    string name = getValueToken(descriptors[i], "CODE");
+                    string value = getSingleValue(descriptors[i], file);
+                    result.singleValue.Add(new Token() { Name = name, Value = value});
                 }
                 else if (descriptors[i].NameObject == "table") {
 

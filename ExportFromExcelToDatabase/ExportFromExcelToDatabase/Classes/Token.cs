@@ -6,13 +6,28 @@ using System.Threading.Tasks;
 
 namespace ExportFromExcelToDatabase.Classes
 {
+    /// <summary>
+    /// Простое представление значений (Имя - значение).
+    /// </summary>
     public class Token
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Атрибуты*/
+        
+        /// <summary>
+        /// Имя токена.
+        /// </summary>
         private string _name;
+        /// <summary>
+        /// Значение токена.
+        /// </summary>
         private string _value;
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Свойства*/
+
         /// <summary>
-        /// Remark: Null replaced on empty string
+        /// Имя токена. Примечание: NULL заменяется на пустую строку.
         /// </summary>
         public string Name {
             get {
@@ -23,7 +38,7 @@ namespace ExportFromExcelToDatabase.Classes
             }
         }
         /// <summary>
-        /// Remark: Null replaced on empty string
+        /// Значение токена. Примечание: NULL заменяется на пустую строку.
         /// </summary>
         public string Value {
             get {
