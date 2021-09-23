@@ -58,7 +58,7 @@ namespace ExportFromExcelToDatabase.Classes
          public void parser(List<DescriptorObject> descriptors, ExcelFile file) {
             for (int i = 0; i < descriptors.Count; i++) {
                 if (descriptors[i].NameObject == "singleValue") {
-
+                    getSingleValue(descriptors[i], file);
                 }
                 else if (descriptors[i].NameObject == "table") {
 
@@ -66,6 +66,8 @@ namespace ExportFromExcelToDatabase.Classes
             }
         }
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Privat методы*/
 
         /// <summary>
         /// Получить из списка токенов значение токена по имени.
@@ -82,19 +84,27 @@ namespace ExportFromExcelToDatabase.Classes
             return null;
         }
 
+        /// <summary>
+        /// Получить значение из файла по дескриптору.
+        /// </summary>
+        /// <param name="descriptor">Дескриптор.</param>
+        /// <param name="file">Файл.</param>
+        /// <returns>Значение.</returns>
         private string getSingleValue(DescriptorObject descriptor, ExcelFile file) {
             List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
-            /*
-            string SECTION_NAME = getValueToken(descriptor, "SECTION_NAME");
-            bool SECTION_BOTTOM = ((getValueToken(descriptor, "SECTION_BOTTOM") ?? "0") == "0") ? false : true;
-            bool SECTION_UP = ((getValueToken(descriptor, "SECTION_UP") ?? "0") == "0") ? false : true;
-            bool SECTION_LEFT = ((getValueToken(descriptor, "SECTION_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_RIGHT = ((getValueToken(descriptor, "SECTION_RIGHT") ?? "0") == "0") ? false : true;
             string FIELD = getValueToken(descriptor, "FIELD");
-            string CODE = getValueToken(descriptor, "CODE");
             int OFFEST_ROW = ((getValueToken(descriptor, "OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_ROW"));
             int OFFEST_COLUMN = ((getValueToken(descriptor, "OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_COLUMN"));
-            */
+            for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
+                for (int iLine = 0; iLine < sheetForSearch[iSheet].GetLength(0); iLine++) {
+                    for (int iColumn = 0; iColumn < sheetForSearch[iSheet].GetLength(1); iColumn++) {
+                        if (sheetForSearch[iSheet][iLine, iColumn] == FIELD) {
+                            return sheetForSearch[iSheet][iLine + OFFEST_ROW, iColumn + OFFEST_COLUMN];
+                        }
+                    }
+                }
+            }
+            return "";
         }
 
         /// <summary>
@@ -135,7 +145,7 @@ namespace ExportFromExcelToDatabase.Classes
                         return sheet;
                     }
                 }
-                throw new Exception($"ParserExcelFile: Не найдена страница с именем {SHEET_NAME} для {descriptor.NameObject} с кодом {getValueToken(descriptor, "CODE")});
+                throw new Exception($"ParserExcelFile: Не найдена страница с именем {SHEET_NAME} для {descriptor.NameObject} с кодом {getValueToken(descriptor, "CODE")}");
             }
             throw new Exception("ParserExcelFile: не предусмотрен вариант при выборе страниц для поиска");
         }
@@ -147,22 +157,23 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="sheet">Страница.</param>
         /// <returns>Координаты места. Если все координаты 0, то не найдена секция, если она нужна.</returns>
         private CoordinatesPlace getCoordinatesPlaceInSneet(DescriptorObject descriptor, string[,] sheet) {
+            CoordinatesPlace coordinates = new CoordinatesPlace() {lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0};
             //Проверка наличия секции для поиска.
             string SECTION_NAME = getValueToken(descriptor, "SECTION_NAME");
             if (SECTION_NAME == null) {
-                return new CoordinatesPlace() {
-                    lineFrom = 0, columnFrom = 0, lineTo = sheet.GetLength(0), columnTo = sheet.GetLength(1),
-                };
+                coordinates.lineTo = sheet.GetLength(0);
+                coordinates.columnTo = sheet.GetLength(1);
+                return coordinates;
             }
             //Поиск самой секции.
-            CoordinatesPlace coordinateSection = new CoordinatesPlace();
             bool found = false;
+            int tileSectionLine = 0, titleSectionColumn = 0;
             for (int i = 0; i < sheet.GetLength(0); i++) {
                 for (int j = 0; j < sheet.GetLength(1); j++) {
                     if (sheet[i, j] == SECTION_NAME) {
                         found = true;
-                        coordinateSection.lineFrom = i;
-                        coordinateSection.columnFrom = j;
+                        tileSectionLine = i;
+                        titleSectionColumn = j;
                         break;
                     }
                 }
@@ -171,16 +182,42 @@ namespace ExportFromExcelToDatabase.Classes
                 }
             }
             if (!found) {
-                return new CoordinatesPlace() {
-                    lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0,
-                };
+                return coordinates; //Все значения 0.
             }
             //Высчитывание области относительно флагов.
             bool SECTION_BOTTOM = ((getValueToken(descriptor, "SECTION_BOTTOM") ?? "0") == "0") ? false : true;
-            bool SECTION_UP = ((getValueToken(descriptor, "SECTION_UP") ?? "0") == "0") ? false : true;
-            bool SECTION_LEFT = ((getValueToken(descriptor, "SECTION_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_RIGHT = ((getValueToken(descriptor, "SECTION_RIGHT") ?? "0") == "0") ? false : true;
-
+            bool SECTION_UP     = ((getValueToken(descriptor, "SECTION_UP") ?? "0") == "0") ? false : true;
+            bool SECTION_LEFT   = ((getValueToken(descriptor, "SECTION_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_RIGHT  = ((getValueToken(descriptor, "SECTION_RIGHT") ?? "0") == "0") ? false : true;
+            if (SECTION_BOTTOM) {
+                coordinates.lineFrom = tileSectionLine;
+                coordinates.lineTo = sheet.GetLength(0);
+            }
+            if (SECTION_UP) {
+                if (SECTION_BOTTOM) {
+                    coordinates.lineFrom = 0;
+                }
+                else {
+                    coordinates.lineFrom = 0;
+                    coordinates.lineTo = tileSectionLine;
+                }
+            }
+            if (SECTION_LEFT) {
+                coordinates.columnFrom = 0;
+                coordinates.columnTo = titleSectionColumn;
+            }
+            if (SECTION_RIGHT) {
+                if (SECTION_LEFT) {
+                    coordinates.columnTo = sheet.GetLength(1);
+                }
+                else {
+                    coordinates.lineFrom = titleSectionColumn;
+                    coordinates.lineTo = sheet.GetLength(1);
+                }
+            }
+            return coordinates;
         }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }
