@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\DescriptorObject.cs" />
+    <Compile Include="Classes\ExcelFile.cs" />
     <Compile Include="Classes\ParserExcelFile.cs" />
     <Compile Include="Classes\ReaderExcelFile.cs" />
     <Compile Include="Classes\Token.cs" />
