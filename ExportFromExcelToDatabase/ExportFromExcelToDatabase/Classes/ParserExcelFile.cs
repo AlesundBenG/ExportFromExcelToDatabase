@@ -48,13 +48,24 @@ namespace ExportFromExcelToDatabase.Classes
     /// </summary>
     public class ParserExcelFile
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Структуры.*/
+
         /// <summary>
         /// Координаты места.
         /// </summary>
         private struct CoordinatesPlace
         {
-            public int lineFrom, columnFrom, lineTo, columnTo;
+            public int lineFrom;
+            public int columnFrom;
+            public int lineTo;
+            public int columnTo;
         }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Public методы*/
+
 
         /// <summary>
         /// Получить данные из файла по дескриптору.
@@ -63,9 +74,9 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="file">Файл, представленный списком страниц в виде матрицы ячеек.</param>
         /// <returns>Список одиночных значений и список таблиц.</returns>
         public ParserResult parser(List<DescriptorObject> descriptors, ExcelFile file) {
-            ParserResult result = new ParserResult {
-                singleValue = new List<Token>(),
-                table = new List<DataTable>()
+            ParserResult result = new ParserResult { 
+                singleValue = new List<Token>(), 
+                table = new List<DataTable>() 
             };
             for (int i = 0; i < descriptors.Count; i++) {
                 switch(descriptors[i].NameObject) {
@@ -81,7 +92,6 @@ namespace ExportFromExcelToDatabase.Classes
             }
             return result;
         }
-
 
         /// <summary>
         /// Получить значение из файла по дескриптору.
@@ -146,6 +156,16 @@ namespace ExportFromExcelToDatabase.Classes
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Privat методы*/
 
+
+        /// <summary>
+        /// Заполнение таблицы.
+        /// </summary>
+        /// <param name="headerLine">Номер строки с заголовком.</param>
+        /// <param name="finalLine">Номер последней строки.</param>
+        /// <param name="sheet">Страница.</param>
+        /// <param name="nameColumn">Коды столбцов.</param>
+        /// <param name="indexColumn">В каком столбце находятся данные столбцы на странице.</param>
+        /// <returns>Таблица.</returns>
         private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> nameColumn, List<int> indexColumn) {
             DataTable table = new DataTable();
             for (int i = 0; i < nameColumn.Count; i++) {
@@ -264,40 +284,6 @@ namespace ExportFromExcelToDatabase.Classes
         }
 
         /// <summary>
-        /// Получение координат таблицы.
-        /// </summary>
-        /// <param name="descriptor">Дескриптор объекта.</param>
-        /// <param name="sheet">Страница.</param>
-        /// <returns>Координаты таблицы. Если все координаты 0, то не найдена таблица.</returns>
-        private CoordinatesPlace getCoordinatesTable(DescriptorObject descriptor, string[,] sheet) {
-            //Получение названия столбцов.
-            List<string> nameColumns = new List<string>();
-            List<string> finalLine= new List<string>();
-            for (int i = 0; i < descriptor.CountNestedObject; i++) {
-                DescriptorObject column = descriptor.getNestedObject(i);
-                nameColumns.Add(column.getValueToken("NAME"));
-                finalLine.Add(column.getValueToken("FINAL_CELL"));
-            }
-            //Если нет столбцов.
-            if (nameColumns.Count == 0) {
-                return new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
-            }
-            CoordinatesPlace coordinates = getCoordinatesPlaceInSneet(descriptor, sheet);
-
-            for (int iLine = coordinates.lineFrom; iLine < coordinates.lineTo; iLine++) {
-                for (int iColumn = coordinates.columnFrom; iColumn < coordinates.columnTo; iColumn++) {
-                    if (nameColumns[0] == sheet[iLine, iColumn]) {
-                        List<int> indexColumn = getIndexColumn(nameColumns, sheet, iLine);
-                        if (indexColumn != null) {
-                            int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheet);
-                        }
-                    }
-                }
-            }
-            return coordinates;
-        }
-
-        /// <summary>
         /// Каждому столбцу из списка подставляется номер столбца на листе.
         /// </summary>
         /// <param name="nameColumns">Названия столбцов для поиска.</param>
@@ -322,10 +308,20 @@ namespace ExportFromExcelToDatabase.Classes
             return indexColumn;
         }
 
+        /// <summary>
+        /// Получить номер последней строки таблицы.
+        /// </summary>
+        /// <param name="headerLine">Номер строки с заголовком.</param>
+        /// <param name="indexColumn">Расположения столбцов на странице.</param>
+        /// <param name="finalLine">Шаблон последней строки (какие значения должны быть, чтобы считать эту строку последней).</param>
+        /// <param name="sheet">Страница</param>
+        /// <returns>Номер последней строки таблицы.</returns>
         private int getIndexFinalLine(int headerLine, List<int> indexColumn, List<string> finalLine, string[,] sheet) {
             for (int i = headerLine; i < sheet.GetLength(0); i++) {
                 bool fullEqually = true;
                 for (int j = 0; j < indexColumn.Count; j++) {
+                    //NULL считаем совпадением, так как, если не указано, какое значение должно быть, то не важно
+                    //какое значение должно быть, чтобы считать эту строку последней.
                     if (finalLine[j] != null) {
                         if (sheet[i, indexColumn[j]] != finalLine[j]) {
                             fullEqually = false;
