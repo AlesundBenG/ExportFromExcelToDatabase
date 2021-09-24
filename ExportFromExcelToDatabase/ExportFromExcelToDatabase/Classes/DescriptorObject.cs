@@ -147,5 +147,19 @@ namespace ExportFromExcelToDatabase.Classes
                 throw new ArgumentException($"Class DescriptorObject: попытка получить {index} вложенный объект объекта {_name}, когда количество объектов {_listNestedObject.Count}");
             }
         }
+
+        /// <summary>
+        /// Получить значение атбриута объекта по коду атрибута.
+        /// </summary>
+        /// <param name="nameToken">Имя атрибута.</param>
+        /// <returns>Значение атрибута, либо NULl, если такого атрибута нет.</returns>
+        private string getValueToken(string nameToken) {
+            for (int i = 0; i < _listToken.Count; i++) {
+                if (_listToken[i].Name == nameToken) {
+                    return _listToken[i].Value;
+                }
+            }
+            return null;
+        }
     }
 }

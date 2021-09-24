@@ -21,8 +21,8 @@ namespace ExportFromExcelToDatabase
             ReaderTextFile readerFile = new ReaderTextFile();
             ReaderExcelFile readerExcelFile = new ReaderExcelFile();
 
-            string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\test.txt");
-            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\batas\\Desktop\\test.xls");
+            string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\bnl\\Desktop\\test.txt");
+            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\bnl\\Desktop\\test.xls");
             string file = String.Join(" ", linesFile);
 
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();

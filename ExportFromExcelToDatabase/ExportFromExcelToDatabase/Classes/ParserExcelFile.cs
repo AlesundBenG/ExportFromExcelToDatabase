@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data; //Для использования класса DataTable.
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,10 +32,10 @@ namespace ExportFromExcelToDatabase.Classes
     ///    SHEET_NUMBER: номер страницы (Если не указано, то номер не учиытвается)
     ///    SHEET_NAME: название странциы (Если не указано, то имя не учиытвается)
     ///    SECTION_NAME: раздел на странице (для уточнения, если несколько таблиц с одними и теми же столбцами)
-    ///    SECTION_BOTTOM: (1 - поиск от раздела до нижнего края, 0 - поиск с верхнего края до нижнего края, изначально 0)
-    ///    SECTION_UP: (1 - поиск с верхнего края и до раздела, 0 - поиск с верхнего края до нижнего края, изначально 0)
-    ///    SECTION_LEFT: (1 - поиск с левого края и до раздела, 0 - поиск с левого края до правого края, изначально 0)
-    ///    SECTION_RIGHT: (1 - поиск от раздела и до правого края, 0 - поиск с левого края до правого края, изначально 0)
+    ///    SECTION_BOTTOM_LEFT: (1 - поиск в левой нижней части от раздела)
+    ///    SECTION_BOTTOM_RIGHT: (1 - поиск в правой нижней части от раздела)
+    ///    SECTION_UP_LEFT: (1 - поиск в левой верхней части от раздела)
+    ///    SECTION_UP_RIGHT: (1 - поиск в правой верхней части от раздела)
     ///    CODE: условный код этой таблицы (для идентификации этой таблицы).
     /// Тег <column>:
     /// Описание: 
@@ -62,21 +63,65 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="file">Файл, представленный списком страниц в виде матрицы ячеек.</param>
         /// <returns>Список одиночных значений и список таблиц.</returns>
         public ParserResult parser(List<DescriptorObject> descriptors, ExcelFile file) {
-            ParserResult result = new ParserResult();
-            result.singleValue = new List<Token>();
-            result.table = new List<System.Data.DataTable>();
+            ParserResult result = new ParserResult {
+                singleValue = new List<Token>(),
+                table = new List<DataTable>()
+            };
             for (int i = 0; i < descriptors.Count; i++) {
                 if (descriptors[i].NameObject == "singleValue") {
-                    string name = getValueToken(descriptors[i], "CODE");
-                    string value = getSingleValue(descriptors[i], file);
-                    result.singleValue.Add(new Token() { Name = name, Value = value});
+                    result.singleValue.Add(getSingleValue(descriptors[i], file));
                 }
                 else if (descriptors[i].NameObject == "table") {
-
+                    DataTable table = getTable(descriptors[i], file);
+                    table.TableName = getValueToken(descriptors[i], "CODE");
+                    result.table.Add(table);
                 }
             }
             return result;
         }
+
+        /// <summary>
+        /// Получить значение из файла по дескриптору.
+        /// </summary>
+        /// <param name="descriptor">Дескриптор.</param>
+        /// <param name="file">Файл.</param>
+        /// <returns>Токен - код и значение. NULL если ничего не найдено.</returns>
+        public Token getSingleValue(DescriptorObject descriptor, ExcelFile file) {
+            List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
+            string FIELD = getValueToken(descriptor, "FIELD");                     
+            for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
+                CoordinatesPlace coordinatesPlace = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[iSheet]); //Место для поиска относительно параметров дескриптора.
+                for (int iLine = coordinatesPlace.lineFrom; iLine < coordinatesPlace.lineTo; iLine++) {
+                    for (int iColumn = coordinatesPlace.columnFrom; iColumn < coordinatesPlace.columnTo; iColumn++) {
+                        if (sheetForSearch[iSheet][iLine, iColumn] == FIELD) {
+                            int OFFEST_ROW = ((getValueToken(descriptor, "OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_ROW"));          //Смещение значения относительно поля.
+                            int OFFEST_COLUMN = ((getValueToken(descriptor, "OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_COLUMN")); //Смещение значения относительно поля.
+                            return new Token() {
+                                Name = getValueToken(descriptor, "CODE"),
+                                Value = sheetForSearch[iSheet][iLine + OFFEST_ROW, iColumn + OFFEST_COLUMN]
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Получить таблицу из файла по дескриптору.
+        /// </summary>
+        /// <param name="descriptor">Дескриптор.</param>
+        /// <param name="file">Файл.</param>
+        /// <returns>Таблица.</returns>
+        public DataTable getTable(DescriptorObject descriptor, ExcelFile file) {
+            DataTable table = new DataTable();
+            for (int i = 0; i < descriptor.CountNestedObject; i++) {
+                DescriptorObject column = descriptor.getNestedObject(i);
+                table.Columns.Add(getValueToken(column, "CODE"), typeof(string));
+            }
+            return table;
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Privat методы*/
@@ -97,30 +142,6 @@ namespace ExportFromExcelToDatabase.Classes
         }
 
         /// <summary>
-        /// Получить значение из файла по дескриптору.
-        /// </summary>
-        /// <param name="descriptor">Дескриптор.</param>
-        /// <param name="file">Файл.</param>
-        /// <returns>Значение.</returns>
-        private string getSingleValue(DescriptorObject descriptor, ExcelFile file) {
-            List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
-            string FIELD = getValueToken(descriptor, "FIELD");
-            int OFFEST_ROW = ((getValueToken(descriptor, "OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_ROW"));
-            int OFFEST_COLUMN = ((getValueToken(descriptor, "OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_COLUMN"));
-            for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
-                CoordinatesPlace coordinatesPlace = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[iSheet]);
-                for (int iLine = coordinatesPlace.lineFrom; iLine < coordinatesPlace.lineTo; iLine++) {
-                    for (int iColumn = coordinatesPlace.columnFrom; iColumn < coordinatesPlace.columnTo; iColumn++) {
-                        if (sheetForSearch[iSheet][iLine, iColumn] == FIELD) {
-                            return sheetForSearch[iSheet][iLine + OFFEST_ROW, iColumn + OFFEST_COLUMN];
-                        }
-                    }
-                }
-            }
-            return "";
-        }
-
-        /// <summary>
         /// Получить листы для поиска.
         /// </summary>
         /// <param name="descriptor">Дескриптор объекта.</param>
@@ -129,10 +150,9 @@ namespace ExportFromExcelToDatabase.Classes
         private List<string[,]> getSheetForSearch(DescriptorObject descriptor, ExcelFile file) {
             string SHEET_NUMBER = getValueToken(descriptor, "SHEET_NUMBER");
             string SHEET_NAME = getValueToken(descriptor, "SHEET_NAME");
-            //Отбор листов для поиска.
-            List<string[,]> sheet = new List<string[,]>();
+            List<string[,]> sheet = new List<string[,]>(); //Отбор листов для поиска.
             //Не важно, на каких листах.
-            if ((SHEET_NUMBER == null) && (SHEET_NAME == null)) {
+            if ((SHEET_NUMBER == null) && (SHEET_NAME == null)) { //Не важно, на каких листах.
                 for (int i = 0; i < file.CountSheet; i++) {
                     sheet.Add(file.getSheet(i));
                 }
@@ -210,7 +230,7 @@ namespace ExportFromExcelToDatabase.Classes
             }
             if (SECTION_BOTTOM_RIGHT) {
                 coordinates.lineTo = sheet.GetLength(0);
-                coordinates.columnFrom = sheet.GetLength(1);
+                coordinates.columnTo = sheet.GetLength(1);
             }
             if (SECTION_UP_LEFT) {
                 coordinates.lineFrom = 0;
@@ -222,6 +242,64 @@ namespace ExportFromExcelToDatabase.Classes
             }
             return coordinates;
         }
+
+        /// <summary>
+        /// Получение координат таблицы.
+        /// </summary>
+        /// <param name="descriptor">Дескриптор объекта.</param>
+        /// <param name="sheet">Страница.</param>
+        /// <returns>Координаты таблицы. Если все координаты 0, то не найдена таблица.</returns>
+        private CoordinatesPlace getCoordinatesTable(DescriptorObject descriptor, string[,] sheet) {
+            //Получение названия столбцов.
+            List<string> nameColumns = new List<string>();
+            for (int i = 0; i < descriptor.CountNestedObject; i++) {
+                DescriptorObject column = descriptor.getNestedObject(i);
+                nameColumns.Add(getValueToken(column, "NAME"));
+            }
+            //Если нет столбцов.
+            if (nameColumns.Count == 0) {
+                return new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
+            }
+            CoordinatesPlace coordinates = new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
+
+            for (int iLine = coordinates.lineFrom; iLine < coordinates.lineTo; iLine++) {
+                for (int iColumn = coordinates.columnFrom; iColumn < coordinates.columnTo; iColumn++) {
+                    if (nameColumns[0] == sheet[iLine, iColumn]) {
+                        List<int> indexColumn = getIndexColumn(nameColumns, sheet, iLine);
+                        if (indexColumn != null) {
+
+                        }
+                    }
+                }
+            }
+            return coordinates;
+        }
+
+        /// <summary>
+        /// Каждому столбцу из списка подставляется номер столбца на листе.
+        /// </summary>
+        /// <param name="nameColumns">Названия столбцов для поиска.</param>
+        /// <param name="sheet">Страница.</param>
+        /// <param name="iLine">Строка, в которой ищутся названия столбцов.</param>
+        /// <returns>Список столбцов на листе, соответствующий названиям столбцов. NULL, если не найдены все столбцы.</returns>
+        private List<int> getIndexColumn(List<string> nameColumns, string[,] sheet, int iLine) {
+            List<int> indexColumn = new List<int>();
+            for (int i = 0; i < nameColumns.Count; i++) {
+                bool found = false;
+                for (int iColumn = 0; iColumn < sheet.GetLength(1); iColumn++) {
+                    if (nameColumns[i] == sheet[iLine, iColumn]) {
+                        found = true;
+                        indexColumn.Add(iColumn);
+                        break;
+                    }
+                }
+                if (!found) {
+                    return null;
+                }
+            }
+            return indexColumn;
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
