@@ -153,7 +153,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// </summary>
         /// <param name="nameToken">Имя атрибута.</param>
         /// <returns>Значение атрибута, либо NULl, если такого атрибута нет.</returns>
-        private string getValueToken(string nameToken) {
+        public string getValueToken(string nameToken) {
             for (int i = 0; i < _listToken.Count; i++) {
                 if (_listToken[i].Name == nameToken) {
                     return _listToken[i].Value;

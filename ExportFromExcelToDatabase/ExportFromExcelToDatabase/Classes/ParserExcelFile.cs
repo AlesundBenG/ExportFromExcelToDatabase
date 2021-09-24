@@ -73,7 +73,7 @@ namespace ExportFromExcelToDatabase.Classes
                 }
                 else if (descriptors[i].NameObject == "table") {
                     DataTable table = getTable(descriptors[i], file);
-                    table.TableName = getValueToken(descriptors[i], "CODE");
+                    table.TableName = descriptors[i].getValueToken("CODE");
                     result.table.Add(table);
                 }
             }
@@ -88,16 +88,16 @@ namespace ExportFromExcelToDatabase.Classes
         /// <returns>Токен - код и значение. NULL если ничего не найдено.</returns>
         public Token getSingleValue(DescriptorObject descriptor, ExcelFile file) {
             List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
-            string FIELD = getValueToken(descriptor, "FIELD");                     
+            string FIELD = descriptor.getValueToken("FIELD");                     
             for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
                 CoordinatesPlace coordinatesPlace = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[iSheet]); //Место для поиска относительно параметров дескриптора.
                 for (int iLine = coordinatesPlace.lineFrom; iLine < coordinatesPlace.lineTo; iLine++) {
                     for (int iColumn = coordinatesPlace.columnFrom; iColumn < coordinatesPlace.columnTo; iColumn++) {
                         if (sheetForSearch[iSheet][iLine, iColumn] == FIELD) {
-                            int OFFEST_ROW = ((getValueToken(descriptor, "OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_ROW"));          //Смещение значения относительно поля.
-                            int OFFEST_COLUMN = ((getValueToken(descriptor, "OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(getValueToken(descriptor, "OFFEST_COLUMN")); //Смещение значения относительно поля.
+                            int OFFEST_ROW = ((descriptor.getValueToken("OFFEST_ROW") ?? "0") == "0") ? 0 : Convert.ToInt32(descriptor.getValueToken("OFFEST_ROW"));          //Смещение значения относительно поля.
+                            int OFFEST_COLUMN = ((descriptor.getValueToken("OFFEST_COLUMN") ?? "0") == "0") ? 0 : Convert.ToInt32(descriptor.getValueToken("OFFEST_COLUMN")); //Смещение значения относительно поля.
                             return new Token() {
-                                Name = getValueToken(descriptor, "CODE"),
+                                Name = descriptor.getValueToken("CODE"),
                                 Value = sheetForSearch[iSheet][iLine + OFFEST_ROW, iColumn + OFFEST_COLUMN]
                             };
                         }
@@ -117,7 +117,7 @@ namespace ExportFromExcelToDatabase.Classes
             DataTable table = new DataTable();
             for (int i = 0; i < descriptor.CountNestedObject; i++) {
                 DescriptorObject column = descriptor.getNestedObject(i);
-                table.Columns.Add(getValueToken(column, "CODE"), typeof(string));
+                table.Columns.Add(column.getValueToken("CODE"), typeof(string));
             }
             return table;
         }
@@ -127,29 +127,14 @@ namespace ExportFromExcelToDatabase.Classes
         /*Privat методы*/
 
         /// <summary>
-        /// Получить из списка токенов значение токена по имени.
-        /// </summary>
-        /// <param name="tokens">Список токенов.</param>
-        /// <param name="nameToken">Имя токена.</param>
-        /// <returns>Значение токена. NULl, если токен с таким именем не найден.</returns>
-        private string getValueToken(DescriptorObject descriptor, string nameToken) {
-            for (int i = 0; i < descriptor.CountToken; i++) {
-                if (descriptor.getToken(i).Name == nameToken) {
-                    return descriptor.getToken(i).Value;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Получить листы для поиска.
         /// </summary>
         /// <param name="descriptor">Дескриптор объекта.</param>
         /// <param name="file">Страницы файла.</param>
         /// <returns>Страницы для поиска.</returns>
         private List<string[,]> getSheetForSearch(DescriptorObject descriptor, ExcelFile file) {
-            string SHEET_NUMBER = getValueToken(descriptor, "SHEET_NUMBER");
-            string SHEET_NAME = getValueToken(descriptor, "SHEET_NAME");
+            string SHEET_NUMBER = descriptor.getValueToken("SHEET_NUMBER");
+            string SHEET_NAME = descriptor.getValueToken("SHEET_NAME");
             List<string[,]> sheet = new List<string[,]>(); //Отбор листов для поиска.
             //Не важно, на каких листах.
             if ((SHEET_NUMBER == null) && (SHEET_NAME == null)) { //Не важно, на каких листах.
@@ -162,10 +147,10 @@ namespace ExportFromExcelToDatabase.Classes
             if (SHEET_NUMBER != null) {
                 int sheetNumber = Convert.ToInt32(SHEET_NUMBER);
                 if (sheetNumber > sheet.Count) {
-                    throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {getValueToken(descriptor, "CODE")} превосходит количество страниц в файле.");
+                    throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {descriptor.getValueToken("CODE")} превосходит количество страниц в файле.");
                 }
                 if (sheetNumber == 0) {
-                    throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {getValueToken(descriptor, "CODE")} равен 0, но счет страниц осуществляется с 1");
+                    throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {descriptor.getValueToken("CODE")} равен 0, но счет страниц осуществляется с 1");
                 }
                 sheet.Add(file.getSheet(sheetNumber));
                 return sheet;
@@ -178,7 +163,7 @@ namespace ExportFromExcelToDatabase.Classes
                         return sheet;
                     }
                 }
-                throw new Exception($"ParserExcelFile: Не найдена страница с именем {SHEET_NAME} для {descriptor.NameObject} с кодом {getValueToken(descriptor, "CODE")}");
+                throw new Exception($"ParserExcelFile: Не найдена страница с именем {SHEET_NAME} для {descriptor.NameObject} с кодом {descriptor.getValueToken("CODE")}");
             }
             throw new Exception("ParserExcelFile: не предусмотрен вариант при выборе страниц для поиска");
         }
@@ -192,7 +177,7 @@ namespace ExportFromExcelToDatabase.Classes
         private CoordinatesPlace getCoordinatesPlaceInSneet(DescriptorObject descriptor, string[,] sheet) {
             CoordinatesPlace coordinates = new CoordinatesPlace() {lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0};
             //Проверка наличия секции для поиска.
-            string SECTION_NAME = getValueToken(descriptor, "SECTION_NAME");
+            string SECTION_NAME = descriptor.getValueToken("SECTION_NAME");
             if (SECTION_NAME == null) {
                 coordinates.lineTo = sheet.GetLength(0);
                 coordinates.columnTo = sheet.GetLength(1);
@@ -220,10 +205,10 @@ namespace ExportFromExcelToDatabase.Classes
                 return coordinates; //Все значения 0.
             }
             //Высчитывание области относительно флагов.
-            bool SECTION_BOTTOM_LEFT    = ((getValueToken(descriptor, "SECTION_BOTTOM_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_BOTTOM_RIGHT   = ((getValueToken(descriptor, "SECTION_BOTTOM_RIGHT") ?? "0") == "0") ? false : true;
-            bool SECTION_UP_LEFT        = ((getValueToken(descriptor, "SECTION_UP_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_UP_RIGHT       = ((getValueToken(descriptor, "SECTION_UP_RIGHT") ?? "0") == "0") ? false : true;
+            bool SECTION_BOTTOM_LEFT    = ((descriptor.getValueToken("SECTION_BOTTOM_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_BOTTOM_RIGHT   = ((descriptor.getValueToken("SECTION_BOTTOM_RIGHT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_LEFT        = ((descriptor.getValueToken("SECTION_UP_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_RIGHT       = ((descriptor.getValueToken("SECTION_UP_RIGHT") ?? "0") == "0") ? false : true;
             if (SECTION_BOTTOM_LEFT) {
                 coordinates.lineTo = sheet.GetLength(0);
                 coordinates.columnFrom = 0;
@@ -254,7 +239,7 @@ namespace ExportFromExcelToDatabase.Classes
             List<string> nameColumns = new List<string>();
             for (int i = 0; i < descriptor.CountNestedObject; i++) {
                 DescriptorObject column = descriptor.getNestedObject(i);
-                nameColumns.Add(getValueToken(column, "NAME"));
+                nameColumns.Add(column.getValueToken("NAME"));
             }
             //Если нет столбцов.
             if (nameColumns.Count == 0) {
