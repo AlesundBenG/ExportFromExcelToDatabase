@@ -68,17 +68,20 @@ namespace ExportFromExcelToDatabase.Classes
                 table = new List<DataTable>()
             };
             for (int i = 0; i < descriptors.Count; i++) {
-                if (descriptors[i].NameObject == "singleValue") {
-                    result.singleValue.Add(getSingleValue(descriptors[i], file));
-                }
-                else if (descriptors[i].NameObject == "table") {
-                    DataTable table = getTable(descriptors[i], file);
-                    table.TableName = descriptors[i].getValueToken("CODE");
-                    result.table.Add(table);
+                switch(descriptors[i].NameObject) {
+                    case "singleValue": 
+                        result.singleValue.Add(getSingleValue(descriptors[i], file)); 
+                        break;
+                    case "table": 
+                        result.table.Add(getTable(descriptors[i], file)); 
+                        break;
+                    default:
+                        throw new Exception($"ParserExcelFile: Встречен неизвестный тег: {descriptors[i].NameObject}.");
                 }
             }
             return result;
         }
+
 
         /// <summary>
         /// Получить значение из файла по дескриптору.
@@ -114,17 +117,49 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="file">Файл.</param>
         /// <returns>Таблица.</returns>
         public DataTable getTable(DescriptorObject descriptor, ExcelFile file) {
-            DataTable table = new DataTable();
-            for (int i = 0; i < descriptor.CountNestedObject; i++) {
-                DescriptorObject column = descriptor.getNestedObject(i);
-                table.Columns.Add(column.getValueToken("CODE"), typeof(string));
+            List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
+            for (int i = 0; i < sheetForSearch.Count; i++) {
+                CoordinatesPlace coordinates = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[i]);
+                List<string> nameColumns = new List<string>();
+                List<string> finalLine = new List<string>();
+                for (int iColumn = 0; iColumn < descriptor.CountNestedObject; iColumn++) {
+                    DescriptorObject column = descriptor.getNestedObject(iColumn);
+                    nameColumns.Add(column.getValueToken("NAME"));
+                    finalLine.Add(column.getValueToken("FINAL_CELL"));
+                }
+                for (int iLine = coordinates.lineFrom; iLine < coordinates.lineTo; iLine++) {
+                    for (int iColumn = coordinates.columnFrom; iColumn < coordinates.columnTo; iColumn++) {
+                        if (nameColumns[0] == sheetForSearch[i][iLine, iColumn]) {
+                            List<int> indexColumn = getIndexColumn(nameColumns, sheetForSearch[i], iLine);
+                            if (indexColumn != null) {
+                                int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheetForSearch[i]);
+                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], nameColumns, indexColumn);
+                            }
+                        }
+                    }
+                }
             }
-            return table;
+            return null;
         }
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Privat методы*/
+
+        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> nameColumn, List<int> indexColumn) {
+            DataTable table = new DataTable();
+            for (int i = 0; i < nameColumn.Count; i++) {
+                table.Columns.Add(nameColumn[i], typeof(string));
+            }
+            for (int iLine = headerLine + 1; iLine < finalLine; iLine++) {
+                DataRow line = table.NewRow();
+                for (int column = 0; column < indexColumn.Count; column++) {
+                    line[column] = sheet[iLine, indexColumn[column]];
+                }
+                table.Rows.Add(line);
+            }
+            return table;
+        }
 
         /// <summary>
         /// Получить листы для поиска.
@@ -237,22 +272,24 @@ namespace ExportFromExcelToDatabase.Classes
         private CoordinatesPlace getCoordinatesTable(DescriptorObject descriptor, string[,] sheet) {
             //Получение названия столбцов.
             List<string> nameColumns = new List<string>();
+            List<string> finalLine= new List<string>();
             for (int i = 0; i < descriptor.CountNestedObject; i++) {
                 DescriptorObject column = descriptor.getNestedObject(i);
                 nameColumns.Add(column.getValueToken("NAME"));
+                finalLine.Add(column.getValueToken("FINAL_CELL"));
             }
             //Если нет столбцов.
             if (nameColumns.Count == 0) {
                 return new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
             }
-            CoordinatesPlace coordinates = new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
+            CoordinatesPlace coordinates = getCoordinatesPlaceInSneet(descriptor, sheet);
 
             for (int iLine = coordinates.lineFrom; iLine < coordinates.lineTo; iLine++) {
                 for (int iColumn = coordinates.columnFrom; iColumn < coordinates.columnTo; iColumn++) {
                     if (nameColumns[0] == sheet[iLine, iColumn]) {
                         List<int> indexColumn = getIndexColumn(nameColumns, sheet, iLine);
                         if (indexColumn != null) {
-
+                            int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheet);
                         }
                     }
                 }
@@ -283,6 +320,24 @@ namespace ExportFromExcelToDatabase.Classes
                 }
             }
             return indexColumn;
+        }
+
+        private int getIndexFinalLine(int headerLine, List<int> indexColumn, List<string> finalLine, string[,] sheet) {
+            for (int i = headerLine; i < sheet.GetLength(0); i++) {
+                bool fullEqually = true;
+                for (int j = 0; j < indexColumn.Count; j++) {
+                    if (finalLine[j] != null) {
+                        if (sheet[i, indexColumn[j]] != finalLine[j]) {
+                            fullEqually = false;
+                            break;
+                        }
+                    }
+                }
+                if (fullEqually) {
+                    return i;
+                }
+            }
+            return sheet.GetLength(0);
         }
 
 
