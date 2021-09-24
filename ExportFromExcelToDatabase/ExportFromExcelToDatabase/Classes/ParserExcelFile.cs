@@ -16,10 +16,10 @@ namespace ExportFromExcelToDatabase.Classes
     ///    SHEET_NUMBER: номер страницы, отсчет с единицы (Если не указано, то номер не учиытвается)
     ///    SHEET_NAME: название странциы (Если не указано, то имя не учиытвается)
     ///    SECTION_NAME: раздел на странице (для уточнения, если несколько полей с одним и тем же текстом)
-    ///    SECTION_BOTTOM: (1 - поиск от раздела до нижнего края)
-    ///    SECTION_UP: (1 - поиск с верхнего края и до раздела)
-    ///    SECTION_LEFT: (1 - поиск с левого края и до раздела)
-    ///    SECTION_RIGHT: (1 - поиск от раздела и до правого края)
+    ///    SECTION_BOTTOM_LEFT: (1 - поиск в левой нижней части от раздела)
+    ///    SECTION_BOTTOM_RIGHT: (1 - поиск в правой нижней части от раздела)
+    ///    SECTION_UP_LEFT: (1 - поиск в левой верхней части от раздела)
+    ///    SECTION_UP_RIGHT: (1 - поиск в правой верхней части от раздела)
     ///    FIELD: текст ячейки, относительно которой ищется значение.
     ///    CODE: условный код этого значения (для идентификации этого значения).
     ///    OFFEST_ROW: смещение по строке относительно ячейки с текстом (начальное значение 0)
@@ -185,8 +185,10 @@ namespace ExportFromExcelToDatabase.Classes
                 for (int j = 0; j < sheet.GetLength(1); j++) {
                     if (sheet[i, j] == SECTION_NAME) {
                         found = true;
-                        tileSectionLine = i;
-                        titleSectionColumn = j;
+                        coordinates.lineFrom = i;
+                        coordinates.lineTo = i;
+                        coordinates.columnFrom = j;
+                        coordinates.columnTo = j;
                         break;
                     }
                 }
@@ -198,35 +200,25 @@ namespace ExportFromExcelToDatabase.Classes
                 return coordinates; //Все значения 0.
             }
             //Высчитывание области относительно флагов.
-            bool SECTION_BOTTOM = ((getValueToken(descriptor, "SECTION_BOTTOM") ?? "0") == "0") ? false : true;
-            bool SECTION_UP     = ((getValueToken(descriptor, "SECTION_UP") ?? "0") == "0") ? false : true;
-            bool SECTION_LEFT   = ((getValueToken(descriptor, "SECTION_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_RIGHT  = ((getValueToken(descriptor, "SECTION_RIGHT") ?? "0") == "0") ? false : true;
-            if (SECTION_BOTTOM) {
-                coordinates.lineFrom = tileSectionLine;
+            bool SECTION_BOTTOM_LEFT    = ((getValueToken(descriptor, "SECTION_BOTTOM_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_BOTTOM_RIGHT   = ((getValueToken(descriptor, "SECTION_BOTTOM_RIGHT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_LEFT        = ((getValueToken(descriptor, "SECTION_UP_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_RIGHT       = ((getValueToken(descriptor, "SECTION_UP_RIGHT") ?? "0") == "0") ? false : true;
+            if (SECTION_BOTTOM_LEFT) {
                 coordinates.lineTo = sheet.GetLength(0);
-            }
-            if (SECTION_UP) {
-                if (SECTION_BOTTOM) {
-                    coordinates.lineFrom = 0;
-                }
-                else {
-                    coordinates.lineFrom = 0;
-                    coordinates.lineTo = tileSectionLine;
-                }
-            }
-            if (SECTION_LEFT) {
                 coordinates.columnFrom = 0;
-                coordinates.columnTo = titleSectionColumn;
             }
-            if (SECTION_RIGHT) {
-                if (SECTION_LEFT) {
-                    coordinates.columnTo = sheet.GetLength(1);
-                }
-                else {
-                    coordinates.lineFrom = titleSectionColumn;
-                    coordinates.lineTo = sheet.GetLength(1);
-                }
+            if (SECTION_BOTTOM_RIGHT) {
+                coordinates.lineTo = sheet.GetLength(0);
+                coordinates.columnFrom = sheet.GetLength(1);
+            }
+            if (SECTION_UP_LEFT) {
+                coordinates.lineFrom = 0;
+                coordinates.columnFrom = 0;
+            }
+            if (SECTION_UP_RIGHT) {
+                coordinates.lineFrom = 0;
+                coordinates.columnTo = sheet.GetLength(1);
             }
             return coordinates;
         }
