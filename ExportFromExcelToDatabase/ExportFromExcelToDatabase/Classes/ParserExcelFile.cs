@@ -240,7 +240,6 @@ namespace ExportFromExcelToDatabase.Classes
             }
             //Поиск самой секции.
             bool found = false;
-            int tileSectionLine = 0, titleSectionColumn = 0;
             for (int i = 0; i < sheet.GetLength(0); i++) {
                 for (int j = 0; j < sheet.GetLength(1); j++) {
                     if (sheet[i, j] == SECTION_NAME) {
