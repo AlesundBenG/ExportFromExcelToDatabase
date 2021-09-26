@@ -132,10 +132,12 @@ namespace ExportFromExcelToDatabase.Classes
                 CoordinatesPlace coordinates = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[i]);
                 List<string> nameColumns = new List<string>();
                 List<string> finalLine = new List<string>();
+                List<string> codeColumns = new List<string>();
                 for (int iColumn = 0; iColumn < descriptor.CountNestedObject; iColumn++) {
                     DescriptorObject column = descriptor.getNestedObject(iColumn);
                     nameColumns.Add(column.getValueToken("NAME"));
                     finalLine.Add(column.getValueToken("FINAL_CELL"));
+                    codeColumns.Add(column.getValueToken("CODE"));
                 }
                 for (int iLine = coordinates.lineFrom; iLine < coordinates.lineTo; iLine++) {
                     for (int iColumn = coordinates.columnFrom; iColumn < coordinates.columnTo; iColumn++) {
@@ -143,7 +145,7 @@ namespace ExportFromExcelToDatabase.Classes
                             List<int> indexColumn = getIndexColumn(nameColumns, sheetForSearch[i], iLine);
                             if (indexColumn != null) {
                                 int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheetForSearch[i]);
-                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], nameColumns, indexColumn);
+                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], codeColumns, indexColumn);
                             }
                         }
                     }
@@ -163,13 +165,13 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="headerLine">Номер строки с заголовком.</param>
         /// <param name="finalLine">Номер последней строки.</param>
         /// <param name="sheet">Страница.</param>
-        /// <param name="nameColumn">Коды столбцов.</param>
+        /// <param name="codeColumn">Коды столбцов.</param>
         /// <param name="indexColumn">В каком столбце находятся данные столбцы на странице.</param>
         /// <returns>Таблица.</returns>
-        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> nameColumn, List<int> indexColumn) {
+        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn) {
             DataTable table = new DataTable();
-            for (int i = 0; i < nameColumn.Count; i++) {
-                table.Columns.Add(nameColumn[i], typeof(string));
+            for (int i = 0; i < codeColumn.Count; i++) {
+                table.Columns.Add(codeColumn[i], typeof(string));
             }
             for (int iLine = headerLine + 1; iLine < finalLine; iLine++) {
                 DataRow line = table.NewRow();

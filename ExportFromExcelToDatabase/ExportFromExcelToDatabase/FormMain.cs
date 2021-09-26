@@ -19,20 +19,24 @@ namespace ExportFromExcelToDatabase
         }
 
         private void Form1_Load(object sender, EventArgs e) {
-            /*
             ReaderTextFile readerFile = new ReaderTextFile();
             ReaderExcelFile readerExcelFile = new ReaderExcelFile();
 
-            string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\bnl\\Desktop\\test.txt");
-            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\bnl\\Desktop\\test.xls");
+            string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\test.txt");
+            string[] linesFileSQL = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\testSQL.txt");
+            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\batas\\Desktop\\test.xls");
             string file = String.Join(" ", linesFile);
-
+            string fileSQL = String.Join(" ", linesFileSQL);
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();
             List<DescriptorObject> descriptors = readerDescriptor.getListDescriptors(file);
 
             ParserExcelFile parserExcelFile = new ParserExcelFile();
-            parserExcelFile.parser(descriptors, excelFile);
-            */
+            ParserResult result = parserExcelFile.parser(descriptors, excelFile);
+
+            GeneratorSQLCommand generator = new GeneratorSQLCommand();
+            string command = generator.insertDataToCommand(fileSQL, result.singleValue, result.table);
+
+
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
