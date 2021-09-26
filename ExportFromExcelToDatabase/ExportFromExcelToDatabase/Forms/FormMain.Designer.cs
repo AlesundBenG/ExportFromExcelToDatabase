@@ -26,24 +26,22 @@ namespace ExportFromExcelToDatabase
         /// содержимое этого метода с помощью редактора кода.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.выбратьФайлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.выбратьПапкуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настрокиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBoxProcess = new System.Windows.Forms.GroupBox();
-            this.Информация = new System.Windows.Forms.GroupBox();
+            this.buttonStart = new System.Windows.Forms.Button();
             this.dataGridViewProcess = new System.Windows.Forms.DataGridView();
-            this.выбратьФайлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.выбратьПапкуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.FileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Message = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ShowData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.buttonStart = new System.Windows.Forms.Button();
+            this.Информация = new System.Windows.Forms.GroupBox();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip.SuspendLayout();
             this.groupBoxProcess.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProcess)).BeginInit();
@@ -51,6 +49,7 @@ namespace ExportFromExcelToDatabase
             // 
             // menuStrip
             // 
+            this.menuStrip.BackColor = System.Drawing.Color.PowderBlue;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.файлToolStripMenuItem,
             this.настрокиToolStripMenuItem,
@@ -59,7 +58,7 @@ namespace ExportFromExcelToDatabase
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(784, 24);
             this.menuStrip.TabIndex = 0;
-            this.menuStrip.Text = "menuStrip1";
+            this.menuStrip.Text = "menuStrip";
             // 
             // файлToolStripMenuItem
             // 
@@ -69,6 +68,20 @@ namespace ExportFromExcelToDatabase
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
+            // 
+            // выбратьФайлToolStripMenuItem
+            // 
+            this.выбратьФайлToolStripMenuItem.Name = "выбратьФайлToolStripMenuItem";
+            this.выбратьФайлToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.выбратьФайлToolStripMenuItem.Text = "Выбрать файл";
+            this.выбратьФайлToolStripMenuItem.Click += new System.EventHandler(this.выбратьФайлToolStripMenuItem_Click);
+            // 
+            // выбратьПапкуToolStripMenuItem
+            // 
+            this.выбратьПапкуToolStripMenuItem.Name = "выбратьПапкуToolStripMenuItem";
+            this.выбратьПапкуToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.выбратьПапкуToolStripMenuItem.Text = "Выбрать папку";
+            this.выбратьПапкуToolStripMenuItem.Click += new System.EventHandler(this.выбратьПапкуToolStripMenuItem_Click);
             // 
             // настрокиToolStripMenuItem
             // 
@@ -100,18 +113,20 @@ namespace ExportFromExcelToDatabase
             this.groupBoxProcess.TabStop = false;
             this.groupBoxProcess.Text = "Процесс";
             // 
-            // Информация
+            // buttonStart
             // 
-            this.Информация.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Информация.BackColor = System.Drawing.Color.LightGray;
-            this.Информация.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Информация.Location = new System.Drawing.Point(13, 469);
-            this.Информация.Name = "Информация";
-            this.Информация.Size = new System.Drawing.Size(759, 80);
-            this.Информация.TabIndex = 2;
-            this.Информация.TabStop = false;
-            this.Информация.Text = "Информация";
+            this.buttonStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonStart.BackColor = System.Drawing.Color.Orange;
+            this.buttonStart.Enabled = false;
+            this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonStart.Location = new System.Drawing.Point(638, 400);
+            this.buttonStart.Name = "buttonStart";
+            this.buttonStart.Size = new System.Drawing.Size(115, 29);
+            this.buttonStart.TabIndex = 1;
+            this.buttonStart.Text = "Запустить";
+            this.buttonStart.UseVisualStyleBackColor = false;
+            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // dataGridViewProcess
             // 
@@ -121,51 +136,17 @@ namespace ExportFromExcelToDatabase
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewProcess.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewProcess.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridViewProcess.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewProcess.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FileName,
             this.Status,
             this.Message,
             this.ShowData});
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewProcess.DefaultCellStyle = dataGridViewCellStyle8;
             this.dataGridViewProcess.Location = new System.Drawing.Point(7, 20);
             this.dataGridViewProcess.Name = "dataGridViewProcess";
             this.dataGridViewProcess.ReadOnly = true;
             this.dataGridViewProcess.Size = new System.Drawing.Size(746, 373);
             this.dataGridViewProcess.TabIndex = 0;
-            // 
-            // выбратьФайлToolStripMenuItem
-            // 
-            this.выбратьФайлToolStripMenuItem.Name = "выбратьФайлToolStripMenuItem";
-            this.выбратьФайлToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.выбратьФайлToolStripMenuItem.Text = "Выбрать файл";
-            this.выбратьФайлToolStripMenuItem.Click += new System.EventHandler(this.выбратьФайлToolStripMenuItem_Click);
-            // 
-            // выбратьПапкуToolStripMenuItem
-            // 
-            this.выбратьПапкуToolStripMenuItem.Name = "выбратьПапкуToolStripMenuItem";
-            this.выбратьПапкуToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.выбратьПапкуToolStripMenuItem.Text = "Выбрать папку";
-            this.выбратьПапкуToolStripMenuItem.Click += new System.EventHandler(this.выбратьПапкуToolStripMenuItem_Click);
-            // 
-            // openFileDialog
-            // 
-            this.openFileDialog.FileName = "Наименование файла";
             // 
             // FileName
             // 
@@ -191,19 +172,23 @@ namespace ExportFromExcelToDatabase
             this.ShowData.Name = "ShowData";
             this.ShowData.ReadOnly = true;
             // 
-            // buttonStart
+            // Информация
             // 
-            this.buttonStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonStart.BackColor = System.Drawing.Color.PaleGreen;
-            this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonStart.Location = new System.Drawing.Point(638, 400);
-            this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(115, 29);
-            this.buttonStart.TabIndex = 1;
-            this.buttonStart.Text = "Запустить";
-            this.buttonStart.UseVisualStyleBackColor = false;
-            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
+            this.Информация.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Информация.BackColor = System.Drawing.Color.LightGray;
+            this.Информация.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Информация.Location = new System.Drawing.Point(13, 469);
+            this.Информация.Name = "Информация";
+            this.Информация.Size = new System.Drawing.Size(759, 80);
+            this.Информация.TabIndex = 2;
+            this.Информация.TabStop = false;
+            this.Информация.Text = "Информация";
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.FileName = "Наименование файла";
+            this.openFileDialog.Filter = "Excel-файлы |*.xls; *.xlsx";
             // 
             // FormMain
             // 

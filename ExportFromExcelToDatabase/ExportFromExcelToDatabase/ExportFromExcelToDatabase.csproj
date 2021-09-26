@@ -57,18 +57,27 @@
     <Compile Include="Classes\ParserResult.cs" />
     <Compile Include="Classes\ReaderExcelFile.cs" />
     <Compile Include="Classes\Token.cs" />
-    <Compile Include="FormMain.cs">
+    <Compile Include="Forms\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormMain.Designer.cs">
+    <Compile Include="Forms\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSetting.Designer.cs">
+      <DependentUpon>FormSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\ReaderTextFile.cs" />
     <Compile Include="Classes\ReaderDescriptor.cs" />
-    <EmbeddedResource Include="FormMain.resx">
+    <EmbeddedResource Include="Forms\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSetting.resx">
+      <DependentUpon>FormSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
