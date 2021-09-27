@@ -240,7 +240,7 @@ namespace ExportFromExcelToDatabase
             ReaderExcelFile readerFile = new ReaderExcelFile();
             ParserExcelFile parser = new ParserExcelFile();
             for (int i = 0; i < pathFiles.Length; i++) {
-                string fileExtension = pathFiles[i].Substring(pathFiles[i].IndexOf('.') + 1);
+                string fileExtension = pathFiles[i].Substring(pathFiles[i].LastIndexOf('.') + 1);
                 if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
                     _excelFiles.Add(pathFiles[i]);
                     _dataExcelFiles.Add(parser.parser(_listDescriptorObject, readerFile.readFile(pathFiles[i])));
