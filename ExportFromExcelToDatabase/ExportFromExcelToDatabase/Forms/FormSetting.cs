@@ -56,8 +56,10 @@ namespace ExportFromExcelToDatabase
 
         private void дескрипторExcelфайлаToolStripMenuItem_Click(object sender, EventArgs e) {
             if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                labelDescriptorPath.Text = openFileDialog.FileName;
-                _formMain.PathDescriptor = openFileDialog.FileName;
+                string descriptorPath = openFileDialog.FileName;
+                List<DescriptorObject> descriptors = _formMain.readDescriptor(descriptorPath);
+                _formMain.PathDescriptor = descriptorPath;
+                setDescriptor(descriptorPath, descriptors);
             }
         }
 

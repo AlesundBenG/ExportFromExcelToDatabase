@@ -125,7 +125,7 @@ namespace ExportFromExcelToDatabase
         public List<DescriptorObject> readDescriptor(string pathDescriptor) {
             ReaderTextFile readerTextFile = new ReaderTextFile();
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();
-            string[] linesTextFile = readerTextFile.getSplitTextOnLines(_pathDescriptor);
+            string[] linesTextFile = readerTextFile.getSplitTextOnLines(pathDescriptor);
             string textFile = String.Join(" ", linesTextFile);
             return readerDescriptor.getListDescriptors(textFile);
         }
