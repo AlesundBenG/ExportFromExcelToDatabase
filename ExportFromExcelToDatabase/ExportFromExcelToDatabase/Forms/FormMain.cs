@@ -34,6 +34,10 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         private FormSetting _formSetting;
         /// <summary>
+        /// SQL-запрос.
+        /// </summary>
+        private string _querySQL;
+        /// <summary>
         /// Список дескрипторов объектов.
         /// </summary>
         private List<DescriptorObject> _listDescriptorObject;
@@ -106,11 +110,11 @@ namespace ExportFromExcelToDatabase
             }
             if (File.Exists(_pathExe + "\\Sourse\\Query.sql")) {
                 _pathQuery = _pathExe + "\\Sourse\\Query.sql";
+                _querySQL = readQuery(_pathQuery, false);
             }
             else {
                 MessageBox.Show($"Не был найден SQL-запрос по пути: {_pathExe}\\Sourse\\Query.sql! Укажите путь к SQL-запросу в настройках!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            _listDescriptorObject = new List<DescriptorObject>();
         }
 
         /// <summary>
@@ -142,7 +146,6 @@ namespace ExportFromExcelToDatabase
                 return readerTextFile.getText(pathQuery);
             }
         }
-
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Private методы*/
@@ -184,8 +187,10 @@ namespace ExportFromExcelToDatabase
         private void настрокиToolStripMenuItem_Click(object sender, EventArgs e) {
             _formSetting = new FormSetting(this);
             if (_pathQuery != null) {
-                string query = readQuery(_pathQuery, false);
-                _formSetting.setQuery(_pathQuery, query);
+                _formSetting.setQuery(_pathQuery, _querySQL);
+            }
+            if (_pathDescriptor != null) {
+                _formSetting.setDescriptor(_pathDescriptor, _listDescriptorObject);
             }
             _formSetting.ShowDialog();
         }

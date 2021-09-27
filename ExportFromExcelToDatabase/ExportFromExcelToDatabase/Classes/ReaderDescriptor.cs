@@ -115,8 +115,8 @@ namespace ExportFromExcelToDatabase.Classes
             startPosition = goWhileMeetThoseSymbols(pathToken, startPosition, symbolsBetweenNameAndValue);
             //Значение токена одним словом.
             if (pathToken[startPosition] != '\"') {
-                endPosition = goWhileNotMeetThoseSymbols(pathToken, startPosition, symbolsSpace);
-                value = pathToken.Substring(startPosition, endPosition - startPosition + 1);
+                endPosition = goWhileNotMeetThoseSymbols(pathToken, startPosition, new char[] { ' ', ';', '\t' });
+                value = pathToken.Substring(startPosition, endPosition - startPosition);
             }
             //Имя токена в несколько слов.
             else {

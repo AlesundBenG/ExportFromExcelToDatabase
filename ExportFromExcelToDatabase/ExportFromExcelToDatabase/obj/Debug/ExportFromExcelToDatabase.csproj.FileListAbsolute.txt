@@ -11,7 +11,6 @@ C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabas
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\bin\Debug\ExportFromExcelToDatabase.exe
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\bin\Debug\ExportFromExcelToDatabase.pdb
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csprojAssemblyReference.cache
-C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Form1.resources
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Properties.Resources.resources
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.GenerateResource.cache
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.CoreCompileInputs.cache
@@ -19,3 +18,5 @@ C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabas
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.pdb
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormMain.resources
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormSetting.resources
+C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormMain.resources
+C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormSetting.resources

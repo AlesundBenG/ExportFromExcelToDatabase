@@ -94,6 +94,10 @@
 	<column>
 		NAME: "Код";
 		CODE: "TYPE_SERV_CODE";
+		<column2>
+			NAME: "Код2";
+			CODE: "TYPE_SERV_CODE2";
+		</column2>
 	</column>
 	<column>
 		NAME: "Описание";

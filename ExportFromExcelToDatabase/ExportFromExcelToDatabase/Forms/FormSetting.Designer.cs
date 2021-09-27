@@ -26,35 +26,40 @@ namespace ExportFromExcelToDatabase
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBoxFilesPath = new System.Windows.Forms.GroupBox();
-            this.labelDescriptorPathTitle = new System.Windows.Forms.Label();
-            this.labelQueryPathTitle = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.labelDescriptorPath = new System.Windows.Forms.Label();
             this.labelQueryPath = new System.Windows.Forms.Label();
+            this.labelDescriptorPathTitle = new System.Windows.Forms.Label();
+            this.labelQueryPathTitle = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPageDescriptor = new System.Windows.Forms.TabPage();
-            this.tabPageQuery = new System.Windows.Forms.TabPage();
             this.dataGridViewDescriptorObjects = new System.Windows.Forms.DataGridView();
+            this.tabPageQuery = new System.Windows.Forms.TabPage();
             this.textBoxQuerySQL = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.дескрипторExcelфайлаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выбратьSQLзапросToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.numberParent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tag = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBoxFilesPath.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPageDescriptor.SuspendLayout();
-            this.tabPageQuery.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDescriptorObjects)).BeginInit();
+            this.tabPageQuery.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxFilesPath
@@ -71,25 +76,19 @@ namespace ExportFromExcelToDatabase
             this.groupBoxFilesPath.TabStop = false;
             this.groupBoxFilesPath.Text = "Файлы";
             // 
-            // labelDescriptorPathTitle
+            // panel1
             // 
-            this.labelDescriptorPathTitle.AutoSize = true;
-            this.labelDescriptorPathTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelDescriptorPathTitle.Location = new System.Drawing.Point(10, 0);
-            this.labelDescriptorPathTitle.Name = "labelDescriptorPathTitle";
-            this.labelDescriptorPathTitle.Size = new System.Drawing.Size(136, 13);
-            this.labelDescriptorPathTitle.TabIndex = 0;
-            this.labelDescriptorPathTitle.Text = "Дескриптор Excel-файла:";
-            // 
-            // labelQueryPathTitle
-            // 
-            this.labelQueryPathTitle.AutoSize = true;
-            this.labelQueryPathTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelQueryPathTitle.Location = new System.Drawing.Point(10, 22);
-            this.labelQueryPathTitle.Name = "labelQueryPathTitle";
-            this.labelQueryPathTitle.Size = new System.Drawing.Size(70, 13);
-            this.labelQueryPathTitle.TabIndex = 1;
-            this.labelQueryPathTitle.Text = "SQL-запрос:";
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.labelDescriptorPath);
+            this.panel1.Controls.Add(this.labelQueryPath);
+            this.panel1.Controls.Add(this.labelDescriptorPathTitle);
+            this.panel1.Controls.Add(this.labelQueryPathTitle);
+            this.panel1.Location = new System.Drawing.Point(11, 32);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(742, 56);
+            this.panel1.TabIndex = 3;
             // 
             // labelDescriptorPath
             // 
@@ -110,6 +109,26 @@ namespace ExportFromExcelToDatabase
             this.labelQueryPath.Size = new System.Drawing.Size(57, 13);
             this.labelQueryPath.TabIndex = 2;
             this.labelQueryPath.Text = "QueryPath";
+            // 
+            // labelDescriptorPathTitle
+            // 
+            this.labelDescriptorPathTitle.AutoSize = true;
+            this.labelDescriptorPathTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelDescriptorPathTitle.Location = new System.Drawing.Point(10, 0);
+            this.labelDescriptorPathTitle.Name = "labelDescriptorPathTitle";
+            this.labelDescriptorPathTitle.Size = new System.Drawing.Size(136, 13);
+            this.labelDescriptorPathTitle.TabIndex = 0;
+            this.labelDescriptorPathTitle.Text = "Дескриптор Excel-файла:";
+            // 
+            // labelQueryPathTitle
+            // 
+            this.labelQueryPathTitle.AutoSize = true;
+            this.labelQueryPathTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelQueryPathTitle.Location = new System.Drawing.Point(10, 22);
+            this.labelQueryPathTitle.Name = "labelQueryPathTitle";
+            this.labelQueryPathTitle.Size = new System.Drawing.Size(70, 13);
+            this.labelQueryPathTitle.TabIndex = 1;
+            this.labelQueryPathTitle.Text = "SQL-запрос:";
             // 
             // groupBox2
             // 
@@ -151,6 +170,51 @@ namespace ExportFromExcelToDatabase
             this.tabPageDescriptor.Text = "Дескриптор Excel-файла";
             this.tabPageDescriptor.UseVisualStyleBackColor = true;
             // 
+            // dataGridViewDescriptorObjects
+            // 
+            this.dataGridViewDescriptorObjects.AllowUserToAddRows = false;
+            this.dataGridViewDescriptorObjects.AllowUserToDeleteRows = false;
+            this.dataGridViewDescriptorObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewDescriptorObjects.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewDescriptorObjects.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridViewDescriptorObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewDescriptorObjects.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Number,
+            this.numberParent,
+            this.tag,
+            this.Attribute,
+            this.Value});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewDescriptorObjects.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridViewDescriptorObjects.Location = new System.Drawing.Point(7, 7);
+            this.dataGridViewDescriptorObjects.Name = "dataGridViewDescriptorObjects";
+            this.dataGridViewDescriptorObjects.ReadOnly = true;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewDescriptorObjects.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.dataGridViewDescriptorObjects.Size = new System.Drawing.Size(725, 345);
+            this.dataGridViewDescriptorObjects.TabIndex = 0;
+            // 
             // tabPageQuery
             // 
             this.tabPageQuery.Controls.Add(this.textBoxQuerySQL);
@@ -161,44 +225,6 @@ namespace ExportFromExcelToDatabase
             this.tabPageQuery.TabIndex = 1;
             this.tabPageQuery.Text = "SQL-запрос";
             this.tabPageQuery.UseVisualStyleBackColor = true;
-            // 
-            // dataGridViewDescriptorObjects
-            // 
-            this.dataGridViewDescriptorObjects.AllowUserToAddRows = false;
-            this.dataGridViewDescriptorObjects.AllowUserToDeleteRows = false;
-            this.dataGridViewDescriptorObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewDescriptorObjects.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
-            this.dataGridViewDescriptorObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewDescriptorObjects.DefaultCellStyle = dataGridViewCellStyle14;
-            this.dataGridViewDescriptorObjects.Location = new System.Drawing.Point(7, 7);
-            this.dataGridViewDescriptorObjects.Name = "dataGridViewDescriptorObjects";
-            this.dataGridViewDescriptorObjects.ReadOnly = true;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewDescriptorObjects.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
-            this.dataGridViewDescriptorObjects.Size = new System.Drawing.Size(725, 345);
-            this.dataGridViewDescriptorObjects.TabIndex = 0;
             // 
             // textBoxQuerySQL
             // 
@@ -239,13 +265,6 @@ namespace ExportFromExcelToDatabase
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
             // 
-            // выходToolStripMenuItem
-            // 
-            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
-            this.выходToolStripMenuItem.Text = "Выход";
-            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
-            // 
             // дескрипторExcelфайлаToolStripMenuItem
             // 
             this.дескрипторExcelфайлаToolStripMenuItem.Name = "дескрипторExcelфайлаToolStripMenuItem";
@@ -260,19 +279,47 @@ namespace ExportFromExcelToDatabase
             this.выбратьSQLзапросToolStripMenuItem.Text = "Выбрать SQL-запрос";
             this.выбратьSQLзапросToolStripMenuItem.Click += new System.EventHandler(this.выбратьSQLзапросToolStripMenuItem_Click);
             // 
-            // panel1
+            // выходToolStripMenuItem
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.AutoScroll = true;
-            this.panel1.Controls.Add(this.labelDescriptorPath);
-            this.panel1.Controls.Add(this.labelQueryPath);
-            this.panel1.Controls.Add(this.labelDescriptorPathTitle);
-            this.panel1.Controls.Add(this.labelQueryPathTitle);
-            this.panel1.Location = new System.Drawing.Point(11, 32);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(742, 56);
-            this.panel1.TabIndex = 3;
+            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
+            this.выходToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.выходToolStripMenuItem.Text = "Выход";
+            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
+            // 
+            // Number
+            // 
+            this.Number.HeaderText = "Номер";
+            this.Number.Name = "Number";
+            this.Number.ReadOnly = true;
+            this.Number.Width = 66;
+            // 
+            // numberParent
+            // 
+            this.numberParent.HeaderText = "Номер родителя";
+            this.numberParent.Name = "numberParent";
+            this.numberParent.ReadOnly = true;
+            this.numberParent.Width = 106;
+            // 
+            // tag
+            // 
+            this.tag.HeaderText = "Тег";
+            this.tag.Name = "tag";
+            this.tag.ReadOnly = true;
+            this.tag.Width = 50;
+            // 
+            // Attribute
+            // 
+            this.Attribute.HeaderText = "Атрибут";
+            this.Attribute.Name = "Attribute";
+            this.Attribute.ReadOnly = true;
+            this.Attribute.Width = 72;
+            // 
+            // Value
+            // 
+            this.Value.HeaderText = "Значение";
+            this.Value.Name = "Value";
+            this.Value.ReadOnly = true;
+            this.Value.Width = 80;
             // 
             // FormSetting
             // 
@@ -286,16 +333,16 @@ namespace ExportFromExcelToDatabase
             this.Name = "FormSetting";
             this.Text = "Настройки";
             this.groupBoxFilesPath.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPageDescriptor.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDescriptorObjects)).EndInit();
             this.tabPageQuery.ResumeLayout(false);
             this.tabPageQuery.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDescriptorObjects)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -321,5 +368,10 @@ namespace ExportFromExcelToDatabase
         private System.Windows.Forms.ToolStripMenuItem выходToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem выбратьSQLзапросToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Number;
+        private System.Windows.Forms.DataGridViewTextBoxColumn numberParent;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tag;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Attribute;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Value;
     }
 }
