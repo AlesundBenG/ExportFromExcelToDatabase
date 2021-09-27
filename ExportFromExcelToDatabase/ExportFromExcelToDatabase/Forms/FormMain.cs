@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExportFromExcelToDatabase.Classes;
 using System.IO;    //Для работы с папками.
+using ExportFromExcelToDatabase.Forms;
 
 namespace ExportFromExcelToDatabase
 {
@@ -45,6 +46,10 @@ namespace ExportFromExcelToDatabase
         /// Файлы для обработки.
         /// </summary>
         private List<string> _excelFiles;
+        /// <summary>
+        /// Данные Excel-файлов.
+        /// </summary>
+        private List<ParserResult> _dataExcelFiles;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
@@ -64,15 +69,6 @@ namespace ExportFromExcelToDatabase
             get {
                 return _pathDescriptor;
             }
-            set {
-                if (File.Exists(value)) {
-                    _pathDescriptor = value;
-                    _listDescriptorObject = readDescriptor(value);
-                }
-                else {
-                    MessageBox.Show($"Не был найден дескриптор Excel-файла по пути: {value}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
         }
         /// <summary>
         /// Путь к SQL-запросу.
@@ -80,14 +76,6 @@ namespace ExportFromExcelToDatabase
         public string PathQuery {
             get {
                 return _pathQuery;
-            }
-            set {
-                if (File.Exists(value)) {
-                    _pathQuery = value;
-                }
-                else {
-                    MessageBox.Show($"Не был найден SQL-запрос по пути: {value}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 
@@ -101,19 +89,40 @@ namespace ExportFromExcelToDatabase
         public FormMain() {
             InitializeComponent();
             _pathExe = Environment.CurrentDirectory;
-            if (File.Exists(_pathExe + "\\Sourse\\Descriptor.txt")) {
-                _pathDescriptor = _pathExe + "\\Sourse\\Descriptor.txt";
-                _listDescriptorObject = readDescriptor(_pathDescriptor);
+            setDescriptor(_pathExe + "\\Sourse\\Descriptor.txt");
+            setQuerySQL(_pathExe + "\\Sourse\\Query.sql");
+        }
+
+        /// <summary>
+        /// Чтение и установка дескриптора Excel-файла.
+        /// </summary>
+        /// <param name="pathDescriptor">Путь к дескриптору Excel-файла.</param>
+        public void setDescriptor(string pathDescriptor) {
+            if (File.Exists(pathDescriptor) && _pathDescriptor != pathDescriptor) {
+                try {
+                    _pathDescriptor = pathDescriptor;
+                    _listDescriptorObject = readDescriptor(pathDescriptor);
+                }
+                catch(Exception exception) {
+                    MessageBox.Show(exception.Message, "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else if (!File.Exists(pathDescriptor)) {
+                MessageBox.Show($"Не был найден дескриптор Excel-файла по пути: {pathDescriptor}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Чтение и установка SQL-запроса.
+        /// </summary>
+        /// <param name="pathQuery"></param>
+        public void setQuerySQL(string pathQuery) {
+            if (File.Exists(pathQuery) && _pathQuery != pathQuery) {
+                _pathQuery = pathQuery;
+                _querySQL = readQuery(pathQuery, false);
             }
             else {
-                MessageBox.Show($"Не был найден дескриптор Excel-файла по пути: {_pathExe}\\Sourse\\Descriptor.txt! Укажите путь к дескриптору в настройках!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            if (File.Exists(_pathExe + "\\Sourse\\Query.sql")) {
-                _pathQuery = _pathExe + "\\Sourse\\Query.sql";
-                _querySQL = readQuery(_pathQuery, false);
-            }
-            else {
-                MessageBox.Show($"Не был найден SQL-запрос по пути: {_pathExe}\\Sourse\\Query.sql! Укажите путь к SQL-запросу в настройках!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Не был найден SQL-запрос по пути: {pathQuery}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -173,14 +182,30 @@ namespace ExportFromExcelToDatabase
         }
 
         private void выбратьФайлToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                prepareForProcess(new string[1] { openFileDialog.FileName });
+            if ((_pathDescriptor != null) && (_pathQuery != null)) {
+                if (openFileDialog.ShowDialog() == DialogResult.OK) {
+                    prepareForProcess(new string[1] { openFileDialog.FileName });
+                }
+            } 
+            else if (_pathDescriptor == null) {
+                MessageBox.Show($"Не выбран дескриптор Excel-файла!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (_pathQuery != null) {
+                MessageBox.Show($"Не выбран SQL-запрос!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void выбратьПапкуToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
-                prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
+            if ((_pathDescriptor != null) && (_pathQuery != null)) {
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
+                    prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
+                }
+            }
+            else if (_pathDescriptor == null) {
+                MessageBox.Show($"Не выбран дескриптор Excel-файла!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (_pathQuery != null) {
+                MessageBox.Show($"Не выбран SQL-запрос!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -211,13 +236,17 @@ namespace ExportFromExcelToDatabase
         private void prepareForProcess(string[] pathFiles) {
             dataGridViewProcess.Rows.Clear();
             _excelFiles = new List<string>();
+            _dataExcelFiles = new List<ParserResult>();
+            ReaderExcelFile readerFile = new ReaderExcelFile();
+            ParserExcelFile parser = new ParserExcelFile();
             for (int i = 0; i < pathFiles.Length; i++) {
                 string fileExtension = pathFiles[i].Substring(pathFiles[i].IndexOf('.') + 1);
                 if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
                     _excelFiles.Add(pathFiles[i]);
+                    _dataExcelFiles.Add(parser.parser(_listDescriptorObject, readerFile.readFile(pathFiles[i])));
                     dataGridViewProcess.Rows.Add();
-                    dataGridViewProcess.Rows[i].Cells[0].Value = pathFiles[i].Substring(pathFiles[i].LastIndexOf('\\') + 1);
-                    dataGridViewProcess.Rows[i].Cells[1].Value = "Готов к обработке";
+                    dataGridViewProcess["FileName", i].Value = pathFiles[i].Substring(pathFiles[i].LastIndexOf('\\') + 1);
+                    dataGridViewProcess["Status", i].Value = "Готов к обработке";
                 }
             }
             if (_excelFiles.Count < 1) {
@@ -225,8 +254,13 @@ namespace ExportFromExcelToDatabase
             }
         }
 
+        private void dataGridViewProcess_MouseClick(object sender, MouseEventArgs e) {
+            
+        }
 
-
-
+        private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
+            FormShowingDataFromFile formShowing = new FormShowingDataFromFile(_listDescriptorObject, _dataExcelFiles[e.RowIndex]);
+            formShowing.Show();
+        }
     }
 }

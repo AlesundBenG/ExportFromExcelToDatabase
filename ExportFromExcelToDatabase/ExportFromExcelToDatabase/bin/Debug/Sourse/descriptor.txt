@@ -1,6 +1,6 @@
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)			";
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: СНИЛС;
@@ -9,7 +9,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)			";
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: Имя;
@@ -18,7 +18,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)			";
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: Фамилия;
@@ -27,7 +27,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)			";
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: Отчество;
@@ -36,7 +36,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)			";
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Дата рождения";
@@ -45,7 +45,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)			";
+	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Дата оформления";
@@ -54,7 +54,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)			";
+	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Номер документа ";
@@ -63,7 +63,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о договоре (доп.соглашении)			";
+	SECTION_NAME: "Данные о договоре (доп.соглашении)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Форма социального обслуживания";
@@ -72,7 +72,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Период за который предоставляются сведения	";
+	SECTION_NAME: "Период за который предоставляются сведения";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Год";
@@ -81,7 +81,7 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Период за который предоставляются сведения	";
+	SECTION_NAME: "Период за который предоставляются сведения";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Месяц";

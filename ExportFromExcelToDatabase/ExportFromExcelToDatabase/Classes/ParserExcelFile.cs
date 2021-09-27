@@ -203,18 +203,18 @@ namespace ExportFromExcelToDatabase.Classes
             //Важно на какой странице и известен номер.
             if (SHEET_NUMBER != null) {
                 int sheetNumber = Convert.ToInt32(SHEET_NUMBER);
-                if (sheetNumber > sheet.Count) {
+                if (sheetNumber > file.CountSheet) {
                     throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {descriptor.getValueToken("CODE")} превосходит количество страниц в файле.");
                 }
                 if (sheetNumber == 0) {
                     throw new Exception($"ParserExcelFile: Номер странциы у {descriptor.NameObject} с кодом {descriptor.getValueToken("CODE")} равен 0, но счет страниц осуществляется с 1");
                 }
-                sheet.Add(file.getSheet(sheetNumber));
+                sheet.Add(file.getSheet(sheetNumber - 1));
                 return sheet;
             }
             //Важно на какой странице и известно имя.
             if (SHEET_NAME != null) {
-                for (int i = 0; i < sheet.Count; i++) {
+                for (int i = 0; i < file.CountSheet; i++) {
                     if (SHEET_NAME == file.getTitleSheet(i)) {
                         sheet.Add(file.getSheet(i));
                         return sheet;

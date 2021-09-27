@@ -20,3 +20,4 @@ C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatab
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormSetting.resources
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormMain.resources
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.FormSetting.resources
+C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Forms.FormShowingDataFromFile.resources

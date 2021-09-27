@@ -58,7 +58,7 @@ namespace ExportFromExcelToDatabase
             if (openFileDialog.ShowDialog() == DialogResult.OK) {
                 string descriptorPath = openFileDialog.FileName;
                 List<DescriptorObject> descriptors = _formMain.readDescriptor(descriptorPath);
-                _formMain.PathDescriptor = descriptorPath;
+                _formMain.setDescriptor(descriptorPath);
                 setDescriptor(descriptorPath, descriptors);
             }
         }
@@ -67,7 +67,7 @@ namespace ExportFromExcelToDatabase
             if (openFileDialog.ShowDialog() == DialogResult.OK) {
                 string queryPath = openFileDialog.FileName;
                 string query = _formMain.readQuery(queryPath, false);
-                _formMain.PathQuery = queryPath;
+                _formMain.setQuerySQL(queryPath);
                 setQuery(queryPath, query);
             }
         }

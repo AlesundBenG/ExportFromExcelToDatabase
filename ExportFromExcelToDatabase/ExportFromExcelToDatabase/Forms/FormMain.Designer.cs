@@ -135,7 +135,7 @@ namespace ExportFromExcelToDatabase
             this.dataGridViewProcess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewProcess.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewProcess.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridViewProcess.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewProcess.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FileName,
@@ -147,30 +147,36 @@ namespace ExportFromExcelToDatabase
             this.dataGridViewProcess.ReadOnly = true;
             this.dataGridViewProcess.Size = new System.Drawing.Size(746, 373);
             this.dataGridViewProcess.TabIndex = 0;
+            this.dataGridViewProcess.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewProcess_CellClick);
+            this.dataGridViewProcess.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridViewProcess_MouseClick);
             // 
             // FileName
             // 
             this.FileName.HeaderText = "Файл";
             this.FileName.Name = "FileName";
             this.FileName.ReadOnly = true;
+            this.FileName.Width = 65;
             // 
             // Status
             // 
             this.Status.HeaderText = "Статус";
             this.Status.Name = "Status";
             this.Status.ReadOnly = true;
+            this.Status.Width = 72;
             // 
             // Message
             // 
             this.Message.HeaderText = "Доп. информация";
             this.Message.Name = "Message";
             this.Message.ReadOnly = true;
+            this.Message.Width = 126;
             // 
             // ShowData
             // 
             this.ShowData.HeaderText = "Просмотр файла.";
             this.ShowData.Name = "ShowData";
             this.ShowData.ReadOnly = true;
+            this.ShowData.Width = 124;
             // 
             // Информация
             // 
