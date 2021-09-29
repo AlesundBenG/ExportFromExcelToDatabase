@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExportFromExcelToDatabase.Classes;
 using System.IO;    //Для работы с папками.
+using System.Threading; //Для работы с потоками.
 using ExportFromExcelToDatabase.Forms;
+
 
 namespace ExportFromExcelToDatabase
 {
@@ -48,6 +50,8 @@ namespace ExportFromExcelToDatabase
         /// Данные Excel-файлов.
         /// </summary>
         private List<ParserResult> _dataExcelFiles;
+
+        private string[] _pathFiles;
 
         /// <summary>
         /// Сгенерированные SQL-запросы для Excel-файлов.
@@ -175,7 +179,11 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                    prepareForProcess(new string[1] { openFileDialog.FileName });
+                    _pathFiles = new string[1] { openFileDialog.FileName };
+                    Thread thread = new Thread(prepareForProcess);
+                    thread.Start();
+
+                    //prepareForProcess(new string[1] { openFileDialog.FileName });
                 }
             } 
         }
@@ -186,7 +194,10 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
-                    prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
+                    _pathFiles = Directory.GetFiles(folderBrowserDialog.SelectedPath);
+                    Thread thread = new Thread(prepareForProcess);
+                    thread.Start();
+                    //prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
                 }
             }
         }
@@ -230,16 +241,16 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         /// <param name="pathFiles">Пути к файлам</param>
         /// <returns>0 - Успешно; -1 - Ошибка.</returns>
-        private void prepareForProcess(string[] pathFiles) {
+        private void prepareForProcess() {
             dataGridViewProcess.Rows.Clear();
             _excelFiles = new List<string>();
             _dataExcelFiles = new List<ParserResult>();
             _queryForExcelFiles = new List<string>();
-            progressBar.Value = 0;
-            progressBar.Maximum = pathFiles.Length;
-            for (int i = 0; i < pathFiles.Length; i++) {
-                prepareFileForProcess(pathFiles[i]);
-                progressBar.Value += 1;
+            progressBar.Invoke(new Action(() => progressBar.Value = 0));
+            progressBar.Invoke(new Action(() => progressBar.Maximum = _pathFiles.Length));
+            for (int i = 0; i < _pathFiles.Length; i++) {
+                prepareFileForProcess(_pathFiles[i]);
+                progressBar.Invoke(new Action(() => progressBar.Value += 1));
             }
             if (_excelFiles.Count < 1) {
                 MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -265,14 +276,14 @@ namespace ExportFromExcelToDatabase
                 _excelFiles.Add(pathFile);
                 _dataExcelFiles.Add(parserResult);
                 _queryForExcelFiles.Add(querySQL);
-                dataGridViewProcess.Rows.Add();
-                int lastRow = dataGridViewProcess.Rows.Count - 1;
-                dataGridViewProcess["FileName", lastRow].Value = pathFile.Substring(pathFile.LastIndexOf('\\') + 1);
-                dataGridViewProcess["Status", lastRow].Value = "Готов к обработке";
-                dataGridViewProcess["ShowData", lastRow].Value = "Показать";
-                dataGridViewProcess["ShowQuerySQL", lastRow].Value = "Показать";
-                dataGridViewProcess["ShowData", lastRow].Style.BackColor = Color.LightGreen;
-                dataGridViewProcess["ShowQuerySQL", lastRow].Style.BackColor = Color.LightGreen;
+                int lastRow = dataGridViewProcess.Rows.Count;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows.Add()));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["FileName", lastRow].Value = pathFile.Substring(pathFile.LastIndexOf('\\') + 1)));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", lastRow].Value = "Готов к обработке"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", lastRow].Value = "Показать"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", lastRow].Value = "Показать"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", lastRow].Style.BackColor = Color.LightGreen));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", lastRow].Style.BackColor = Color.LightGreen));
                 return 0;
             }
             else {
