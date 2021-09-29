@@ -15,6 +15,34 @@ using ExportFromExcelToDatabase.Forms;
 
 namespace ExportFromExcelToDatabase
 {
+    public struct MetadataFile
+    {
+        /// <summary>
+        /// Порядковый номер файла.
+        /// </summary>
+        public int indexFile;
+        /// <summary>
+        /// Путь к файлу.
+        /// </summary>
+        public string pathFile;
+        /// <summary>
+        /// Состояние обработки файла.
+        /// </summary>
+        public int conditionProcess;
+        /// <summary>
+        /// Данные из файла.
+        /// </summary>
+        public ExcelFile dataFile;
+        /// <summary>
+        /// Извлеченная информация.
+        /// </summary>
+        public ParserResult parsedData;
+        /// <summary>
+        /// Сгенерированный SQL-запрос.
+        /// </summary>
+        public string queryForFile;
+    }
+
     public partial class FormMain : Form
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +61,10 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         private string _pathQuery;
 
+        private MetadataFile[] _metadataFiles;
+
+
+
         /// <summary>
         /// SQL-запрос.
         /// </summary>
@@ -42,21 +74,9 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         private List<DescriptorObject> _listDescriptorObject;
 
-        /// <summary>
-        /// Файлы для обработки.
-        /// </summary>
-        private List<string> _excelFiles;
-        /// <summary>
-        /// Данные Excel-файлов.
-        /// </summary>
-        private List<ParserResult> _dataExcelFiles;
-
         private string[] _pathFiles;
 
-        /// <summary>
-        /// Сгенерированные SQL-запросы для Excel-файлов.
-        /// </summary>
-        private List<string> _queryForExcelFiles;
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
@@ -179,7 +199,9 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
+
                     _pathFiles = new string[1] { openFileDialog.FileName };
+                    //showFiles(_pathFiles);
                     Thread thread = new Thread(prepareForProcess);
                     thread.Start();
 
@@ -194,7 +216,9 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
+                    //_pathFilesFolder = folderBrowserDialog.SelectedPath;
                     _pathFiles = Directory.GetFiles(folderBrowserDialog.SelectedPath);
+                    //showFiles(_pathFiles);
                     Thread thread = new Thread(prepareForProcess);
                     thread.Start();
                     //prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
@@ -226,12 +250,18 @@ namespace ExportFromExcelToDatabase
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
             if (e.RowIndex >= 0) {
                 if (e.ColumnIndex == dataGridViewProcess.Columns["ShowData"].Index) {
-                    FormShowingDataFromFile formShowing = new FormShowingDataFromFile(_listDescriptorObject, _dataExcelFiles[e.RowIndex]);
-                    formShowing.Show();
+                    bool canShow = (dataGridViewProcess.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "Показать");
+                    if (canShow) {
+                        FormShowingDataFromFile formShowing = new FormShowingDataFromFile(_listDescriptorObject, _metadataFiles[e.RowIndex].parsedData);
+                        formShowing.Show();
+                    }
                 }
                 else if (e.ColumnIndex == dataGridViewProcess.Columns["ShowQuerySQL"].Index) {
-                    FormShowingQuerySQL formShowing = new FormShowingQuerySQL(_queryForExcelFiles[e.RowIndex]);
-                    formShowing.Show();
+                    bool canShow = (dataGridViewProcess.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "Показать");
+                    if (canShow) {
+                        FormShowingQuerySQL formShowing = new FormShowingQuerySQL(_metadataFiles[e.RowIndex].queryForFile);
+                        formShowing.Show();
+                    }
                 }
             }
         }
@@ -242,53 +272,124 @@ namespace ExportFromExcelToDatabase
         /// <param name="pathFiles">Пути к файлам</param>
         /// <returns>0 - Успешно; -1 - Ошибка.</returns>
         private void prepareForProcess() {
-            dataGridViewProcess.Rows.Clear();
-            _excelFiles = new List<string>();
-            _dataExcelFiles = new List<ParserResult>();
-            _queryForExcelFiles = new List<string>();
+            initMetadataFiles(_pathFiles);
+            showFiles(_metadataFiles);
             progressBar.Invoke(new Action(() => progressBar.Value = 0));
             progressBar.Invoke(new Action(() => progressBar.Maximum = _pathFiles.Length));
-            for (int i = 0; i < _pathFiles.Length; i++) {
-                prepareFileForProcess(_pathFiles[i]);
+            for (int i = 0; i < _metadataFiles.Length; i++) {
+                bool successCheckFileExtension = (checkFilesExtension(i) == 0);
+                if (successCheckFileExtension) {
+                    bool successGetDataFile = (getDataFile(i) == 0);
+                    if (successGetDataFile) {
+                        bool successParseFile = (parseFile(i) == 0);
+                        if (successParseFile) {
+                            generateQuery(i);
+                        }
+                    }
+                }
                 progressBar.Invoke(new Action(() => progressBar.Value += 1));
-            }
-            if (_excelFiles.Count < 1) {
-                MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         /// <summary>
-        /// Подготовка файла к обработке: Чтение файла, парсинг файла, генерация SQL-запроса.
-        /// Добавление файла в список файлов для обработки, добавление данных файла в список данных файлов, добавление сгенерированного SQl-запроса.
-        /// Плюс файл отображается в dataGridViewProcess.
+        /// Инициализация мета-данных файлов.
         /// </summary>
-        /// <param name="pathFile">Путь к файлу.</param>
-        /// <returns>0 - Успешно, 1 - файл не является Excel-файлом</returns>
-        private int prepareFileForProcess(string pathFile) {
-            string fileExtension = pathFile.Substring(pathFile.LastIndexOf('.') + 1);
-            if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
-                ReaderExcelFile readerFile = new ReaderExcelFile();
-                ParserExcelFile parser = new ParserExcelFile();
-                GeneratorSQLCommand generator = new GeneratorSQLCommand();
-                ExcelFile excelFile = readerFile.readFile(pathFile);
-                ParserResult parserResult = parser.parser(_listDescriptorObject, excelFile);
-                string querySQL = generator.insertDataToCommand(_querySQL, parserResult.singleValue, parserResult.table);
-                _excelFiles.Add(pathFile);
-                _dataExcelFiles.Add(parserResult);
-                _queryForExcelFiles.Add(querySQL);
-                int lastRow = dataGridViewProcess.Rows.Count;
+        /// <param name="pathFiles">Пути к файлам.</param>
+        private void initMetadataFiles(string[] pathFiles) {
+            _metadataFiles = new MetadataFile[pathFiles.Length];
+            for (int i = 0; i < pathFiles.Length; i++) {
+                _metadataFiles[i].indexFile = i;
+                _metadataFiles[i].pathFile = pathFiles[i];
+                _metadataFiles[i].conditionProcess = 0;
+            }
+        }
+
+        /// <summary>
+        /// Загрузка в dataGridViewProcess файлов.
+        /// </summary>
+        /// <param name="pathFiles">Пути к файлам.</param>
+        private void showFiles(MetadataFile[] files) {
+            dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows.Clear()));   
+            for (int i = 0; i < files.Length; i++) {
+                string nameFile = files[i].pathFile.Substring(files[i].pathFile.LastIndexOf('\\') + 1);
                 dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows.Add()));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["FileName", lastRow].Value = pathFile.Substring(pathFile.LastIndexOf('\\') + 1)));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", lastRow].Value = "Готов к обработке"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", lastRow].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", lastRow].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", lastRow].Style.BackColor = Color.LightGreen));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", lastRow].Style.BackColor = Color.LightGreen));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["FileName", i].Value = nameFile));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private int checkFilesExtension(int indexFile) {
+            string fileExtension = _metadataFiles[indexFile].pathFile.Substring(_metadataFiles[indexFile].pathFile.LastIndexOf('.') + 1);
+            if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
+                _metadataFiles[indexFile].conditionProcess = 1;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Открытие файла"));
                 return 0;
             }
             else {
+                _metadataFiles[indexFile].conditionProcess = -1;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка открытия файла"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = "Не верное расширение файла"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
                 return 1;
             }
         }
+
+        private int getDataFile(int indexFile) {
+            ReaderExcelFile readerFile = new ReaderExcelFile();
+            try {
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Чтение файла"));
+                _metadataFiles[indexFile].dataFile = readerFile.readFile(_metadataFiles[indexFile].pathFile);
+                _metadataFiles[indexFile].conditionProcess = 2;
+                return 0;
+            }
+            catch (Exception exception) {
+                _metadataFiles[indexFile].conditionProcess = -2;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка чтения файла"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                return 1;
+            }
+        }
+
+        private int parseFile(int indexFile) {
+            ParserExcelFile parser = new ParserExcelFile();
+            try {
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Извлечение данных из файла"));
+                _metadataFiles[indexFile].parsedData = parser.parser(_listDescriptorObject, _metadataFiles[indexFile].dataFile);
+                _metadataFiles[indexFile].conditionProcess = 3;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Value = "Показать"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Style.BackColor = Color.LightGreen));
+                return 0;
+            }
+            catch (Exception exception) {
+                _metadataFiles[indexFile].conditionProcess = -3;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка извлечения данных"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                return 1;
+            }
+        }
+
+        private int generateQuery(int indexFile) {
+            GeneratorSQLCommand generator = new GeneratorSQLCommand();
+            try {
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Генерация запроса"));
+                _metadataFiles[indexFile].queryForFile = generator.insertDataToCommand(_querySQL, _metadataFiles[indexFile].parsedData.singleValue, _metadataFiles[indexFile].parsedData.table);
+                _metadataFiles[indexFile].conditionProcess = 4;
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Value = "Показать"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Style.BackColor = Color.LightGreen));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Готов к обработке"));
+                return 0;
+            }
+            catch (Exception exception) {
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка генерации запроса"));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                return 1;
+            }
+        }
+
     }
 }

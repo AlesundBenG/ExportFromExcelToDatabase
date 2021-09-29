@@ -35,6 +35,8 @@ namespace ExportFromExcelToDatabase
             this.настрокиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBoxProcess = new System.Windows.Forms.GroupBox();
+            this.labelProgress = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.buttonStart = new System.Windows.Forms.Button();
             this.dataGridViewProcess = new System.Windows.Forms.DataGridView();
             this.FileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -44,8 +46,7 @@ namespace ExportFromExcelToDatabase
             this.ShowQuerySQL = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.labelProgress = new System.Windows.Forms.Label();
+            this.labelCondition = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.groupBoxProcess.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProcess)).BeginInit();
@@ -107,6 +108,7 @@ namespace ExportFromExcelToDatabase
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxProcess.BackColor = System.Drawing.Color.LightGray;
+            this.groupBoxProcess.Controls.Add(this.labelCondition);
             this.groupBoxProcess.Controls.Add(this.labelProgress);
             this.groupBoxProcess.Controls.Add(this.progressBar);
             this.groupBoxProcess.Controls.Add(this.buttonStart);
@@ -119,6 +121,26 @@ namespace ExportFromExcelToDatabase
             this.groupBoxProcess.TabStop = false;
             this.groupBoxProcess.Text = "Обработка файлов";
             this.groupBoxProcess.UseCompatibleTextRendering = true;
+            // 
+            // labelProgress
+            // 
+            this.labelProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelProgress.AutoSize = true;
+            this.labelProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelProgress.Location = new System.Drawing.Point(6, 494);
+            this.labelProgress.Name = "labelProgress";
+            this.labelProgress.Size = new System.Drawing.Size(59, 13);
+            this.labelProgress.TabIndex = 3;
+            this.labelProgress.Text = "Прогресс:";
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(71, 486);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(561, 29);
+            this.progressBar.TabIndex = 2;
             // 
             // buttonStart
             // 
@@ -213,25 +235,14 @@ namespace ExportFromExcelToDatabase
             this.openFileDialog.FileName = "Наименование файла";
             this.openFileDialog.Filter = "Excel-файлы |*.xls; *.xlsx";
             // 
-            // progressBar
+            // labelCondition
             // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(71, 486);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(561, 29);
-            this.progressBar.TabIndex = 2;
-            // 
-            // labelProgress
-            // 
-            this.labelProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelProgress.AutoSize = true;
-            this.labelProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelProgress.Location = new System.Drawing.Point(6, 494);
-            this.labelProgress.Name = "labelProgress";
-            this.labelProgress.Size = new System.Drawing.Size(59, 13);
-            this.labelProgress.TabIndex = 3;
-            this.labelProgress.Text = "Прогресс:";
+            this.labelCondition.AutoSize = true;
+            this.labelCondition.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelCondition.Location = new System.Drawing.Point(81, 494);
+            this.labelCondition.Name = "labelCondition";
+            this.labelCondition.Size = new System.Drawing.Size(0, 13);
+            this.labelCondition.TabIndex = 4;
             // 
             // FormMain
             // 
@@ -274,6 +285,7 @@ namespace ExportFromExcelToDatabase
         private System.Windows.Forms.DataGridViewTextBoxColumn ShowQuerySQL;
         private System.Windows.Forms.Label labelProgress;
         private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label labelCondition;
     }
 }
 
