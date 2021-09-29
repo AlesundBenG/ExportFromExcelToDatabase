@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Classes\DescriptorObject.cs" />
     <Compile Include="Classes\ExcelFile.cs" />
+    <Compile Include="Classes\ExecutorQuerySQL.cs" />
     <Compile Include="Classes\GeneratorSQLCommand.cs" />
     <Compile Include="Classes\ParserExcelFile.cs" />
     <Compile Include="Classes\ParserResult.cs" />

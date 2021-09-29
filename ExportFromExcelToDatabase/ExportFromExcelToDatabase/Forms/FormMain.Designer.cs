@@ -27,6 +27,7 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         private void InitializeComponent() {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выбратьФайлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,9 +42,10 @@ namespace ExportFromExcelToDatabase
             this.Message = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ShowData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ShowQuerySQL = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Информация = new System.Windows.Forms.GroupBox();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.labelProgress = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.groupBoxProcess.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProcess)).BeginInit();
@@ -105,15 +107,18 @@ namespace ExportFromExcelToDatabase
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxProcess.BackColor = System.Drawing.Color.LightGray;
+            this.groupBoxProcess.Controls.Add(this.labelProgress);
+            this.groupBoxProcess.Controls.Add(this.progressBar);
             this.groupBoxProcess.Controls.Add(this.buttonStart);
             this.groupBoxProcess.Controls.Add(this.dataGridViewProcess);
             this.groupBoxProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.groupBoxProcess.Location = new System.Drawing.Point(13, 28);
             this.groupBoxProcess.Name = "groupBoxProcess";
-            this.groupBoxProcess.Size = new System.Drawing.Size(759, 435);
+            this.groupBoxProcess.Size = new System.Drawing.Size(759, 521);
             this.groupBoxProcess.TabIndex = 1;
             this.groupBoxProcess.TabStop = false;
-            this.groupBoxProcess.Text = "Процесс";
+            this.groupBoxProcess.Text = "Обработка файлов";
+            this.groupBoxProcess.UseCompatibleTextRendering = true;
             // 
             // buttonStart
             // 
@@ -122,7 +127,7 @@ namespace ExportFromExcelToDatabase
             this.buttonStart.Enabled = false;
             this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonStart.Location = new System.Drawing.Point(638, 400);
+            this.buttonStart.Location = new System.Drawing.Point(638, 486);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(115, 29);
             this.buttonStart.TabIndex = 1;
@@ -138,6 +143,14 @@ namespace ExportFromExcelToDatabase
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewProcess.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewProcess.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewProcess.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewProcess.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FileName,
@@ -145,18 +158,18 @@ namespace ExportFromExcelToDatabase
             this.Message,
             this.ShowData,
             this.ShowQuerySQL});
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewProcess.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewProcess.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewProcess.Location = new System.Drawing.Point(7, 20);
             this.dataGridViewProcess.Name = "dataGridViewProcess";
             this.dataGridViewProcess.ReadOnly = true;
-            this.dataGridViewProcess.Size = new System.Drawing.Size(746, 373);
+            this.dataGridViewProcess.Size = new System.Drawing.Size(746, 459);
             this.dataGridViewProcess.TabIndex = 0;
             this.dataGridViewProcess.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewProcess_CellClick);
             // 
@@ -165,60 +178,66 @@ namespace ExportFromExcelToDatabase
             this.FileName.HeaderText = "Файл";
             this.FileName.Name = "FileName";
             this.FileName.ReadOnly = true;
-            this.FileName.Width = 65;
+            this.FileName.Width = 61;
             // 
             // Status
             // 
             this.Status.HeaderText = "Статус";
             this.Status.Name = "Status";
             this.Status.ReadOnly = true;
-            this.Status.Width = 72;
+            this.Status.Width = 66;
             // 
             // Message
             // 
             this.Message.HeaderText = "Доп. информация";
             this.Message.Name = "Message";
             this.Message.ReadOnly = true;
-            this.Message.Width = 126;
+            this.Message.Width = 113;
             // 
             // ShowData
             // 
             this.ShowData.HeaderText = "Просмотр файла";
             this.ShowData.Name = "ShowData";
             this.ShowData.ReadOnly = true;
-            this.ShowData.Width = 121;
+            this.ShowData.Width = 108;
             // 
             // ShowQuerySQL
             // 
             this.ShowQuerySQL.HeaderText = "Просмотр сгенерированного SQL-запроса";
             this.ShowQuerySQL.Name = "ShowQuerySQL";
             this.ShowQuerySQL.ReadOnly = true;
-            this.ShowQuerySQL.Width = 190;
-            // 
-            // Информация
-            // 
-            this.Информация.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Информация.BackColor = System.Drawing.Color.LightGray;
-            this.Информация.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Информация.Location = new System.Drawing.Point(13, 469);
-            this.Информация.Name = "Информация";
-            this.Информация.Size = new System.Drawing.Size(759, 80);
-            this.Информация.TabIndex = 2;
-            this.Информация.TabStop = false;
-            this.Информация.Text = "Информация";
+            this.ShowQuerySQL.Width = 167;
             // 
             // openFileDialog
             // 
             this.openFileDialog.FileName = "Наименование файла";
             this.openFileDialog.Filter = "Excel-файлы |*.xls; *.xlsx";
             // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(71, 486);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(561, 29);
+            this.progressBar.TabIndex = 2;
+            // 
+            // labelProgress
+            // 
+            this.labelProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelProgress.AutoSize = true;
+            this.labelProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelProgress.Location = new System.Drawing.Point(6, 494);
+            this.labelProgress.Name = "labelProgress";
+            this.labelProgress.Size = new System.Drawing.Size(59, 13);
+            this.labelProgress.TabIndex = 3;
+            this.labelProgress.Text = "Прогресс:";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.Информация);
             this.Controls.Add(this.groupBoxProcess);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
@@ -228,6 +247,7 @@ namespace ExportFromExcelToDatabase
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.groupBoxProcess.ResumeLayout(false);
+            this.groupBoxProcess.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProcess)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -241,7 +261,6 @@ namespace ExportFromExcelToDatabase
         private System.Windows.Forms.ToolStripMenuItem настрокиToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem выходToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBoxProcess;
-        private System.Windows.Forms.GroupBox Информация;
         private System.Windows.Forms.ToolStripMenuItem выбратьФайлToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem выбратьПапкуToolStripMenuItem;
         private System.Windows.Forms.DataGridView dataGridViewProcess;
@@ -253,6 +272,8 @@ namespace ExportFromExcelToDatabase
         private System.Windows.Forms.DataGridViewTextBoxColumn Message;
         private System.Windows.Forms.DataGridViewTextBoxColumn ShowData;
         private System.Windows.Forms.DataGridViewTextBoxColumn ShowQuerySQL;
+        private System.Windows.Forms.Label labelProgress;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 

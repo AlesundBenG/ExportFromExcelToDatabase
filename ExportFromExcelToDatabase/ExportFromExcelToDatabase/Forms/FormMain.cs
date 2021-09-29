@@ -185,7 +185,7 @@ namespace ExportFromExcelToDatabase
             bool successSetQuerySQL = (setQuerySQL(_pathQuery) == 0);
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
-                if (openFileDialog.ShowDialog() == DialogResult.OK) {
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
                     prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
                 }
             }
@@ -235,8 +235,11 @@ namespace ExportFromExcelToDatabase
             _excelFiles = new List<string>();
             _dataExcelFiles = new List<ParserResult>();
             _queryForExcelFiles = new List<string>();
+            progressBar.Value = 0;
+            progressBar.Maximum = pathFiles.Length;
             for (int i = 0; i < pathFiles.Length; i++) {
                 prepareFileForProcess(pathFiles[i]);
+                progressBar.Value += 1;
             }
             if (_excelFiles.Count < 1) {
                 MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
