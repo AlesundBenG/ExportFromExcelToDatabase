@@ -42,6 +42,7 @@ namespace ExportFromExcelToDatabase
         /// Список дескрипторов объектов.
         /// </summary>
         private List<DescriptorObject> _listDescriptorObject;
+
         /// <summary>
         /// Файлы для обработки.
         /// </summary>
@@ -50,6 +51,11 @@ namespace ExportFromExcelToDatabase
         /// Данные Excel-файлов.
         /// </summary>
         private List<ParserResult> _dataExcelFiles;
+
+        /// <summary>
+        /// Сгенерированные SQL-запросы для Excel-файлов.
+        /// </summary>
+        private List<string> _queryForExcelFiles;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
@@ -237,17 +243,11 @@ namespace ExportFromExcelToDatabase
             dataGridViewProcess.Rows.Clear();
             _excelFiles = new List<string>();
             _dataExcelFiles = new List<ParserResult>();
+            _queryForExcelFiles = new List<string>();
             ReaderExcelFile readerFile = new ReaderExcelFile();
             ParserExcelFile parser = new ParserExcelFile();
             for (int i = 0; i < pathFiles.Length; i++) {
-                string fileExtension = pathFiles[i].Substring(pathFiles[i].LastIndexOf('.') + 1);
-                if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
-                    _excelFiles.Add(pathFiles[i]);
-                    _dataExcelFiles.Add(parser.parser(_listDescriptorObject, readerFile.readFile(pathFiles[i])));
-                    dataGridViewProcess.Rows.Add();
-                    dataGridViewProcess["FileName", i].Value = pathFiles[i].Substring(pathFiles[i].LastIndexOf('\\') + 1);
-                    dataGridViewProcess["Status", i].Value = "Готов к обработке";
-                }
+                prepareFileForProcess(pathFiles[i]);
             }
             if (_excelFiles.Count < 1) {
                 MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -259,8 +259,43 @@ namespace ExportFromExcelToDatabase
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
-            FormShowingDataFromFile formShowing = new FormShowingDataFromFile(_listDescriptorObject, _dataExcelFiles[e.RowIndex]);
-            formShowing.Show();
+            if (e.RowIndex >= 0) {
+                if (e.ColumnIndex == dataGridViewProcess.Columns["ShowData"].Index) {
+                    FormShowingDataFromFile formShowing = new FormShowingDataFromFile(_listDescriptorObject, _dataExcelFiles[e.RowIndex]);
+                    formShowing.Show();
+                }
+                else if (e.ColumnIndex == dataGridViewProcess.Columns["ShowQuerySQL"].Index) {
+                    FormShowingQuerySQL formShowing = new FormShowingQuerySQL(_queryForExcelFiles[e.RowIndex]);
+                    formShowing.Show();
+                }
+            }
+        }
+
+        private int prepareFileForProcess(string pathFile) {
+            string fileExtension = pathFile.Substring(pathFile.LastIndexOf('.') + 1);
+            if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
+                ReaderExcelFile readerFile = new ReaderExcelFile();
+                ParserExcelFile parser = new ParserExcelFile();
+                GeneratorSQLCommand generator = new GeneratorSQLCommand();
+                ExcelFile excelFile = readerFile.readFile(pathFile);
+                ParserResult parserResult = parser.parser(_listDescriptorObject, excelFile);
+                string querySQL = generator.insertDataToCommand(_querySQL, parserResult.singleValue, parserResult.table);
+                _excelFiles.Add(pathFile);
+                _dataExcelFiles.Add(parserResult);
+                _queryForExcelFiles.Add(querySQL);
+                dataGridViewProcess.Rows.Add();
+                int lastRow = dataGridViewProcess.Rows.Count - 1;
+                dataGridViewProcess["FileName", lastRow].Value = pathFile.Substring(pathFile.LastIndexOf('\\') + 1);
+                dataGridViewProcess["Status", lastRow].Value = "Готов к обработке";
+                dataGridViewProcess["ShowData", lastRow].Value = "Показать";
+                dataGridViewProcess["ShowQuerySQL", lastRow].Value = "Показать";
+                dataGridViewProcess["ShowData", lastRow].Style.BackColor = Color.LightGreen;
+                dataGridViewProcess["ShowQuerySQL", lastRow].Style.BackColor = Color.LightGreen;
+                return 0;
+            }
+            else {
+                return 1;
+            }
         }
     }
 }
