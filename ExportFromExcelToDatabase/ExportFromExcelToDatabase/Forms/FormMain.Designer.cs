@@ -27,7 +27,6 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         private void InitializeComponent() {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выбратьФайлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -37,14 +36,14 @@ namespace ExportFromExcelToDatabase
             this.groupBoxProcess = new System.Windows.Forms.GroupBox();
             this.buttonStart = new System.Windows.Forms.Button();
             this.dataGridViewProcess = new System.Windows.Forms.DataGridView();
-            this.Информация = new System.Windows.Forms.GroupBox();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.FileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Message = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ShowData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ShowQuerySQL = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Информация = new System.Windows.Forms.GroupBox();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip.SuspendLayout();
             this.groupBoxProcess.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProcess)).BeginInit();
@@ -139,14 +138,6 @@ namespace ExportFromExcelToDatabase
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewProcess.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewProcess.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewProcess.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewProcess.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FileName,
@@ -154,21 +145,55 @@ namespace ExportFromExcelToDatabase
             this.Message,
             this.ShowData,
             this.ShowQuerySQL});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewProcess.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewProcess.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewProcess.Location = new System.Drawing.Point(7, 20);
             this.dataGridViewProcess.Name = "dataGridViewProcess";
             this.dataGridViewProcess.ReadOnly = true;
             this.dataGridViewProcess.Size = new System.Drawing.Size(746, 373);
             this.dataGridViewProcess.TabIndex = 0;
             this.dataGridViewProcess.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewProcess_CellClick);
-            this.dataGridViewProcess.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridViewProcess_MouseClick);
+            // 
+            // FileName
+            // 
+            this.FileName.HeaderText = "Файл";
+            this.FileName.Name = "FileName";
+            this.FileName.ReadOnly = true;
+            this.FileName.Width = 65;
+            // 
+            // Status
+            // 
+            this.Status.HeaderText = "Статус";
+            this.Status.Name = "Status";
+            this.Status.ReadOnly = true;
+            this.Status.Width = 72;
+            // 
+            // Message
+            // 
+            this.Message.HeaderText = "Доп. информация";
+            this.Message.Name = "Message";
+            this.Message.ReadOnly = true;
+            this.Message.Width = 126;
+            // 
+            // ShowData
+            // 
+            this.ShowData.HeaderText = "Просмотр файла";
+            this.ShowData.Name = "ShowData";
+            this.ShowData.ReadOnly = true;
+            this.ShowData.Width = 121;
+            // 
+            // ShowQuerySQL
+            // 
+            this.ShowQuerySQL.HeaderText = "Просмотр сгенерированного SQL-запроса";
+            this.ShowQuerySQL.Name = "ShowQuerySQL";
+            this.ShowQuerySQL.ReadOnly = true;
+            this.ShowQuerySQL.Width = 190;
             // 
             // Информация
             // 
@@ -188,41 +213,6 @@ namespace ExportFromExcelToDatabase
             this.openFileDialog.FileName = "Наименование файла";
             this.openFileDialog.Filter = "Excel-файлы |*.xls; *.xlsx";
             // 
-            // FileName
-            // 
-            this.FileName.HeaderText = "Файл";
-            this.FileName.Name = "FileName";
-            this.FileName.ReadOnly = true;
-            this.FileName.Width = 61;
-            // 
-            // Status
-            // 
-            this.Status.HeaderText = "Статус";
-            this.Status.Name = "Status";
-            this.Status.ReadOnly = true;
-            this.Status.Width = 66;
-            // 
-            // Message
-            // 
-            this.Message.HeaderText = "Доп. информация";
-            this.Message.Name = "Message";
-            this.Message.ReadOnly = true;
-            this.Message.Width = 113;
-            // 
-            // ShowData
-            // 
-            this.ShowData.HeaderText = "Просмотр файла";
-            this.ShowData.Name = "ShowData";
-            this.ShowData.ReadOnly = true;
-            this.ShowData.Width = 108;
-            // 
-            // ShowQuerySQL
-            // 
-            this.ShowQuerySQL.HeaderText = "Просмотр сгенерированного SQL-запроса";
-            this.ShowQuerySQL.Name = "ShowQuerySQL";
-            this.ShowQuerySQL.ReadOnly = true;
-            this.ShowQuerySQL.Width = 167;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -235,7 +225,6 @@ namespace ExportFromExcelToDatabase
             this.MinimumSize = new System.Drawing.Size(640, 480);
             this.Name = "FormMain";
             this.Text = "Загрузка данных в базу";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.groupBoxProcess.ResumeLayout(false);

@@ -30,10 +30,7 @@ namespace ExportFromExcelToDatabase
         /// Путь к SQL-запросу.
         /// </summary>
         private string _pathQuery;
-        /// <summary>
-        /// Форма настроек.
-        /// </summary>
-        private FormSetting _formSetting;
+
         /// <summary>
         /// SQL-запрос.
         /// </summary>
@@ -95,26 +92,30 @@ namespace ExportFromExcelToDatabase
         public FormMain() {
             InitializeComponent();
             _pathExe = Environment.CurrentDirectory;
-            setDescriptor(_pathExe + "\\Sourse\\Descriptor.txt");
-            setQuerySQL(_pathExe + "\\Sourse\\Query.sql");
+            _pathDescriptor = _pathExe + "\\Sourse\\Descriptor.txt";
+            _pathQuery = _pathExe + "\\Sourse\\Query.sql";
         }
 
         /// <summary>
         /// Чтение и установка дескриптора Excel-файла.
         /// </summary>
         /// <param name="pathDescriptor">Путь к дескриптору Excel-файла.</param>
-        public void setDescriptor(string pathDescriptor) {
-            if (File.Exists(pathDescriptor) && _pathDescriptor != pathDescriptor) {
+        /// <returns>0 - Успешно, 1 - Ошибка при чтении, 2 - Файл не найден.</returns>
+        public int setDescriptor(string pathDescriptor) {
+            if (File.Exists(pathDescriptor)) {
                 try {
                     _pathDescriptor = pathDescriptor;
                     _listDescriptorObject = readDescriptor(pathDescriptor);
+                    return 0;
                 }
                 catch(Exception exception) {
                     MessageBox.Show(exception.Message, "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return 1;
                 }
             }
-            else if (!File.Exists(pathDescriptor)) {
+            else {
                 MessageBox.Show($"Не был найден дескриптор Excel-файла по пути: {pathDescriptor}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 2;
             }
         }
 
@@ -122,13 +123,16 @@ namespace ExportFromExcelToDatabase
         /// Чтение и установка SQL-запроса.
         /// </summary>
         /// <param name="pathQuery"></param>
-        public void setQuerySQL(string pathQuery) {
-            if (File.Exists(pathQuery) && _pathQuery != pathQuery) {
+        /// <returns>0 - Успешно, 1 - Файл не найден.</returns>
+        public int setQuerySQL(string pathQuery) {
+            if (File.Exists(pathQuery)) {
                 _pathQuery = pathQuery;
                 _querySQL = readQuery(pathQuery, false);
+                return 0;
             }
             else {
                 MessageBox.Show($"Не был найден SQL-запрос по пути: {pathQuery}!", "Ошибка чтения файла", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 1;
             }
         }
 
@@ -165,65 +169,39 @@ namespace ExportFromExcelToDatabase
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Private методы*/
 
-        private void Form1_Load(object sender, EventArgs e) {
-            /*
-            ReaderTextFile readerFile = new ReaderTextFile();
-            ReaderExcelFile readerExcelFile = new ReaderExcelFile();
-
-            string[] linesFile = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\test.txt");
-            string[] linesFileSQL = readerFile.getSplitTextOnLines("C:\\Users\\batas\\Desktop\\testSQL.txt");
-            ExcelFile excelFile = readerExcelFile.readFile("C:\\Users\\batas\\Desktop\\test.xls");
-            string file = String.Join(" ", linesFile);
-            string fileSQL = String.Join(" ", linesFileSQL);
-            ReaderDescriptor readerDescriptor = new ReaderDescriptor();
-            List<DescriptorObject> descriptors = readerDescriptor.getListDescriptors(file);
-
-            ParserExcelFile parserExcelFile = new ParserExcelFile();
-            ParserResult result = parserExcelFile.parser(descriptors, excelFile);
-
-            GeneratorSQLCommand generator = new GeneratorSQLCommand();
-            string command = generator.insertDataToCommand(fileSQL, result.singleValue, result.table);
-            */
-
-        }
-
         private void выбратьФайлToolStripMenuItem_Click(object sender, EventArgs e) {
-            if ((_pathDescriptor != null) && (_pathQuery != null)) {
+            bool successSetDescriptor = (setDescriptor(_pathDescriptor) == 0);
+            bool successSetQuerySQL = (setQuerySQL(_pathQuery) == 0);
+            //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
+            if (successSetDescriptor && successSetQuerySQL) {
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
                     prepareForProcess(new string[1] { openFileDialog.FileName });
                 }
             } 
-            else if (_pathDescriptor == null) {
-                MessageBox.Show($"Не выбран дескриптор Excel-файла!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (_pathQuery != null) {
-                MessageBox.Show($"Не выбран SQL-запрос!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void выбратьПапкуToolStripMenuItem_Click(object sender, EventArgs e) {
-            if ((_pathDescriptor != null) && (_pathQuery != null)) {
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
+            bool successSetDescriptor = (setDescriptor(_pathDescriptor) == 0);
+            bool successSetQuerySQL = (setQuerySQL(_pathQuery) == 0);
+            //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
+            if (successSetDescriptor && successSetQuerySQL) {
+                if (openFileDialog.ShowDialog() == DialogResult.OK) {
                     prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
                 }
-            }
-            else if (_pathDescriptor == null) {
-                MessageBox.Show($"Не выбран дескриптор Excel-файла!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (_pathQuery != null) {
-                MessageBox.Show($"Не выбран SQL-запрос!", "Ошибка настроек программы", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void настрокиToolStripMenuItem_Click(object sender, EventArgs e) {
-            _formSetting = new FormSetting(this);
-            if (_pathQuery != null) {
-                _formSetting.setQuery(_pathQuery, _querySQL);
+            bool successSetDescriptor = (setDescriptor(_pathDescriptor) == 0);
+            bool successSetQuerySQL = (setQuerySQL(_pathQuery) == 0);
+            FormSetting formSetting = new FormSetting(this);
+            if (successSetDescriptor) {
+                formSetting.setDescriptor(_pathDescriptor, _listDescriptorObject);
             }
-            if (_pathDescriptor != null) {
-                _formSetting.setDescriptor(_pathDescriptor, _listDescriptorObject);
+            if (successSetQuerySQL) {
+                formSetting.setQuery(_pathQuery, _querySQL);
             }
-            _formSetting.ShowDialog();
+            formSetting.ShowDialog();
         }
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -232,30 +210,6 @@ namespace ExportFromExcelToDatabase
 
         private void buttonStart_Click(object sender, EventArgs e) {
 
-        }
-
-        /// <summary>
-        /// Подготовка к обработке: Добавить в список файлы и отобразить в dataGridViewProcess.
-        /// </summary>
-        /// <param name="pathFiles">Пути к файлам</param>
-        /// <returns>0 - Успешно; -1 - Ошибка.</returns>
-        private void prepareForProcess(string[] pathFiles) {
-            dataGridViewProcess.Rows.Clear();
-            _excelFiles = new List<string>();
-            _dataExcelFiles = new List<ParserResult>();
-            _queryForExcelFiles = new List<string>();
-            ReaderExcelFile readerFile = new ReaderExcelFile();
-            ParserExcelFile parser = new ParserExcelFile();
-            for (int i = 0; i < pathFiles.Length; i++) {
-                prepareFileForProcess(pathFiles[i]);
-            }
-            if (_excelFiles.Count < 1) {
-                MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void dataGridViewProcess_MouseClick(object sender, MouseEventArgs e) {
-            
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
@@ -271,6 +225,31 @@ namespace ExportFromExcelToDatabase
             }
         }
 
+        /// <summary>
+        /// Подготовка к обработке: Добавить в список файлы и отобразить в dataGridViewProcess.
+        /// </summary>
+        /// <param name="pathFiles">Пути к файлам</param>
+        /// <returns>0 - Успешно; -1 - Ошибка.</returns>
+        private void prepareForProcess(string[] pathFiles) {
+            dataGridViewProcess.Rows.Clear();
+            _excelFiles = new List<string>();
+            _dataExcelFiles = new List<ParserResult>();
+            _queryForExcelFiles = new List<string>();
+            for (int i = 0; i < pathFiles.Length; i++) {
+                prepareFileForProcess(pathFiles[i]);
+            }
+            if (_excelFiles.Count < 1) {
+                MessageBox.Show("В папке нет Excel-файлов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Подготовка файла к обработке: Чтение файла, парсинг файла, генерация SQL-запроса.
+        /// Добавление файла в список файлов для обработки, добавление данных файла в список данных файлов, добавление сгенерированного SQl-запроса.
+        /// Плюс файл отображается в dataGridViewProcess.
+        /// </summary>
+        /// <param name="pathFile">Путь к файлу.</param>
+        /// <returns>0 - Успешно, 1 - файл не является Excel-файлом</returns>
         private int prepareFileForProcess(string pathFile) {
             string fileExtension = pathFile.Substring(pathFile.LastIndexOf('.') + 1);
             if ((fileExtension == "xlsx") || (fileExtension == "xls")) {

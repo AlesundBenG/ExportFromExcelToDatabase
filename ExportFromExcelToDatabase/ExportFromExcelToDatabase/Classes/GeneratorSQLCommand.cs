@@ -97,7 +97,7 @@ namespace ExportFromExcelToDatabase.Classes
                 if (i != 0) {
                     allValues = allValues + ", ";
                 }
-                allValues = allValues + rowValue;
+                allValues = allValues + rowValue + '\n';
             }
             return allValues;
         }
