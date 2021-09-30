@@ -93,6 +93,9 @@ namespace ExportFromExcelToDatabase
                 dataGridViewDescriptorObjects["tag", indexRow].Value = descriptor.NameObject;
                 dataGridViewDescriptorObjects["Attribute", indexRow].Value = descriptor.getToken(i).Name;
                 dataGridViewDescriptorObjects["value", indexRow].Value = descriptor.getToken(i).Value;
+                if (currentNumber % 2 == 0) {
+                    dataGridViewDescriptorObjects.Rows[indexRow].DefaultCellStyle.BackColor = Color.AliceBlue;
+                }
             }
             for (int i = 0; i < descriptor.CountNestedObject; i++) {
                 countPrintedObject = countPrintedObject + printDescriptor(currentNumber, currentNumber + countPrintedObject, descriptor.getNestedObject(i));

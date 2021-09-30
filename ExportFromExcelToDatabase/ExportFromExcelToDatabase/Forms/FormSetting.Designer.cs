@@ -177,7 +177,8 @@ namespace ExportFromExcelToDatabase
             this.dataGridViewDescriptorObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewDescriptorObjects.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridViewDescriptorObjects.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewDescriptorObjects.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -186,7 +187,6 @@ namespace ExportFromExcelToDatabase
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridViewDescriptorObjects.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridViewDescriptorObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewDescriptorObjects.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Number,
             this.numberParent,
@@ -199,7 +199,7 @@ namespace ExportFromExcelToDatabase
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridViewDescriptorObjects.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewDescriptorObjects.Location = new System.Drawing.Point(7, 7);
             this.dataGridViewDescriptorObjects.Name = "dataGridViewDescriptorObjects";
@@ -291,35 +291,31 @@ namespace ExportFromExcelToDatabase
             this.Number.HeaderText = "Номер";
             this.Number.Name = "Number";
             this.Number.ReadOnly = true;
-            this.Number.Width = 66;
+            this.Number.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // numberParent
             // 
             this.numberParent.HeaderText = "Номер родителя";
             this.numberParent.Name = "numberParent";
             this.numberParent.ReadOnly = true;
-            this.numberParent.Width = 106;
             // 
             // tag
             // 
             this.tag.HeaderText = "Тег";
             this.tag.Name = "tag";
             this.tag.ReadOnly = true;
-            this.tag.Width = 50;
             // 
             // Attribute
             // 
             this.Attribute.HeaderText = "Атрибут";
             this.Attribute.Name = "Attribute";
             this.Attribute.ReadOnly = true;
-            this.Attribute.Width = 72;
             // 
             // Value
             // 
             this.Value.HeaderText = "Значение";
             this.Value.Name = "Value";
             this.Value.ReadOnly = true;
-            this.Value.Width = 80;
             // 
             // FormSetting
             // 
