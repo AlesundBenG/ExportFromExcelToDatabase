@@ -15,6 +15,9 @@ using ExportFromExcelToDatabase.Forms;
 
 namespace ExportFromExcelToDatabase
 {
+    /// <summary>
+    /// Метаданные файла.
+    /// </summary>
     public struct MetadataFile
     {
         /// <summary>
@@ -60,23 +63,22 @@ namespace ExportFromExcelToDatabase
         /// Путь к SQL-запросу.
         /// </summary>
         private string _pathQuery;
-
-        private MetadataFile[] _metadataFiles;
-
-
-
         /// <summary>
-        /// SQL-запрос.
+        /// Мета данные файлов в папке.
+        /// </summary>
+        private MetadataFile[] _metadataFiles;
+        /// <summary>
+        /// Шаблон SQL-запроса.
         /// </summary>
         private string _querySQL;
         /// <summary>
         /// Список дескрипторов объектов.
         /// </summary>
         private List<DescriptorObject> _listDescriptorObject;
-
+        /// <summary>
+        /// Файлы в выбранной папке.
+        /// </summary>
         private string[] _pathFiles;
-
-
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
@@ -105,7 +107,6 @@ namespace ExportFromExcelToDatabase
                 return _pathQuery;
             }
         }
-
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Public методы*/
@@ -199,13 +200,9 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
-
                     _pathFiles = new string[1] { openFileDialog.FileName };
-                    //showFiles(_pathFiles);
                     Thread thread = new Thread(prepareForProcess);
                     thread.Start();
-
-                    //prepareForProcess(new string[1] { openFileDialog.FileName });
                 }
             } 
         }
@@ -216,12 +213,9 @@ namespace ExportFromExcelToDatabase
             //В чем ошибка установки вылетает при выполнении функции setDescriptor и setQuerySQL.
             if (successSetDescriptor && successSetQuerySQL) {
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK) {
-                    //_pathFilesFolder = folderBrowserDialog.SelectedPath;
                     _pathFiles = Directory.GetFiles(folderBrowserDialog.SelectedPath);
-                    //showFiles(_pathFiles);
                     Thread thread = new Thread(prepareForProcess);
                     thread.Start();
-                    //prepareForProcess(Directory.GetFiles(folderBrowserDialog.SelectedPath));
                 }
             }
         }
@@ -244,24 +238,8 @@ namespace ExportFromExcelToDatabase
         }
 
         private void buttonStart_Click(object sender, EventArgs e) {
-            ExecutorQuerySQL executor = new ExecutorQuerySQL("172.19.142.236", "gorod_record", "Record2020sao!", "test");
-            for (int i = 0; i < _metadataFiles.Length; i++) {
-                if (_metadataFiles[i].conditionProcess == 4) {
-                    List<DataTable> result = executor.executeComamnd(_metadataFiles[i].queryForFile);
-                    if (result.Count > 0) {
-                        string thereIsError = result[0].Rows[0]["thereIsError"].ToString();
-                        if (thereIsError == "0") {
-                            dataGridViewProcess["Status", i].Value = "Запрос успешно выполнен";
-                            dataGridViewProcess["Status", i].Style.BackColor = Color.LightGreen;
-                        }
-                        else {
-                            dataGridViewProcess["Status", i].Value = "Ошибка выполнения запроса";
-                            dataGridViewProcess["Status", i].Style.BackColor = Color.Red;
-                            dataGridViewProcess["Message", i].Value = result[0].Rows[0]["message"].ToString();
-                        }
-                    }
-                }
-            }
+            Thread thread = new Thread(executeQuerySQL);
+            thread.Start();
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
@@ -289,12 +267,13 @@ namespace ExportFromExcelToDatabase
         /// <param name="pathFiles">Пути к файлам</param>
         /// <returns>0 - Успешно; -1 - Ошибка.</returns>
         private void prepareForProcess() {
-            buttonStart.Invoke(new Action(() => buttonStart.Enabled = false));
-            buttonStart.Invoke(new Action(() => buttonStart.BackColor = Color.Orange));
+            setEnableButton(buttonStart, false);
+            setColorButton(buttonStart, Color.Orange);
+            setTexLabel(labelCondition, "Чтение файлов");
             initMetadataFiles(_pathFiles);
             showFiles(_metadataFiles);
-            progressBar.Invoke(new Action(() => progressBar.Value = 0));
-            progressBar.Invoke(new Action(() => progressBar.Maximum = _pathFiles.Length));
+            resetProgressBar(progressBar);
+            setMaxValueProgressBar(progressBar, _pathFiles.Length);
             for (int i = 0; i < _metadataFiles.Length; i++) {
                 bool successCheckFileExtension = (checkFilesExtension(i) == 0);
                 if (successCheckFileExtension) {
@@ -306,10 +285,12 @@ namespace ExportFromExcelToDatabase
                         }
                     }
                 }
-                progressBar.Invoke(new Action(() => progressBar.Value += 1));
+                incrementProgressBar(progressBar);
             }
-            buttonStart.Invoke(new Action(() => buttonStart.Enabled = true));
-            buttonStart.Invoke(new Action(() => buttonStart.BackColor = Color.LightGreen));
+            setEnableButton(buttonStart, true);
+            setColorButton(buttonStart, Color.LightGreen);
+            setTexLabel(labelCondition, "");
+            resetProgressBar(progressBar);
         }
 
         /// <summary>
@@ -330,87 +311,240 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         /// <param name="pathFiles">Пути к файлам.</param>
         private void showFiles(MetadataFile[] files) {
-            dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows.Clear()));   
+            clearDataGridView(dataGridViewProcess);
             for (int i = 0; i < files.Length; i++) {
                 string nameFile = files[i].pathFile.Substring(files[i].pathFile.LastIndexOf('\\') + 1);
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows.Add()));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["FileName", i].Value = nameFile));
+                addRowDataGridView(dataGridViewProcess);
+                setCellValueDataGridView(dataGridViewProcess, i, "FileName", nameFile);
             }
         }
 
         /// <summary>
-        /// 
+        /// Проверка расширения файла.
         /// </summary>
+        /// <param name="indexFile">Идентификатор.</param>
+        /// <returns>0 - Допустимое расширение, 1 - не допустимое расширение.</returns>
         private int checkFilesExtension(int indexFile) {
             string fileExtension = _metadataFiles[indexFile].pathFile.Substring(_metadataFiles[indexFile].pathFile.LastIndexOf('.') + 1);
             if ((fileExtension == "xlsx") || (fileExtension == "xls")) {
                 _metadataFiles[indexFile].conditionProcess = 1;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Открытие файла"));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Открытие файла");
                 return 0;
             }
             else {
                 _metadataFiles[indexFile].conditionProcess = -1;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка открытия файла"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = "Не верное расширение файла"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Ошибка открытия файла");
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Message", "Не верное расширение файла");
+                setRowColorDataGridView(dataGridViewProcess, indexFile, Color.LightGray);
                 return 1;
             }
         }
 
+        /// <summary>
+        /// Чтение файла.
+        /// </summary>
+        /// <param name="indexFile">Идентификатор файла.</param>
+        /// <returns>0 - Успешно, 1 - ошибка.</returns>
         private int getDataFile(int indexFile) {
             ReaderExcelFile readerFile = new ReaderExcelFile();
             try {
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Чтение файла"));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Чтение файла");
                 _metadataFiles[indexFile].dataFile = readerFile.readFile(_metadataFiles[indexFile].pathFile);
                 _metadataFiles[indexFile].conditionProcess = 2;
                 return 0;
             }
             catch (Exception exception) {
                 _metadataFiles[indexFile].conditionProcess = -2;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка чтения файла"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Ошибка чтения файла");
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Message", exception.Message);
+                setRowColorDataGridView(dataGridViewProcess, indexFile, Color.LightGray);
                 return 1;
             }
         }
 
+        /// <summary>
+        /// Извлечение данных из файла.
+        /// </summary>
+        /// <param name="indexFile">Идентификатор файла.</param>
+        /// <returns>0 - Успешно, 1 - ошибка.</returns>
         private int parseFile(int indexFile) {
             ParserExcelFile parser = new ParserExcelFile();
             try {
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Извлечение данных из файла"));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Извлечение данных из файла");
                 _metadataFiles[indexFile].parsedData = parser.parser(_listDescriptorObject, _metadataFiles[indexFile].dataFile);
                 _metadataFiles[indexFile].conditionProcess = 3;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Style.BackColor = Color.LightBlue));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "ShowData", "Показать");
+                setCellColorDataGridView(dataGridViewProcess, indexFile, "ShowData", Color.LightBlue);
                 return 0;
             }
             catch (Exception exception) {
                 _metadataFiles[indexFile].conditionProcess = -3;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка извлечения данных"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Ошибка извлечения данных");
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Message", exception.Message);
+                setRowColorDataGridView(dataGridViewProcess, indexFile, Color.LightGray);
                 return 1;
             }
         }
 
+        /// <summary>
+        /// Генерация SQL-запроса для файла.
+        /// </summary>
+        /// <param name="indexFile">Идентификатор файла.</param>
+        /// <returns>0 - Успешно, 1 - ошибка.</returns>
         private int generateQuery(int indexFile) {
             GeneratorSQLCommand generator = new GeneratorSQLCommand();
             try {
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Генерация запроса"));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Генерация запроса");
                 _metadataFiles[indexFile].queryForFile = generator.insertDataToCommand(_querySQL, _metadataFiles[indexFile].parsedData.singleValue, _metadataFiles[indexFile].parsedData.table);
                 _metadataFiles[indexFile].conditionProcess = 4;
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Style.BackColor = Color.LightBlue));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Готов к обработке"));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "ShowQuerySQL", "Показать");
+                setCellColorDataGridView(dataGridViewProcess, indexFile, "ShowQuerySQL", Color.LightBlue);
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Готов к обработке");
                 return 0;
             }
             catch (Exception exception) {
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Ошибка генерации запроса"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Message", indexFile].Value = exception.Message));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess.Rows[indexFile].DefaultCellStyle.BackColor = Color.LightGray));
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Status", "Ошибка генерации запроса");
+                setCellValueDataGridView(dataGridViewProcess, indexFile, "Message", exception.Message);
+                setRowColorDataGridView(dataGridViewProcess, indexFile, Color.LightGray);
                 return 1;
             }
         }
 
+        /// <summary>
+        /// Выполнение сгенерированных SQL-запросов.
+        /// </summary>
+        private void executeQuerySQL() {
+            ExecutorQuerySQL executor = new ExecutorQuerySQL();
+            setTexLabel(labelCondition, "Выполнение запросов");
+            resetProgressBar(progressBar);
+            setMaxValueProgressBar(progressBar, _pathFiles.Length);
+            for (int i = 0; i < _metadataFiles.Length; i++) {
+                if (_metadataFiles[i].conditionProcess == 4) {
+                    try {
+                        List<DataTable> result = executor.executeComamnd(_metadataFiles[i].queryForFile);
+                        if (result.Count > 0) {
+                            string thereIsError = result[0].Rows[0]["thereIsError"].ToString();
+                            if (thereIsError == "0") {
+                                setCellValueDataGridView(dataGridViewProcess, i, "Status", "Запрос успешно выполнен");
+                                setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.LightGreen);
+                            }
+                            else {
+                                setCellValueDataGridView(dataGridViewProcess, i, "Status", "Ошибка выполнения запроса");
+                                setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.Red);
+                                setCellValueDataGridView(dataGridViewProcess, i, "Message", result[0].Rows[0]["message"].ToString());
+                            }
+                        }
+                    }
+                    catch (Exception exception) {
+                        setCellValueDataGridView(dataGridViewProcess, i, "Status", "Ошибка выполнения запроса");
+                        setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.Red);
+                        setCellValueDataGridView(dataGridViewProcess, i, "Message", exception.Message);
+                    }
+                }
+                incrementProgressBar(progressBar);
+            }
+            resetProgressBar(progressBar);
+            setTexLabel(labelCondition, "");
+        }
+
+        /// <summary>
+        /// Установка доступноси кнопки на нажатие.
+        /// </summary>
+        /// <param name="button">Кнопка.</param>
+        /// <param name="enable">Доступность к нажатию.</param>
+        private void setEnableButton(Button button, bool enable) {
+            button.Invoke(new Action(() => button.Enabled = enable));
+        }
+
+        /// <summary>
+        /// Установка цвета кнопки.
+        /// </summary>
+        /// <param name="button">Кнопка.</param>
+        /// <param name="color">Цвет.</param>
+        private void setColorButton(Button button, Color color) {
+            button.Invoke(new Action(() => button.BackColor = color));
+        }
+
+        /// <summary>
+        /// Установка текста таблички.
+        /// </summary>
+        /// <param name="label">Табличка.</param>
+        /// <param name="text">Текст.</param>
+        private void setTexLabel(Label label, string text) {
+            label.Invoke(new Action(() => label.Text = text));
+        }
+
+        /// <summary>
+        /// Сброс прогресс бара.
+        /// </summary>
+        /// <param name="progressBar">Прогресс бар</param>
+        private void resetProgressBar(ProgressBar progressBar) {
+            progressBar.Invoke(new Action(() => progressBar.Value = 0));
+        }
+
+        /// <summary>
+        /// Установка максимального допустимого значения в прогресс баре.
+        /// </summary>
+        /// <param name="progressBar">Прогресс бар.</param>
+        /// <param name="maxValue">Максимально допустимое значение.</param>
+        private void setMaxValueProgressBar(ProgressBar progressBar, int maxValue) {
+            progressBar.Invoke(new Action(() => progressBar.Maximum = maxValue));
+        }
+
+        /// <summary>
+        /// Увеличить на единицу значение прогресс бара.
+        /// </summary>
+        /// <param name="progressBar">Прогресс бар.</param>
+        private void incrementProgressBar(ProgressBar progressBar) {
+            progressBar.Invoke(new Action(() => progressBar.Value += 1));
+        }
+
+        /// <summary>
+        /// Очистка таблицы.
+        /// </summary>
+        /// <param name="dataGridView">Таблица.</param>
+        private void clearDataGridView(DataGridView dataGridView) {
+            dataGridView.Invoke(new Action(() => dataGridView.Rows.Clear()));
+        }
+
+        /// <summary>
+        /// Добавить строку в таблицу.
+        /// </summary>
+        /// <param name="dataGridView">Таблица.</param>
+        private void addRowDataGridView(DataGridView dataGridView) {
+            dataGridView.Invoke(new Action(() => dataGridView.Rows.Add()));
+        }
+
+        /// <summary>
+        /// Установка значения в ячейку таблицы.
+        /// </summary>
+        /// <param name="dataGridView">Таблица.</param>
+        /// <param name="row">Строка.</param>
+        /// <param name="columnName">Название столбца.</param>
+        /// <param name="value">Значение.</param>
+        private void setCellValueDataGridView(DataGridView dataGridView, int row, string columnName, string value) {
+            dataGridView.Invoke(new Action(() => dataGridView[columnName, row].Value = value));
+        }
+
+        /// <summary>
+        /// Установка цвета строке таблицы.
+        /// </summary>
+        /// <param name="dataGridView">Таблица.</param>
+        /// <param name="row">Строка.</param>
+        /// <param name="color">Цвет.</param>
+        private void setRowColorDataGridView(DataGridView dataGridView, int row, Color color) {
+            dataGridView.Invoke(new Action(() => dataGridView.Rows[row].DefaultCellStyle.BackColor = color));
+        }
+
+        /// <summary>
+        /// Установка цвета ячейке таблицы.
+        /// </summary>
+        /// <param name="dataGridView">Таблица.</param>
+        /// <param name="row">Строка.</param>
+        /// <param name="columnName">Название столбца.</param>
+        /// <param name="color">Цвет.</param>
+        private void setCellColorDataGridView(DataGridView dataGridView, int row, string columnName, Color color) {
+            dataGridView.Invoke(new Action(() => dataGridView[columnName, row].Style.BackColor = color));
+        }
     }
 }
