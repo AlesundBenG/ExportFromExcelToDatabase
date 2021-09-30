@@ -77,3 +77,14 @@ IF (@thereIsError = 0) BEGIN
     SET @endDate = DATEADD(MONTH, ((YEAR(@startDate) - 1900) * 12) + MONTH(@startDate), -1)
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--Этап 8: Завершение
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--Вывод результата.
+SELECT @thereIsError AS thereIsError, @message AS message
+--Удаление временных таблиц.
+IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
+IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
+IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END --Данные для вставки.

@@ -244,7 +244,24 @@ namespace ExportFromExcelToDatabase
         }
 
         private void buttonStart_Click(object sender, EventArgs e) {
-
+            ExecutorQuerySQL executor = new ExecutorQuerySQL("172.19.142.236", "gorod_record", "Record2020sao!", "test");
+            for (int i = 0; i < _metadataFiles.Length; i++) {
+                if (_metadataFiles[i].conditionProcess == 4) {
+                    List<DataTable> result = executor.executeComamnd(_metadataFiles[i].queryForFile);
+                    if (result.Count > 0) {
+                        string thereIsError = result[0].Rows[0]["thereIsError"].ToString();
+                        if (thereIsError == "0") {
+                            dataGridViewProcess["Status", i].Value = "Запрос успешно выполнен";
+                            dataGridViewProcess["Status", i].Style.BackColor = Color.LightGreen;
+                        }
+                        else {
+                            dataGridViewProcess["Status", i].Value = "Ошибка выполнения запроса";
+                            dataGridViewProcess["Status", i].Style.BackColor = Color.Red;
+                            dataGridViewProcess["Message", i].Value = result[0].Rows[0]["message"].ToString();
+                        }
+                    }
+                }
+            }
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
@@ -272,6 +289,8 @@ namespace ExportFromExcelToDatabase
         /// <param name="pathFiles">Пути к файлам</param>
         /// <returns>0 - Успешно; -1 - Ошибка.</returns>
         private void prepareForProcess() {
+            buttonStart.Invoke(new Action(() => buttonStart.Enabled = false));
+            buttonStart.Invoke(new Action(() => buttonStart.BackColor = Color.Orange));
             initMetadataFiles(_pathFiles);
             showFiles(_metadataFiles);
             progressBar.Invoke(new Action(() => progressBar.Value = 0));
@@ -289,6 +308,8 @@ namespace ExportFromExcelToDatabase
                 }
                 progressBar.Invoke(new Action(() => progressBar.Value += 1));
             }
+            buttonStart.Invoke(new Action(() => buttonStart.Enabled = true));
+            buttonStart.Invoke(new Action(() => buttonStart.BackColor = Color.LightGreen));
         }
 
         /// <summary>
@@ -360,7 +381,7 @@ namespace ExportFromExcelToDatabase
                 _metadataFiles[indexFile].parsedData = parser.parser(_listDescriptorObject, _metadataFiles[indexFile].dataFile);
                 _metadataFiles[indexFile].conditionProcess = 3;
                 dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Style.BackColor = Color.LightGreen));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowData", indexFile].Style.BackColor = Color.LightBlue));
                 return 0;
             }
             catch (Exception exception) {
@@ -379,7 +400,7 @@ namespace ExportFromExcelToDatabase
                 _metadataFiles[indexFile].queryForFile = generator.insertDataToCommand(_querySQL, _metadataFiles[indexFile].parsedData.singleValue, _metadataFiles[indexFile].parsedData.table);
                 _metadataFiles[indexFile].conditionProcess = 4;
                 dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Value = "Показать"));
-                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Style.BackColor = Color.LightGreen));
+                dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["ShowQuerySQL", indexFile].Style.BackColor = Color.LightBlue));
                 dataGridViewProcess.Invoke(new Action(() => dataGridViewProcess["Status", indexFile].Value = "Готов к обработке"));
                 return 0;
             }
