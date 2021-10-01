@@ -149,13 +149,13 @@ namespace ExportFromExcelToDatabase.Classes
         }
 
         /// <summary>
-        /// Получить значение атбриута объекта по коду атрибута.
+        /// Получить значение атбриута объекта по коду атрибута (без учета регистра).
         /// </summary>
         /// <param name="nameToken">Имя атрибута.</param>
         /// <returns>Значение атрибута, либо NULl, если такого атрибута нет.</returns>
         public string getValueToken(string nameToken) {
             for (int i = 0; i < _listToken.Count; i++) {
-                if (_listToken[i].Name == nameToken) {
+                if (nameToken.Equals(_listToken[i].Name, StringComparison.OrdinalIgnoreCase)) {
                     return _listToken[i].Value;
                 }
             }

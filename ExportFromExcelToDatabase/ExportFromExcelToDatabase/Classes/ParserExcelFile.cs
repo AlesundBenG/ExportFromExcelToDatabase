@@ -174,8 +174,9 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="includeFinalRow">Включать последнюю строку в таблицу.</param>
         /// <returns>Таблица.</returns>
         private DataTable fillTable(string tableName, int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn, bool includeFinalRow) {
-            DataTable table = new DataTable();
-            table.TableName = tableName;
+            DataTable table = new DataTable {
+                TableName = tableName
+            };
             for (int i = 0; i < codeColumn.Count; i++) {
                 table.Columns.Add(codeColumn[i], typeof(string));
             }

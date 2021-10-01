@@ -16,7 +16,14 @@ namespace ExportFromExcelToDatabase.Forms
         public FormShowingDataFromFile(List<DescriptorObject> descriptors, ParserResult data) {
             InitializeComponent();
             showSingleValue(dataGridViewSingleValue, descriptors, data.singleValue);
-            showTable(dataGridViewTable1, descriptors, data.table[0]);
+            for (int i = 0; i < data.table.Count; i++) {
+                //tabControl.TabPages.Add(createPage(descriptors, data.table[i]));
+                TabPage pagePage = new TabPage($"Значения таблицы {data.table[i].TableName}") {
+                    BackColor = Color.White
+                };
+                tabControl.TabPages.Add(pagePage);
+                pagePage.Controls.Add(createAndFillDataGridView(pagePage, descriptors, data.table[i]));
+            }
         }
 
         public void showSingleValue(DataGridView dataGridView, List<DescriptorObject> descriptors, List<Token> singleValue) {
@@ -46,7 +53,8 @@ namespace ExportFromExcelToDatabase.Forms
             for (int i = 0; i < table.Columns.Count; i++) {
                 for (int j = 0; j < descriptorTable.CountNestedObject; j++) {
                     DescriptorObject column = descriptorTable.getNestedObject(i);
-                    if (column.getValueToken("CODE") == table.Columns[i].ColumnName) {
+                    string columnName = column.getValueToken("CODE");
+                    if (columnName.Equals(table.Columns[i].ColumnName, StringComparison.OrdinalIgnoreCase)) {
                         dataGridView.Columns.Add(table.Columns[i].ColumnName, column.getValueToken("NAME"));
                         break;
                     }
@@ -58,6 +66,24 @@ namespace ExportFromExcelToDatabase.Forms
                     dataGridView[j, i].Value = table.Rows[i][j].ToString();
                 }
             }
+        }
+
+        private DataGridView createAndFillDataGridView(TabPage pagePage, List<DescriptorObject> descriptors, DataTable table) {
+            DataGridView dataGridView = new DataGridView();
+            dataGridView.Location = new Point(7, 7);
+            dataGridView.ScrollBars = ScrollBars.Both;
+            dataGridView.AllowUserToAddRows = false;
+            dataGridView.AllowUserToDeleteRows = false;
+            dataGridView.ReadOnly = true;
+            dataGridView.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dataGridView.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
+            dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView.ScrollBars = ScrollBars.Both;
+            dataGridView.Height = pagePage.Height - SystemInformation.HorizontalScrollBarHeight;
+            dataGridView.Width = pagePage.Width - SystemInformation.VerticalScrollBarWidth;
+            showTable(dataGridView, descriptors, table);
+            return dataGridView;
         }
     }
 }
