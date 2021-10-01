@@ -37,6 +37,7 @@ namespace ExportFromExcelToDatabase.Classes
     ///    SECTION_UP_LEFT: (1 - поиск в левой верхней части от раздела)
     ///    SECTION_UP_RIGHT: (1 - поиск в правой верхней части от раздела)
     ///    CODE: условный код этой таблицы (для идентификации этой таблицы).
+    ///    INCLUDE_FINAL_ROW: Включать последнюю строку, которая совпадает с FINAL_CELL всех ячеек. (1 - включать, 0 - не включать, по умолчанию 0).
     /// Тег <column>:
     /// Описание: 
     ///    является вложенным в тег <table> и является информацией о столбце таблицы.
@@ -133,6 +134,7 @@ namespace ExportFromExcelToDatabase.Classes
                 List<string> nameColumns = new List<string>();
                 List<string> finalLine = new List<string>();
                 List<string> codeColumns = new List<string>();
+                bool INCLUDE_FINAL_ROW = (descriptor.getValueToken("INCLUDE_FINAL_ROW") ?? "0") != "0";
                 for (int iColumn = 0; iColumn < descriptor.CountNestedObject; iColumn++) {
                     DescriptorObject column = descriptor.getNestedObject(iColumn);
                     nameColumns.Add(column.getValueToken("NAME"));
@@ -145,7 +147,7 @@ namespace ExportFromExcelToDatabase.Classes
                             List<int> indexColumn = getIndexColumn(nameColumns, sheetForSearch[i], iLine);
                             if (indexColumn != null) {
                                 int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheetForSearch[i]);
-                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], codeColumns, indexColumn);
+                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], codeColumns, indexColumn, INCLUDE_FINAL_ROW);
                             }
                         }
                     }
@@ -167,13 +169,14 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="sheet">Страница.</param>
         /// <param name="codeColumn">Коды столбцов.</param>
         /// <param name="indexColumn">В каком столбце находятся данные столбцы на странице.</param>
+        /// <param name="includeFinalRow">Включать последнюю строку в таблицу.</param>
         /// <returns>Таблица.</returns>
-        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn) {
+        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn, bool includeFinalRow) {
             DataTable table = new DataTable();
             for (int i = 0; i < codeColumn.Count; i++) {
                 table.Columns.Add(codeColumn[i], typeof(string));
             }
-            for (int iLine = headerLine + 1; iLine < finalLine; iLine++) {
+            for (int iLine = headerLine + 1; iLine < finalLine + Convert.ToInt32(includeFinalRow); iLine++) {
                 DataRow line = table.NewRow();
                 for (int column = 0; column < indexColumn.Count; column++) {
                     line[column] = sheet[iLine, indexColumn[column]];

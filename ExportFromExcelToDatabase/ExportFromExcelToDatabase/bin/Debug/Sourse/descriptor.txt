@@ -91,6 +91,7 @@
 <table>	
 	SHEET_NUMBER: 2;
 	CODE: "DATA_FOR_INSERV";
+	INCLUDE_FINAL_ROW: "1";
 	<column>
 		NAME: "Код";
 		CODE: "TYPE_SERV_CODE";
