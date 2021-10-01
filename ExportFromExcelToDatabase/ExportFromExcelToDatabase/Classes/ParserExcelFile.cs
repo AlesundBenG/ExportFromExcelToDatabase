@@ -134,6 +134,7 @@ namespace ExportFromExcelToDatabase.Classes
                 List<string> nameColumns = new List<string>();
                 List<string> finalLine = new List<string>();
                 List<string> codeColumns = new List<string>();
+                string tableName = descriptor.getValueToken("CODE");
                 bool INCLUDE_FINAL_ROW = (descriptor.getValueToken("INCLUDE_FINAL_ROW") ?? "0") != "0";
                 for (int iColumn = 0; iColumn < descriptor.CountNestedObject; iColumn++) {
                     DescriptorObject column = descriptor.getNestedObject(iColumn);
@@ -147,7 +148,7 @@ namespace ExportFromExcelToDatabase.Classes
                             List<int> indexColumn = getIndexColumn(nameColumns, sheetForSearch[i], iLine);
                             if (indexColumn != null) {
                                 int finalLineIndex = getIndexFinalLine(iLine, indexColumn, finalLine, sheetForSearch[i]);
-                                return fillTable(iLine, finalLineIndex, sheetForSearch[i], codeColumns, indexColumn, INCLUDE_FINAL_ROW);
+                                return fillTable(tableName, iLine, finalLineIndex, sheetForSearch[i], codeColumns, indexColumn, INCLUDE_FINAL_ROW);
                             }
                         }
                     }
@@ -164,6 +165,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <summary>
         /// Заполнение таблицы.
         /// </summary>
+        /// <param name="tableName">Код таблицы.</param>
         /// <param name="headerLine">Номер строки с заголовком.</param>
         /// <param name="finalLine">Номер последней строки.</param>
         /// <param name="sheet">Страница.</param>
@@ -171,8 +173,9 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="indexColumn">В каком столбце находятся данные столбцы на странице.</param>
         /// <param name="includeFinalRow">Включать последнюю строку в таблицу.</param>
         /// <returns>Таблица.</returns>
-        private DataTable fillTable(int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn, bool includeFinalRow) {
+        private DataTable fillTable(string tableName, int headerLine, int finalLine, string[,] sheet, List<string> codeColumn, List<int> indexColumn, bool includeFinalRow) {
             DataTable table = new DataTable();
+            table.TableName = tableName;
             for (int i = 0; i < codeColumn.Count; i++) {
                 table.Columns.Add(codeColumn[i], typeof(string));
             }

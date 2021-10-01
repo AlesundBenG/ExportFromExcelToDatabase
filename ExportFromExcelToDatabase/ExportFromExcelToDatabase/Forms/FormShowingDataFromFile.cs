@@ -15,12 +15,11 @@ namespace ExportFromExcelToDatabase.Forms
     {
         public FormShowingDataFromFile(List<DescriptorObject> descriptors, ParserResult data) {
             InitializeComponent();
-            showSingleValue(descriptors, data.singleValue);
-            showTable(dataGridViewTable1, data.table[0]);
-
+            showSingleValue(dataGridViewSingleValue, descriptors, data.singleValue);
+            showTable(dataGridViewTable1, descriptors, data.table[0]);
         }
 
-        public void showSingleValue(List<DescriptorObject> descriptors, List<Token> singleValue) {
+        public void showSingleValue(DataGridView dataGridView, List<DescriptorObject> descriptors, List<Token> singleValue) {
             for (int i = 0; i < singleValue.Count; i++) {
                 string field = "";
                 for (int j = 0; j < descriptors.Count; j++) {
@@ -29,16 +28,29 @@ namespace ExportFromExcelToDatabase.Forms
                         break;
                     }
                 }
-                dataGridViewSingleValue.Rows.Add();
-                dataGridViewSingleValue["Field", i].Value = field;
-                dataGridViewSingleValue["Code", i].Value = singleValue[i].Name;
-                dataGridViewSingleValue["Value", i].Value = singleValue[i].Value;
+                dataGridView.Rows.Add();
+                dataGridView["Field", i].Value = field;
+                dataGridView["Code", i].Value = singleValue[i].Name;
+                dataGridView["Value", i].Value = singleValue[i].Value;
             }
         }
 
-        public void showTable(DataGridView dataGridView, DataTable table) {
+        public void showTable(DataGridView dataGridView, List<DescriptorObject> descriptors, DataTable table) {
+            DescriptorObject descriptorTable = new DescriptorObject();
+            for (int i = 0; i < descriptors.Count; i++) {
+                if (descriptors[i].getValueToken("CODE") == table.TableName) {
+                    descriptorTable = descriptors[i];
+                    break;
+                }
+            }
             for (int i = 0; i < table.Columns.Count; i++) {
-                dataGridView.Columns.Add(table.Columns[i].ColumnName, table.Columns[i].ColumnName);
+                for (int j = 0; j < descriptorTable.CountNestedObject; j++) {
+                    DescriptorObject column = descriptorTable.getNestedObject(i);
+                    if (column.getValueToken("CODE") == table.Columns[i].ColumnName) {
+                        dataGridView.Columns.Add(table.Columns[i].ColumnName, column.getValueToken("NAME"));
+                        break;
+                    }
+                }
             }
             for (int i = 0; i < table.Rows.Count; i++) {
                 dataGridView.Rows.Add();
