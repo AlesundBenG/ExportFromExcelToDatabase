@@ -9,7 +9,7 @@ namespace ExportFromExcelToDatabase.Classes
     /// <summary>
     /// Простое представление значений (Имя - значение).
     /// </summary>
-    public class Token
+    public class Token: ICloneable
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Атрибуты*/
@@ -27,26 +27,54 @@ namespace ExportFromExcelToDatabase.Classes
         /*Свойства*/
 
         /// <summary>
-        /// Имя токена. Примечание: NULL заменяется на пустую строку.
+        /// Имя токена.
         /// </summary>
         public string Name {
             get {
                 return _name;
             }
             set {
-                _name = value ?? "";
+                _name = value;
             }
         }
         /// <summary>
-        /// Значение токена. Примечание: NULL заменяется на пустую строку.
+        /// Значение токена.
         /// </summary>
         public string Value {
             get {
                 return _value;
             }
             set {
-                _value = value ?? "";
+                _value = value;
             }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Public методы*/
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Token() {
+
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="name">Имя токена.</param>
+        /// <param name="value">Значение токена.</param>
+        public Token(string name, string value) {
+            this.Name = name;
+            this.Value = value;
+        }
+
+        /// <summary>
+        /// Получить копию объекта.
+        /// </summary>
+        /// <returns>Копия объекта.</returns>
+        public object Clone() {
+            return new Token(_name, _value);
         }
     }
 }
