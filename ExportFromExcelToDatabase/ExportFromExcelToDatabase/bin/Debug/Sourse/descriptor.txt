@@ -1,6 +1,6 @@
 <singleValue>
 	SHEET_NUMBER: 1;
-	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_NAME: "Данные о получателе социальных услу (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: СНИЛС;

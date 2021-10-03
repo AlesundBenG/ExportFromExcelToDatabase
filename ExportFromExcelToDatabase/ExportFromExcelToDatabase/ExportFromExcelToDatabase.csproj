@@ -85,7 +85,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\ReaderTextFile.cs" />
-    <Compile Include="Classes\ReaderDescriptor.cs" />
+    <Compile Include="Classes\DescriptorReader.cs" />
     <EmbeddedResource Include="Forms\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>

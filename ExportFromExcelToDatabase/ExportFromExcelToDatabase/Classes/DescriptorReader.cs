@@ -9,7 +9,7 @@ namespace ExportFromExcelToDatabase.Classes
     /// <summary>
     /// Класс для чтения дескриптора Excel-файла.
     /// </summary>
-    public class ReaderDescriptor
+    public class DescriptorReader
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Атрибуты*/
@@ -20,7 +20,6 @@ namespace ExportFromExcelToDatabase.Classes
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Public методы*/
-
 
         /// <summary>
         /// Получить список дескрипторов объектов из строки.
@@ -48,7 +47,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// </summary>
         /// <param name="objectsPart">Символьное представление дескриптора объекта, которое имеет следующий шаблон: <nameTag>...Tokens...</nameTag>.</param>
         /// <returns>Дескриптор объекта, сформированный из символьного представления</returns>
-        private ObjectDescriptor getDescriptorObject(string objectsPart) {
+        public ObjectDescriptor getDescriptorObject(string objectsPart) {
             ObjectDescriptor descriptor = new ObjectDescriptor {
                 NameObject = objectsPart.Substring(1, objectsPart.IndexOf('>') - 1)
             };
@@ -85,16 +84,12 @@ namespace ExportFromExcelToDatabase.Classes
             return descriptor;
         }
 
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
         /// <summary>
         /// Получение токена из строки определенного паттерна.
         /// </summary>
         /// <param name="pathToken">Строка с паттерном: Имя токена : значение; Имя и значение без пробелов, иначе нужно заключать в кавычки.</param>
         /// <returns>Токен: Имя и значение.</returns>
-        private Token getToken(string pathToken) {
+        public Token getToken(string pathToken) {
             string name, value; //Получаемые значения.
             int startPosition, endPosition; //Вспомогательные указатели.
             char[] symbolsBetweenNameAndValue = new char[] { ' ', ':', '\t' }; //Символы, которые могут встретиться между именем токена и значением.
@@ -123,16 +118,19 @@ namespace ExportFromExcelToDatabase.Classes
                 value = getStringBetweenQuotation(pathToken, startPosition);
                 endPosition = startPosition + value.Length + 2;
             }
-            if (goWhileMeetThoseSymbols(pathToken, endPosition, new char[] { ' ', ';', '\t' }) == -1 ) {
+            if (goWhileMeetThoseSymbols(pathToken, endPosition, new char[] { ' ', ';', '\t' }) == -1) {
                 return new Token() {
                     Name = name,
-                    Value = value
+                    Value = value.Replace("\\\"", "\"") //Убираем символы экранирования кавычек из значения, оставляя простые кавычки.
                 };
             }
             else {
                 throw new Exception($"ReaderDescriptor: после значения атрибута \"{name}\" не встречен символ \";\"");
             }
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*Private методы*/
 
         /// <summary>
         /// Идти по строке, пока встречаются указанные символы.
@@ -210,10 +208,6 @@ namespace ExportFromExcelToDatabase.Classes
             }
         }
 
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
         /// <summary>
         /// Возвращение токена в символьном представлении.
         /// </summary>
@@ -267,9 +261,6 @@ namespace ExportFromExcelToDatabase.Classes
                 return descriptor.Substring(startPosition, endTagPosition - startPosition);
             }
         }
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     }
 }

@@ -168,7 +168,7 @@ namespace ExportFromExcelToDatabase
         /// <returns>Список дескрипторов, либо исключение, если файл не найден.</returns>
         public List<ObjectDescriptor> readDescriptor(string pathDescriptor) {
             ReaderTextFile readerTextFile = new ReaderTextFile();
-            ReaderDescriptor readerDescriptor = new ReaderDescriptor();
+            DescriptorReader readerDescriptor = new DescriptorReader();
             string[] linesTextFile = readerTextFile.getSplitTextOnLines(pathDescriptor);
             string textFile = String.Join(" ", linesTextFile);
             return readerDescriptor.getListDescriptors(textFile);
