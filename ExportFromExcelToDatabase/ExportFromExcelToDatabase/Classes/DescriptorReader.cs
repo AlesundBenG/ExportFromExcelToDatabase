@@ -107,7 +107,11 @@ namespace ExportFromExcelToDatabase.Classes
             }
             //Проход до значащих символов после имени токена.
             startPosition = endPosition;
-            startPosition = goWhileMeetThoseSymbols(pathToken, startPosition, symbolsBetweenNameAndValue);
+            startPosition = goWhileMeetThoseSymbols(pathToken, startPosition, symbolsSpace);
+            if (pathToken[startPosition] != ':') {
+                throw new Exception($"ReaderDescriptor: после имени атрибута \"{name}\" не встречен символ \":\"");
+            }
+            startPosition = goWhileMeetThoseSymbols(pathToken, startPosition + 1, symbolsSpace);
             //Значение токена одним словом.
             if (pathToken[startPosition] != '\"') {
                 endPosition = goWhileNotMeetThoseSymbols(pathToken, startPosition, new char[] { ' ', ';', '\t' });
