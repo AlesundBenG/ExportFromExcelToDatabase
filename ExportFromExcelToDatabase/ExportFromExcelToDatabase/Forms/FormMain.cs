@@ -74,7 +74,7 @@ namespace ExportFromExcelToDatabase
         /// <summary>
         /// Список дескрипторов объектов.
         /// </summary>
-        private List<DescriptorObject> _listDescriptorObject;
+        private List<ObjectDescriptor> _listDescriptorObject;
         /// <summary>
         /// Файлы в выбранной папке.
         /// </summary>
@@ -166,7 +166,7 @@ namespace ExportFromExcelToDatabase
         /// </summary>
         /// <param name="pathDescriptor">Путь к дескриптору.</param>
         /// <returns>Список дескрипторов, либо исключение, если файл не найден.</returns>
-        public List<DescriptorObject> readDescriptor(string pathDescriptor) {
+        public List<ObjectDescriptor> readDescriptor(string pathDescriptor) {
             ReaderTextFile readerTextFile = new ReaderTextFile();
             ReaderDescriptor readerDescriptor = new ReaderDescriptor();
             string[] linesTextFile = readerTextFile.getSplitTextOnLines(pathDescriptor);

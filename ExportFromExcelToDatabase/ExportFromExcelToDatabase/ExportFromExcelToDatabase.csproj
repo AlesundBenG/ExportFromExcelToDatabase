@@ -50,7 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\DescriptorObject.cs" />
+    <Compile Include="Classes\ObjectDescriptor.cs" />
     <Compile Include="Classes\ExcelFile.cs" />
     <Compile Include="Classes\ExecutorQuerySQL.cs" />
     <Compile Include="Classes\GeneratorSQLCommand.cs" />

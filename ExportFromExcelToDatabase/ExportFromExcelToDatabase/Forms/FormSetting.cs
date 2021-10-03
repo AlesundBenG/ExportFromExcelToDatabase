@@ -31,7 +31,7 @@ namespace ExportFromExcelToDatabase
 
         }
 
-        public void setDescriptor(string descriptorPath, List<DescriptorObject> descriptors) {
+        public void setDescriptor(string descriptorPath, List<ObjectDescriptor> descriptors) {
             labelDescriptorPath.Text = descriptorPath;
             dataGridViewDescriptorObjects.Rows.Clear();
             int currentPrintedObject = 0;
@@ -57,7 +57,7 @@ namespace ExportFromExcelToDatabase
         private void дескрипторExcelфайлаToolStripMenuItem_Click(object sender, EventArgs e) {
             if (openFileDialog.ShowDialog() == DialogResult.OK) {
                 string descriptorPath = openFileDialog.FileName;
-                List<DescriptorObject> descriptors = _formMain.readDescriptor(descriptorPath);
+                List<ObjectDescriptor> descriptors = _formMain.readDescriptor(descriptorPath);
                 _formMain.setDescriptor(descriptorPath);
                 setDescriptor(descriptorPath, descriptors);
             }
@@ -83,7 +83,7 @@ namespace ExportFromExcelToDatabase
         /// <param name="currentNumber">Номер объекта</param>
         /// <param name="descriptor">Дескриптор объекта</param>
         /// <returns>Количество отображенных объектов, так как одоин объект может содержать в себе вложенные дескрипторы.</returns>
-        private int printDescriptor(int numberParent, int currentNumber, DescriptorObject descriptor) {
+        private int printDescriptor(int numberParent, int currentNumber, ObjectDescriptor descriptor) {
             int countPrintedObject = 1; //Количество отображенных дескрипторов. 1 так как текущий отображен.
             for (int i = 0; i < descriptor.CountToken; i++) {
                 dataGridViewDescriptorObjects.Rows.Add();

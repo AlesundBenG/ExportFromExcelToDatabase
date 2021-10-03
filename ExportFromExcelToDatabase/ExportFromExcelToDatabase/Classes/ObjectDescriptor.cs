@@ -9,7 +9,7 @@ namespace ExportFromExcelToDatabase.Classes
     /// <summary>
     /// Описание объекта для парсера.
     /// </summary>
-    public class DescriptorObject
+    public class ObjectDescriptor
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Атрибуты*/
@@ -25,20 +25,20 @@ namespace ExportFromExcelToDatabase.Classes
         /// <summary>
         /// Список вложенных объектов в данный объект (Например <column> в <table>).
         /// </summary>
-        private List<DescriptorObject> _listNestedObject;
+        private List<ObjectDescriptor> _listNestedObject;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
 
         /// <summary>
-        /// Имя объекта (Тег). Примечание: Null заменяется на пустую строку.
+        /// Имя объекта (Тег).
         /// </summary>
         public string NameObject {
             get {
                 return _name;
             }
             set {
-                _name = value ?? "";
+                _name = value;
             }
 
         }
@@ -63,9 +63,18 @@ namespace ExportFromExcelToDatabase.Classes
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public DescriptorObject() {
+        public ObjectDescriptor() {
             _listToken = new List<Token>();
-            _listNestedObject = new List<DescriptorObject>();
+            _listNestedObject = new List<ObjectDescriptor>();
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public ObjectDescriptor(string nameObject) {
+            this.NameObject = nameObject;
+            _listToken = new List<Token>();
+            _listNestedObject = new List<ObjectDescriptor>();
         }
 
         /// <summary>
@@ -112,7 +121,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// Добавление вложенного объекта.
         /// </summary>
         /// <param name="nestedObject">Объект, который вложен в текущий.</param>
-        public void addNestedObject(DescriptorObject nestedObject) {
+        public void addNestedObject(ObjectDescriptor nestedObject) {
             _listNestedObject.Add(nestedObject);
         }
 
@@ -127,19 +136,11 @@ namespace ExportFromExcelToDatabase.Classes
         }
 
         /// <summary>
-        /// Удаление вложенного объекта.
-        /// </summary>
-        /// <param name="nestedObject">Удаляемый объект.</param>
-        public void deleteNestedObject(DescriptorObject nestedObject) {
-            _listNestedObject.Remove(nestedObject);
-        }
-
-        /// <summary>
         /// Получение вложенного объекта в текущий объект.
         /// </summary>
         /// <param name="index">Индекс вложенного объекта.</param>
         /// <returns>Вложенный объект, либо исключение при выходе за границы списка.</returns>
-        public DescriptorObject getNestedObject(int index) {
+        public ObjectDescriptor getNestedObject(int index) {
             if (_listNestedObject.Count > index) {
                 return _listNestedObject[index];
             }

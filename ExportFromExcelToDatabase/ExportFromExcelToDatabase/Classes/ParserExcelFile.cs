@@ -74,7 +74,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="descriptors">Дескриптор.</param>
         /// <param name="file">Файл, представленный списком страниц в виде матрицы ячеек.</param>
         /// <returns>Список одиночных значений и список таблиц.</returns>
-        public ParserResult parser(List<DescriptorObject> descriptors, ExcelFile file) {
+        public ParserResult parser(List<ObjectDescriptor> descriptors, ExcelFile file) {
             ParserResult result = new ParserResult { 
                 singleValue = new List<Token>(), 
                 table = new List<DataTable>() 
@@ -100,7 +100,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="descriptor">Дескриптор.</param>
         /// <param name="file">Файл.</param>
         /// <returns>Токен - код и значение. NULL если ничего не найдено.</returns>
-        public Token getSingleValue(DescriptorObject descriptor, ExcelFile file) {
+        public Token getSingleValue(ObjectDescriptor descriptor, ExcelFile file) {
             List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
             string FIELD = descriptor.getValueToken("FIELD");                     
             for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
@@ -127,7 +127,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="descriptor">Дескриптор.</param>
         /// <param name="file">Файл.</param>
         /// <returns>Таблица.</returns>
-        public DataTable getTable(DescriptorObject descriptor, ExcelFile file) {
+        public DataTable getTable(ObjectDescriptor descriptor, ExcelFile file) {
             List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
             for (int i = 0; i < sheetForSearch.Count; i++) {
                 CoordinatesPlace coordinates = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[i]);
@@ -137,7 +137,7 @@ namespace ExportFromExcelToDatabase.Classes
                 string tableName = descriptor.getValueToken("CODE");
                 bool INCLUDE_FINAL_ROW = (descriptor.getValueToken("INCLUDE_FINAL_ROW") ?? "0") != "0";
                 for (int iColumn = 0; iColumn < descriptor.CountNestedObject; iColumn++) {
-                    DescriptorObject column = descriptor.getNestedObject(iColumn);
+                    ObjectDescriptor column = descriptor.getNestedObject(iColumn);
                     nameColumns.Add(column.getValueToken("NAME"));
                     finalLine.Add(column.getValueToken("FINAL_CELL"));
                     codeColumns.Add(column.getValueToken("CODE"));
@@ -196,7 +196,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="descriptor">Дескриптор объекта.</param>
         /// <param name="file">Страницы файла.</param>
         /// <returns>Страницы для поиска.</returns>
-        private List<string[,]> getSheetForSearch(DescriptorObject descriptor, ExcelFile file) {
+        private List<string[,]> getSheetForSearch(ObjectDescriptor descriptor, ExcelFile file) {
             string SHEET_NUMBER = descriptor.getValueToken("SHEET_NUMBER");
             string SHEET_NAME = descriptor.getValueToken("SHEET_NAME");
             List<string[,]> sheet = new List<string[,]>(); //Отбор листов для поиска.
@@ -238,7 +238,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="descriptor">Дескриптор объекта.</param>
         /// <param name="sheet">Страница.</param>
         /// <returns>Координаты места. Если все координаты 0, то не найдена секция, если она нужна.</returns>
-        private CoordinatesPlace getCoordinatesPlaceInSneet(DescriptorObject descriptor, string[,] sheet) {
+        private CoordinatesPlace getCoordinatesPlaceInSneet(ObjectDescriptor descriptor, string[,] sheet) {
             CoordinatesPlace coordinates = new CoordinatesPlace() {lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0};
             //Проверка наличия секции для поиска.
             string SECTION_NAME = descriptor.getValueToken("SECTION_NAME");

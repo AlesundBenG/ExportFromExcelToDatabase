@@ -20,7 +20,7 @@ namespace ExportFromExcelToDatabase.Tests
         /// Инициализация токена через конструктор с установкой входных параметров (Все поля должны быть равны входным параметрам).
         /// </summary>
         [TestMethod]
-        public void constructorFilloken() {
+        public void constructorFillToken() {
             Token filltoken = new Token("CODE", "name");
             Assert.AreEqual(filltoken.Name, "CODE");
             Assert.AreEqual(filltoken.Value, "name");

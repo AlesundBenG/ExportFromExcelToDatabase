@@ -13,7 +13,7 @@ namespace ExportFromExcelToDatabase.Forms
 {
     public partial class FormShowingDataFromFile : Form
     {
-        public FormShowingDataFromFile(List<DescriptorObject> descriptors, ParserResult data) {
+        public FormShowingDataFromFile(List<ObjectDescriptor> descriptors, ParserResult data) {
             InitializeComponent();
             showSingleValue(dataGridViewSingleValue, descriptors, data.singleValue);
             for (int i = 0; i < data.table.Count; i++) {
@@ -26,7 +26,7 @@ namespace ExportFromExcelToDatabase.Forms
             }
         }
 
-        public void showSingleValue(DataGridView dataGridView, List<DescriptorObject> descriptors, List<Token> singleValue) {
+        public void showSingleValue(DataGridView dataGridView, List<ObjectDescriptor> descriptors, List<Token> singleValue) {
             for (int i = 0; i < singleValue.Count; i++) {
                 string field = "";
                 for (int j = 0; j < descriptors.Count; j++) {
@@ -42,8 +42,8 @@ namespace ExportFromExcelToDatabase.Forms
             }
         }
 
-        public void showTable(DataGridView dataGridView, List<DescriptorObject> descriptors, DataTable table) {
-            DescriptorObject descriptorTable = new DescriptorObject();
+        public void showTable(DataGridView dataGridView, List<ObjectDescriptor> descriptors, DataTable table) {
+            ObjectDescriptor descriptorTable = new ObjectDescriptor();
             for (int i = 0; i < descriptors.Count; i++) {
                 if (descriptors[i].getValueToken("CODE") == table.TableName) {
                     descriptorTable = descriptors[i];
@@ -52,7 +52,7 @@ namespace ExportFromExcelToDatabase.Forms
             }
             for (int i = 0; i < table.Columns.Count; i++) {
                 for (int j = 0; j < descriptorTable.CountNestedObject; j++) {
-                    DescriptorObject column = descriptorTable.getNestedObject(i);
+                    ObjectDescriptor column = descriptorTable.getNestedObject(i);
                     string columnName = column.getValueToken("CODE");
                     if (columnName.Equals(table.Columns[i].ColumnName, StringComparison.OrdinalIgnoreCase)) {
                         dataGridView.Columns.Add(table.Columns[i].ColumnName, column.getValueToken("NAME"));
@@ -68,7 +68,7 @@ namespace ExportFromExcelToDatabase.Forms
             }
         }
 
-        private DataGridView createAndFillDataGridView(TabPage pagePage, List<DescriptorObject> descriptors, DataTable table) {
+        private DataGridView createAndFillDataGridView(TabPage pagePage, List<ObjectDescriptor> descriptors, DataTable table) {
             DataGridView dataGridView = new DataGridView();
             dataGridView.Location = new Point(7, 7);
             dataGridView.ScrollBars = ScrollBars.Both;

@@ -27,8 +27,8 @@ namespace ExportFromExcelToDatabase.Classes
         /// </summary>
         /// <param name="descriptor">Строка, в которой содержатся дескрипторы объектов</param>
         /// <returns>Список дескипторов объектов</returns>
-        public List<DescriptorObject> getListDescriptors(string descriptorText) {
-            List<DescriptorObject> listDescriptors = new List<DescriptorObject>();
+        public List<ObjectDescriptor> getListDescriptors(string descriptorText) {
+            List<ObjectDescriptor> listDescriptors = new List<ObjectDescriptor>();
             int currentPosition = 0;
             while (currentPosition < descriptorText.Length) {
                 currentPosition = goWhileMeetThoseSymbols(descriptorText, currentPosition, symbolsSpace);
@@ -36,7 +36,7 @@ namespace ExportFromExcelToDatabase.Classes
                     break;
                 }
                 string descriptorObjectText = getObjectPath(descriptorText, currentPosition);
-                DescriptorObject descriptorObject = getDescriptorObject(descriptorObjectText);
+                ObjectDescriptor descriptorObject = getDescriptorObject(descriptorObjectText);
                 listDescriptors.Add(descriptorObject);
                 currentPosition = currentPosition + descriptorObjectText.Length;
             }
@@ -48,8 +48,8 @@ namespace ExportFromExcelToDatabase.Classes
         /// </summary>
         /// <param name="objectsPart">Символьное представление дескриптора объекта, которое имеет следующий шаблон: <nameTag>...Tokens...</nameTag>.</param>
         /// <returns>Дескриптор объекта, сформированный из символьного представления</returns>
-        private DescriptorObject getDescriptorObject(string objectsPart) {
-            DescriptorObject descriptor = new DescriptorObject {
+        private ObjectDescriptor getDescriptorObject(string objectsPart) {
+            ObjectDescriptor descriptor = new ObjectDescriptor {
                 NameObject = objectsPart.Substring(1, objectsPart.IndexOf('>') - 1)
             };
             string clouseTag = $"</{descriptor.NameObject}>";
@@ -69,7 +69,7 @@ namespace ExportFromExcelToDatabase.Classes
                     }
                     else {
                         string nestedObjectText = getObjectPath(objectsPart, currentPosition);
-                        DescriptorObject nestedObject = getDescriptorObject(nestedObjectText);
+                        ObjectDescriptor nestedObject = getDescriptorObject(nestedObjectText);
                         descriptor.addNestedObject(nestedObject);
                         currentPosition = currentPosition + nestedObjectText.Length;
                     }
@@ -121,11 +121,17 @@ namespace ExportFromExcelToDatabase.Classes
             //Имя токена в несколько слов.
             else {
                 value = getStringBetweenQuotation(pathToken, startPosition);
+                endPosition = startPosition + value.Length + 2;
             }
-            return new Token() {
-                Name = name,
-                Value = value
-            };
+            if (goWhileMeetThoseSymbols(pathToken, endPosition, new char[] { ' ', ';', '\t' }) == -1 ) {
+                return new Token() {
+                    Name = name,
+                    Value = value
+                };
+            }
+            else {
+                throw new Exception($"ReaderDescriptor: после значения атрибута \"{name}\" не встречен символ \";\"");
+            }
         }
 
         /// <summary>
