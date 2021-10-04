@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {}
+    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {
+    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
         "projectName": "ExportFromExcelToDatabase.Tests",
-        "projectPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
-        "packagesPath": "C:\\Users\\batas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
+        "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+        "packagesPath": "C:\\Users\\bnl\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\batas\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\bnl\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -30,10 +26,9 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
-            "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
-                "projectPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
+              "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
+                "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
               }
             }
           }
@@ -46,7 +41,6 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
-          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "MSTest.TestAdapter": {
               "target": "Package",
@@ -80,15 +74,15 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
+    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
       "restore": {
-        "projectUniqueName": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj",
+        "projectUniqueName": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj",
         "projectName": "ExportFromExcelToDatabase",
-        "projectPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
+        "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
       },
       "frameworks": {
         "net472": {}

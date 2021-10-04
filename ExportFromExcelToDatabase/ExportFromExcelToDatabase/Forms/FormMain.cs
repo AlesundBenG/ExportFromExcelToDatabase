@@ -11,7 +11,7 @@ using ExportFromExcelToDatabase.Classes;
 using System.IO;    //Для работы с папками.
 using System.Threading; //Для работы с потоками.
 using ExportFromExcelToDatabase.Forms;
-
+using ExportToDatabaseFromFile;
 
 namespace ExportFromExcelToDatabase
 {
@@ -79,6 +79,10 @@ namespace ExportFromExcelToDatabase
         /// Файлы в выбранной папке.
         /// </summary>
         private string[] _pathFiles;
+        /// <summary>
+        /// Исполнитель SQL-запросов.
+        /// </summary>
+        private ExecutorQuerySQL _executorQuerySQL;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Свойства*/
@@ -238,8 +242,21 @@ namespace ExportFromExcelToDatabase
         }
 
         private void buttonStart_Click(object sender, EventArgs e) {
-            Thread thread = new Thread(executeQuerySQL);
-            thread.Start();
+            FormLogging formLogging = new FormLogging();
+            formLogging.ShowDialog();
+            if (formLogging.DialogResult == DialogResult.OK) {
+                if (formLogging.ExecutorQuerySQL.ThereIsConnection) {
+                    _executorQuerySQL = formLogging.ExecutorQuerySQL;
+                    MessageBox.Show("Успешное подключение.", "Результат подключения", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else {
+                    MessageBox.Show("Не удалось подключиться!", "Результат подключения", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            //formLogging.ShowDialog();
+            //Thread thread = new Thread(executeQuerySQL);
+            //thread.Start();
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {

@@ -24,3 +24,4 @@ C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabas
 C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Forms.FormShowingQuerySQL.resources
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Forms.FormShowingDataFromFile.resources
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Forms.FormShowingQuerySQL.resources
+C:\Users\bnl\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportToDatabaseFromFile.FormLogging.resources

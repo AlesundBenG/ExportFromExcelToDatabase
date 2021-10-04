@@ -58,6 +58,12 @@
     <Compile Include="Classes\ParserResult.cs" />
     <Compile Include="Classes\ReaderExcelFile.cs" />
     <Compile Include="Classes\Token.cs" />
+    <Compile Include="Forms\FormLogging.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormLogging.Designer.cs">
+      <DependentUpon>FormLogging.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,6 +92,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\ReaderTextFile.cs" />
     <Compile Include="Classes\DescriptorReader.cs" />
+    <EmbeddedResource Include="Forms\FormLogging.resx">
+      <DependentUpon>FormLogging.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
