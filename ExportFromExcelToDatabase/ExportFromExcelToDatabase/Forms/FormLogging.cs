@@ -44,6 +44,18 @@ namespace ExportToDatabaseFromFile
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Инициализация формы и ее компонентов с установлением полей подключения.
+        /// </summary>
+        /// <param name="executorQuerySQL">Параметры подключения, которые будут установлены в качестве полей по умолчанию.</param>
+        public FormLogging(ExecutorQuerySQL executorQuerySQL) {
+            InitializeComponent();
+            textBoxServer.Text = executorQuerySQL.Server;
+            textBoxLogin.Text = executorQuerySQL.Login;
+            textBoxPassword.Text = executorQuerySQL.Password;
+            textBoxDatabase.Text = executorQuerySQL.DataBase;
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Private методы*/

@@ -51,6 +51,12 @@ namespace ExportFromExcelToDatabase.Classes
             get { return _login; }
         }
 
+        public string Password {
+            get {
+                return _password;
+            }
+        }
+
         /// <summary>
         /// База данных.
         /// </summary>

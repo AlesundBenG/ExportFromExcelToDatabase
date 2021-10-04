@@ -242,21 +242,25 @@ namespace ExportFromExcelToDatabase
         }
 
         private void buttonStart_Click(object sender, EventArgs e) {
-            FormLogging formLogging = new FormLogging();
+            FormLogging formLogging;
+            if (_executorQuerySQL != null) {
+                formLogging = new FormLogging(_executorQuerySQL);
+            }
+            else {
+                formLogging = new FormLogging();
+            }
             formLogging.ShowDialog();
             if (formLogging.DialogResult == DialogResult.OK) {
                 if (formLogging.ExecutorQuerySQL.ThereIsConnection) {
-                    _executorQuerySQL = formLogging.ExecutorQuerySQL;
                     MessageBox.Show("Успешное подключение.", "Результат подключения", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _executorQuerySQL = formLogging.ExecutorQuerySQL;
+                    Thread thread = new Thread(executeQuerySQL);
+                    thread.Start();
                 }
                 else {
                     MessageBox.Show("Не удалось подключиться!", "Результат подключения", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
-            //formLogging.ShowDialog();
-            //Thread thread = new Thread(executeQuerySQL);
-            //thread.Start();
         }
 
         private void dataGridViewProcess_CellClick(object sender, DataGridViewCellEventArgs e) {
@@ -431,14 +435,13 @@ namespace ExportFromExcelToDatabase
         /// Выполнение сгенерированных SQL-запросов.
         /// </summary>
         private void executeQuerySQL() {
-            ExecutorQuerySQL executor = new ExecutorQuerySQL();
             setTexLabel(labelCondition, "Выполнение запросов");
             resetProgressBar(progressBar);
             setMaxValueProgressBar(progressBar, _pathFiles.Length);
             for (int i = 0; i < _metadataFiles.Length; i++) {
                 if (_metadataFiles[i].conditionProcess == 4) {
                     try {
-                        List<DataTable> result = executor.executeComamnd(_metadataFiles[i].queryForFile);
+                        List<DataTable> result = _executorQuerySQL.executeComamnd(_metadataFiles[i].queryForFile);
                         if (result.Count > 0) {
                             string thereIsError = result[0].Rows[0]["thereIsError"].ToString();
                             if (thereIsError == "0") {
