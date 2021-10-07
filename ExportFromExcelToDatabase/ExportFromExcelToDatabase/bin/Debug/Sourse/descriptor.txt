@@ -1,30 +1,113 @@
-<table>	
+<singleValue>
 	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: СНИЛС;
+	CODE: SNILS;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: Имя;
+	CODE: name;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: Фамилия;
+	CODE: surname;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: Отчество;
+	CODE: secondname;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата рождения";
+	CODE: birthdate;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата оформления";
+	CODE: dateRegistration;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные об индивидуальной программе получателя социальных услуг (ИППСУ)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Номер документа ";
+	CODE: numberDocumentIPRA;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о договоре (доп.соглашении)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Форма социального обслуживания";
+	CODE: formSocServ;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Период за который предоставляются сведения";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Год";
+	CODE: yearReport;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Период за который предоставляются сведения";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Месяц";
+	CODE: monthReport;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<table>	
+	SHEET_NUMBER: 2;
 	CODE: "DATA_FOR_INSERV";
+	INCLUDE_FINAL_ROW: "1";
 	<column>
-		NAME: "№ п/п";
-		CODE: "INDEX";
-		FINAL_CELL: "";
+		NAME: "Код";
+		CODE: "TYPE_SERV_CODE";
 	</column>
 	<column>
-		NAME: "Фамилия";
-		CODE: "SURNAME";
-		FINAL_CELL: "";
+		NAME: "Описание";
+		CODE: "TYPE_SERV_NAME";
+		FINAL_CELL: "ИТОГО:";
 	</column>
 	<column>
-		NAME: "Имя";
-		CODE: "NAME";
-		FINAL_CELL: "";
+		NAME: "Кол-во оказанных услуг (всего)";
+		CODE: "COUNT_SERV_NORMAL";
 	</column>
 	<column>
-		NAME: "Дата рождения";
-		CODE: "BIRTHDATE";
-		FINAL_CELL: "";
-	</column>
-	<column>
-		NAME: "СНИЛС";
-		CODE: "SNILS";
-		FINAL_CELL: "";
+		NAME: "Кол-во оказанных услуг сверх объемов, определяемых стандартом";
+		CODE: "COUNT_SERV_OVER";
 	</column>
 </table>
 
