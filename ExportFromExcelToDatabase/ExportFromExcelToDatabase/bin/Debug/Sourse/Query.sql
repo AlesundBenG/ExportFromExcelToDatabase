@@ -62,6 +62,7 @@ WHERE TYPE_SERV_CODE = '' OR
         OR COUNT_SERV_NORMAL = '0' AND COUNT_SERV_OVER = '' 
         OR COUNT_SERV_NORMAL = '' AND COUNT_SERV_OVER = '0'
         OR COUNT_SERV_NORMAL = '' AND COUNT_SERV_OVER = ''
+        OR COUNT_SERV_NORMAL = '0' AND COUNT_SERV_OVER = '0'
     )
 --Проверка исходных данных.
 IF ((SELECT LEN(@SNILS)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указан СНИЛС' END
@@ -76,6 +77,7 @@ IF ((SELECT ISDATE(@birthdate)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsErr
 IF ((SELECT ISDATE(@dateRegistration)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты оформления ИППСУ' END
 IF ((SELECT ISNUMERIC(@yearReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат года' END
 IF ((SELECT ISNUMERIC(@monthReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат месяца' END
+IF ((SELECT COUNT(*) FROM #DATA_FOR_INSERV) = 0) BEGIN SET @thereIsError = 1 SET @message = 'Нет не нулевых услуг' END
 --Конвертация исходных данных.
 IF (@thereIsError = 0) BEGIN
     SET @yearReport_INT = CONVERT(INT, @yearReport)
