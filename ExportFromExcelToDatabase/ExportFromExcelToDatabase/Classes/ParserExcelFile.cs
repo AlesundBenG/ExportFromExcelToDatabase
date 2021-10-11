@@ -49,6 +49,30 @@ namespace ExportFromExcelToDatabase.Classes
     /// </summary>
     public class ParserExcelFile
     {
+        public ObjectDescriptor ObjectDescriptor {
+            get => default;
+            set {
+            }
+        }
+
+        public ExcelFile ExcelFile {
+            get => default;
+            set {
+            }
+        }
+
+        public ParserResult ParserResult {
+            get => default;
+            set {
+            }
+        }
+
+        public Token Token {
+            get => default;
+            set {
+            }
+        }
+
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Структуры.*/
 
@@ -75,17 +99,17 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="file">Файл, представленный списком страниц в виде матрицы ячеек.</param>
         /// <returns>Список одиночных значений и список таблиц.</returns>
         public ParserResult parser(List<ObjectDescriptor> descriptors, ExcelFile file) {
-            ParserResult result = new ParserResult { 
-                singleValue = new List<Token>(), 
-                table = new List<DataTable>() 
+            ParserResult result = new ParserResult {
+                singleValue = new List<Token>(),
+                table = new List<DataTable>()
             };
             for (int i = 0; i < descriptors.Count; i++) {
-                switch(descriptors[i].NameObject) {
-                    case "singleValue": 
-                        result.singleValue.Add(getSingleValue(descriptors[i], file)); 
+                switch (descriptors[i].NameObject) {
+                    case "singleValue":
+                        result.singleValue.Add(getSingleValue(descriptors[i], file));
                         break;
-                    case "table": 
-                        result.table.Add(getTable(descriptors[i], file)); 
+                    case "table":
+                        result.table.Add(getTable(descriptors[i], file));
                         break;
                     default:
                         throw new Exception($"ParserExcelFile: Встречен неизвестный тег: {descriptors[i].NameObject}.");
@@ -102,7 +126,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <returns>Токен - код и значение. NULL если ничего не найдено.</returns>
         public Token getSingleValue(ObjectDescriptor descriptor, ExcelFile file) {
             List<string[,]> sheetForSearch = getSheetForSearch(descriptor, file);
-            string FIELD = descriptor.getValueToken("FIELD");                     
+            string FIELD = descriptor.getValueToken("FIELD");
             for (int iSheet = 0; iSheet < sheetForSearch.Count; iSheet++) {
                 CoordinatesPlace coordinatesPlace = getCoordinatesPlaceInSneet(descriptor, sheetForSearch[iSheet]); //Место для поиска относительно параметров дескриптора.
                 for (int iLine = coordinatesPlace.lineFrom; iLine < coordinatesPlace.lineTo; iLine++) {
@@ -239,7 +263,7 @@ namespace ExportFromExcelToDatabase.Classes
         /// <param name="sheet">Страница.</param>
         /// <returns>Координаты места. Если все координаты 0, то не найдена секция, если она нужна.</returns>
         private CoordinatesPlace getCoordinatesPlaceInSneet(ObjectDescriptor descriptor, string[,] sheet) {
-            CoordinatesPlace coordinates = new CoordinatesPlace() {lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0};
+            CoordinatesPlace coordinates = new CoordinatesPlace() { lineFrom = 0, columnFrom = 0, lineTo = 0, columnTo = 0 };
             //Проверка наличия секции для поиска.
             string SECTION_NAME = descriptor.getValueToken("SECTION_NAME");
             if (SECTION_NAME == null) {
@@ -268,10 +292,10 @@ namespace ExportFromExcelToDatabase.Classes
                 return coordinates; //Все значения 0.
             }
             //Высчитывание области относительно флагов.
-            bool SECTION_BOTTOM_LEFT    = ((descriptor.getValueToken("SECTION_BOTTOM_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_BOTTOM_RIGHT   = ((descriptor.getValueToken("SECTION_BOTTOM_RIGHT") ?? "0") == "0") ? false : true;
-            bool SECTION_UP_LEFT        = ((descriptor.getValueToken("SECTION_UP_LEFT") ?? "0") == "0") ? false : true;
-            bool SECTION_UP_RIGHT       = ((descriptor.getValueToken("SECTION_UP_RIGHT") ?? "0") == "0") ? false : true;
+            bool SECTION_BOTTOM_LEFT = ((descriptor.getValueToken("SECTION_BOTTOM_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_BOTTOM_RIGHT = ((descriptor.getValueToken("SECTION_BOTTOM_RIGHT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_LEFT = ((descriptor.getValueToken("SECTION_UP_LEFT") ?? "0") == "0") ? false : true;
+            bool SECTION_UP_RIGHT = ((descriptor.getValueToken("SECTION_UP_RIGHT") ?? "0") == "0") ? false : true;
             if (SECTION_BOTTOM_LEFT) {
                 coordinates.lineTo = sheet.GetLength(0);
                 coordinates.columnFrom = 0;

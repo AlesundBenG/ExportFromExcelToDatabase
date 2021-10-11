@@ -35,6 +35,12 @@ namespace ExportFromExcelToDatabase.Classes
         //Символы пробелов.
         private readonly char[] symbolsSpace = new char[] { ' ', '\t' };
 
+        public ParserResult ParserResult {
+            get => default;
+            set {
+            }
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Public методы*/

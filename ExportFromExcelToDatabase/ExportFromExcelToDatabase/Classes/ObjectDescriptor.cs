@@ -57,6 +57,12 @@ namespace ExportFromExcelToDatabase.Classes
             get { return _listNestedObject.Count; }
         }
 
+        public Token Token {
+            get => default;
+            set {
+            }
+        }
+
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Public методы*/
 

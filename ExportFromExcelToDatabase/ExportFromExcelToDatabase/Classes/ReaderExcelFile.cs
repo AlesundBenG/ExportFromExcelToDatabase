@@ -12,6 +12,12 @@ namespace ExportFromExcelToDatabase.Classes
     /// </summary>
     public class ReaderExcelFile
     {
+        public ExcelFile ExcelFile {
+            get => default;
+            set {
+            }
+        }
+
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Public методы*/
 
