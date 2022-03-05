@@ -1,0 +1,150 @@
+--Переменные.
+DECLARE @identifiedPerson INT --Идентифицированный человек.
+DECLARE @identifiedSocServ INT --Идентифицированное социальное обслуживание.
+DECLARE @yearReport_INT INT --Год, конвертированный в число.
+DECLARE @monthReport_INT INT --Месяц, конвертированный в число.
+DECLARE @startDate DATE --Дата -начала периода.
+DECLARE @endDate DATE --Дата конца периода.
+DECLARE @thereIsError INT = 0 --Флаг наличия ошибки.
+DECLARE @message VARCHAR(256)= 'Успешно' --Сообщение.
+------------------------------------------------------------------------------------------
+--Выбранная индивидуальная программа.
+DECLARE @individProgram INT = 63119
+--Регистрационный номер поставщика в Реестре поставщиков.
+DECLARE @regNumOrganization VARCHAR(10) = '63'
+--Номер договора.
+DECLARE @documentNumber VARCHAR(128) = '8'
+--Дата начала действия основания.
+DECLARE @documentStartDate DATE = CONVERT(DATE, '02.12.2019')
+--Дата окончания действия основания.
+DECLARE @documentEndDate DATE = CONVERT(DATE, '25.11.2022')
+------------------------------------------------------------------------------------------
+--Удаление временных таблиц.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_ORGANIZATION') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_ORGANIZATION END --Найденные организация для вставки в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_DEPARTAMENT') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_DEPARTAMENT END --Найденные подразделения для вставки в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_CONDITIONAL') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_CONDITIONAL END --Найденные условия оказания для вставки в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_DISTRIBUTION_HOME') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_DISTRIBUTION_HOME END --Распределение в надомное подразделение в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_DISTRIBUTION_HALF_STAZ') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_DISTRIBUTION_HALF_STAZ END --Распределение в полустационарное подразделение в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_DISTRIBUTION_STAZ') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_DISTRIBUTION_STAZ END --Распределение в стационарное подразделение в ИПРА для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOUND_FOR_IPRA_FOR_DISTRICT') IS NOT NULL BEGIN DROP TABLE #FOUND_FOR_IPRA_FOR_DISTRICT END --Найденные местности распространения услуг для создания СО и договора.
+IF OBJECT_ID('tempdb..#FOR_INSERT_IPRA') IS NOT NULL BEGIN DROP TABLE #FOR_INSERT_IPRA END --Данные для вставки в ИПРА для создания СО и договора.
+--Создание временных таблиц.
+CREATE TABLE #FOUND_FOR_IPRA_ORGANIZATION (
+    ORGANIZATION_OUID INT, 
+)
+CREATE TABLE #FOUND_FOR_IPRA_DEPARTAMENT (
+    DEPARTAMENT_OUID INT, 
+)
+CREATE TABLE #FOUND_FOR_IPRA_CONDITIONAL (
+    CONDITION_CODE VARCHAR(32), 
+)
+CREATE TABLE #FOUND_FOR_IPRA_DISTRIBUTION_HOME (
+    DISTRIBUTION_OUID INT, 
+)
+CREATE TABLE #FOUND_FOR_IPRA_DISTRIBUTION_HALF_STAZ (
+    DISTRIBUTION_OUID INT, 
+)
+CREATE TABLE #FOUND_FOR_IPRA_DISTRIBUTION_STAZ (
+    DISTRIBUTION_OUID INT, 
+)
+CREATE TABLE #FOUND_FOR_IPRA_FOR_DISTRICT (
+    DISTRINCT_OUID INT, 
+)
+------------------------------------------------------------------------------------------
+--Выбор организации.
+INSERT INTO #FOUND_FOR_IPRA_ORGANIZATION (ORGANIZATION_OUID)
+SELECT DISTINCT organization.OUID
+FROM LINK_INDIVIDPROGRAM_SPRORGUSON program_link_organization
+----Учреждения социального обслуживания.
+    INNER JOIN SPR_ORG_USON organization
+        ON organization.OUID = program_link_organization.A_TOID
+            AND organization.A_REG_NUM = @regNumOrganization
+----Базовый класс организаций.
+    INNER JOIN SPR_ORG_BASE organizationInfo
+        ON organizationInfo.OUID = organization.OUID
+            AND organizationInfo.A_STATUS = 10
+WHERE program_link_organization.A_FROMID = @individProgram
+--Выбор подразделения.
+INSERT INTO #FOUND_FOR_IPRA_DEPARTAMENT (DEPARTAMENT_OUID)
+SELECT DISTINCT departament.OUID
+FROM #FOUND_FOR_IPRA_ORGANIZATION organization
+----Подразделения.
+    INNER JOIN SPR_DEP departament 
+        ON departament.A_UPPER_DEP = organization.ORGANIZATION_OUID
+----Базовый класс подразделения.
+    INNER JOIN SPR_ORG_BASE departamentInfo
+        ON departamentInfo.OUID = departament.OUID
+            AND departamentInfo.A_STATUS = 10
+----Индивидуальная программа.
+    INNER JOIN INDIVID_PROGRAM individProgram
+        ON individProgram.A_OUID = @individProgram
+WHERE individProgram.A_FORM_SOCSERV= 1 AND departament.A_TYPE_DEP IN (1, 2, 3, 4, 5, 6, 8, 10, 20, 21) --Полустационар.
+    OR individProgram.A_FORM_SOCSERV = 2 AND departament.A_TYPE_DEP in (7, 11, 12) --На дому.
+    OR individProgram.A_FORM_SOCSERV = 4 AND departament.A_TYPE_DEP in (10, 13, 17) --Стационар.
+--Выбор условия оказания услуг.
+INSERT INTO #FOUND_FOR_IPRA_CONDITIONAL (CONDITION_CODE)
+VALUES('free')
+--Выбор распределений.
+INSERT INTO #FOUND_FOR_IPRA_DISTRIBUTION_HOME (DISTRIBUTION_OUID)
+SELECT area.OUID
+FROM #FOUND_FOR_IPRA_DEPARTAMENT departament
+    INNER JOIN SPR_AREA_USON area
+        ON area.A_DEPUSON = departament.DEPARTAMENT_OUID
+INSERT INTO #FOUND_FOR_IPRA_DISTRIBUTION_HALF_STAZ (DISTRIBUTION_OUID)
+SELECT room.A_OUID
+FROM #FOUND_FOR_IPRA_DEPARTAMENT departament
+    INNER JOIN SPR_ROOMS room
+        ON room.A_SPR_DEP_STATIONAR = departament.DEPARTAMENT_OUID
+INSERT INTO  #FOUND_FOR_IPRA_DISTRIBUTION_STAZ (DISTRIBUTION_OUID)
+SELECT bunks.A_OUID
+FROM #FOUND_FOR_IPRA_DEPARTAMENT departament
+    INNER JOIN SPR_CHAMBERS chambers
+        ON chambers.A_SPR_DEP_STATIONAR	= departament.DEPARTAMENT_OUID
+    INNER JOIN SPR_BUNKS bunks
+        ON bunks.A_CHAMBER = chambers.A_OUID
+            AND bunks.A_CONDITION='freely'
+--Выбор области распространения.
+INSERT INTO  #FOUND_FOR_IPRA_FOR_DISTRICT (DISTRINCT_OUID)
+SELECT DISTINCT direct.A_OUID
+FROM #FOUND_FOR_IPRA_DEPARTAMENT departament
+    INNER JOIN SPR_TARIF_SOC_SERV tarif
+        ON tarif.A_DEP = departament.DEPARTAMENT_OUID
+            AND tarif.A_STATUS = 10
+            AND (tarif.A_DATE_FINISH_SERV IS NULL OR CONVERT(DATE, tarif.A_DATE_FINISH_SERV) >= CONVERT(date,getdate()))
+    INNER JOIN SPR_DIRECT direct 
+        ON direct.A_OUID = tarif.A_DISTRICT
+------------------------------------------------------------------------------------------
+--Выбор информации для вставки.
+SELECT
+    ORGANIZATION_OUID AS A_ORG_SOC_CREATE,
+    DEPARTAMENT_OUID AS A_DEP_CREATE,
+    CONDITION_CODE AS A_COND_SOC_SERV,
+    CASE DISTRIBUTION_TYPE
+        WHEN 1 THEN distribution.DISTRIBUTION_OUID
+        ELSE NULL
+    END AS A_DISTRIB_HOME,
+    CASE DISTRIBUTION_TYPE
+        WHEN 2 THEN distribution.DISTRIBUTION_OUID
+        ELSE NULL
+    END AS A_DISTRIB_HALF_STAT,
+    CASE DISTRIBUTION_TYPE
+        WHEN 3 THEN distribution.DISTRIBUTION_OUID
+        ELSE NULL
+    END AS A_DISTRIB_STAT,
+    DISTRINCT_OUID AS A_DISTRICT,
+    @documentNumber AS DOCUMENTSNUMBER,
+    @documentStartDate AS A_DOCBASESTARTDATE,
+    @documentEndDate AS A_DOCBASEFINISHDATE
+INTO #FOR_INSERT_IPRA
+FROM #FOUND_FOR_IPRA_ORGANIZATION
+    CROSS JOIN #FOUND_FOR_IPRA_DEPARTAMENT
+    CROSS JOIN #FOUND_FOR_IPRA_CONDITIONAL
+    CROSS JOIN #FOUND_FOR_IPRA_FOR_DISTRICT
+    CROSS JOIN (
+        SELECT DISTRIBUTION_OUID, 1 AS DISTRIBUTION_TYPE FROM #FOUND_FOR_IPRA_DISTRIBUTION_HOME
+        UNION
+        SELECT DISTRIBUTION_OUID, 2 AS DISTRIBUTION_TYPE FROM #FOUND_FOR_IPRA_DISTRIBUTION_HALF_STAZ
+        UNION
+        SELECT DISTRIBUTION_OUID, 3 AS DISTRIBUTION_TYPE FROM #FOUND_FOR_IPRA_DISTRIBUTION_STAZ
+    ) distribution
+------------------------------------------------------------------------------------------
