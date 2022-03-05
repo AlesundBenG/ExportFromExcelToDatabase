@@ -1,0 +1,473 @@
+
+/*
+    Код был взят из запроса esrn/admin/edit.htm?id=11434611%40SXObjQuery
+    "Запрос на создание договора и назначения по индивидуальной программе".
+*/
+declare		@id				int, 
+			@userId			int,
+			@org			int,
+			@personID		int,
+			@docCode		varchar(255),
+			@area			int,
+			@dateContract	date,
+			@docType		int,
+			@dateStart		date,
+			@dep			int,
+			@docNum			varchar(255),
+			@lk				int,
+			@cond			varchar(255),
+			@dateFinisch	date,
+			@orgServ		int,
+			@orgType		int,
+			@orgServType	int,
+			@formType		int,
+			@persS			int,
+			@areaUson		int,	
+			
+			@ipst int,
+			@A_DEGREE int,
+			@A_TOTAL_POINTS decimal(18,2)
+
+
+set	@id = #objectID# 
+set @userId =  #curAccount# 
+
+select @ipst = A_STATUSPRIVELEGE from INDIVID_PROGRAM where A_OUID = @id
+
+if (isnull(@ipst, 0) in (13, 2))
+begin
+
+select	@area = A_DISTRICT,
+		@org = A_DEP_CREATE,
+		@personID = PERSONOUID/*A_PERSON_CONTRACT*/,
+		@persS = A_PERSON_CONTRACT,
+		@dateContract = A_DOCBASESTARTDATE,
+		@docNum = DOCUMENTSNUMBER,
+		@docCode = sfs.A_CODE,
+		@dateStart = A_START_DATE,
+		/*@lk = A_CATEGORY,*/
+		@cond = A_COND_SOC_SERV,
+		@dateFinisch = A_DOCBASEFINISHDATE,
+		@orgServ = A_ORG_SOC_CREATE,
+		@areaUson = case 
+						when sfs.A_CODE = 'serHalfStat' then A_DISTRIB_HALF_STAT
+						when sfs.A_CODE = 'servHome' then A_DISTRIB_HOME
+						when sfs.A_CODE = 'servStat' then A_DISTRIB_STAT
+					end,
+		@A_DEGREE = A_DEGREE,
+		@A_TOTAL_POINTS = A_TOTAL_POINTS
+from	INDIVID_PROGRAM ip
+		join SPR_FORM_SOCSERV sfs on sfs.A_OUID = ip.A_FORM_SOCSERV
+where	ip.A_OUID = @id
+
+select	@orgServType = A_KIND_USON
+from	SPR_ORG_USON
+where	OUID = @orgServ
+
+select	@orgType = A_TYPE_DEP
+from	SPR_DEP  
+where	OUID = @org
+
+select	@dep = sd.A_UPPER_DEP		
+from	SD_POSITION sp
+		join SD_EMPLOYEE se on se.OUID = sp.A_EMPLOYEE
+		join SPR_DEP sd on sp.A_DEPARTMENT = sd.OUID
+where	se.A_ACCOUNT = @userId
+
+select @docType = case
+					when @docCode = 'serHalfStat' then (select A_ID from PPR_DOC where A_CODE='socServContractHH')--п/стац
+					when @docCode = 'servHome' then (select A_ID from PPR_DOC where A_CODE='socServContractHome')--дом
+					when @docCode = 'servStat' then (select A_ID from PPR_DOC where A_CODE='socServContractHosp')--стац
+					when @docCode = 'servExpress' then 0 --срочное
+				end
+				
+select @formType = 
+				case
+					when @docCode = 'serHalfStat' then 827--п/стац
+					when @docCode = 'servHome' then 806--дом
+					when @docCode = 'servStat' then 826--стац
+				end
+--if exists --Для создание с пересекающимися периодами.
+if not exists --Для создания без пересекающихся периодов.
+(	
+	select	1
+	from	ESRN_SOC_SERV ess
+			join SPR_SOCSERV_PERIOD period on ess.OUID = period.A_SERV
+			join SPR_NPD_MSP_CAT snmc 
+				join PPR_SERV ps on snmc.A_MSP = ps.A_ID
+			on ess.A_SERV = snmc.A_ID
+	where	ess.A_STATUS = 10
+			and period.A_STATUS = 10
+			and A_PERSONOUID = @personID
+			and @formType = ps.A_ID
+			and ess.A_STATUSPRIVELEGE in (13)
+			and (ps.A_ID <> 827 or ps.A_ID = 827 and ess.A_ORGNAME <> @orgServ or ps.A_ID = 827 and ess.A_ORGNAME = @orgServ and ess.A_DEPNAME = @org)
+			and (@orgServ in (462897, 462898, 477548) and ess.A_ORGNAME in (462897, 462898, 477548) or @orgServ not in (462897, 462898, 477548) and ess.A_ORGNAME not in (462897, 462898, 477548))
+		and not(
+				(@dateContract<period.STARTDATE
+				and @dateFinisch<period.STARTDATE
+				and period.A_LASTDATE is null
+				and @dateFinisch is not null)
+						or
+				(@dateContract<period.STARTDATE
+				and @dateFinisch<period.STARTDATE
+				and period.A_LASTDATE is not null
+				and @dateFinisch is not null)
+						or
+				(@dateContract>period.A_LASTDATE
+				and @dateFinisch>period.A_LASTDATE
+				and period.A_LASTDATE is not null
+				)
+		)
+)	
+and
+not exists
+(
+	select	1
+	from	ESRN_SOC_SERV ess
+			join SPR_SOCSERV_PERIOD period on ess.OUID = period.A_SERV
+			join SPR_NPD_MSP_CAT snmc 
+				join PPR_SERV ps on snmc.A_MSP = ps.A_ID
+			on ess.A_SERV = snmc.A_ID
+	where	ess.A_STATUS = 10
+			and period.A_STATUS = 10
+			and A_PERSONOUID = @personID
+			and @formType = ps.A_ID
+		and ess.A_STATUSPRIVELEGE in (12)
+		and ess.A_ORGNAME = @orgServ
+		
+)	
+begin	
+if (
+		(@docType>0) 
+		and (@dateContract>=@dateStart)
+		and (@formType>0)--Форма социального обслуживания A_FORM_SOCSERV
+		and (@cond is not null) --Условие оказания социальных услуг A_COND_SOC_SERV
+		and (@areaUson is not null) --Распределение в подразделение (в зависимости от формы СО)
+		and (@orgServ is not null) --Учреждение A_ORG_SOC_CREATE
+		and (@org is not null) --Подразделение A_DEP_CREATE
+		and (@area is not null)--	Местность распространения услуг A_DISTRICT
+		and (@dateContract is not null)--Дата начала действия основания A_DOCBASESTARTDATE
+
+)			
+begin
+DECLARE @MyTableVar table(docID int, typeDoc int)
+DECLARE	@Tarif table(tarifId int, rnum int, summ float)
+if 
+		(select	COUNT(1)
+		from	SOCSERV_INDIVDPROGRAM
+		where	A_INDIVID_PROGRAM = @id
+				and A_STATUS = 10
+				)>0
+begin
+insert into WM_ACTDOCUMENTS (
+								PERSONOUID, 
+								DOCUMENTSTYPE,	
+								ISSUEEXTENSIONSDATE, 
+								GIVEDOCUMENTORG, 
+								GUID, 
+								A_CREATEDATE, 
+								A_CROWNER,
+								TS, 
+								A_EDITOWNER, 
+								A_STATUS, 
+								A_DOCBASESTARTDATE, 
+								A_DOCSTATUS, 
+								A_DUMMY, 
+								A_PERSON_CONTRACT,
+								DOCUMENTSNUMBER,
+								COMPLETIONSACTIONDATE, 
+								A_DOCBASEFINISHDATE)
+OUTPUT	inserted.OUID, 1 INTO @MyTableVar
+select @personID,@docType,@dateContract, @dep, NEWID(),GETDATE(), @userId, GETDATE(), @userId,10, @dateContract, 1,0,@persS,@docNum, @dateFinisch, @dateFinisch
+
+if @docCode = 'servHome'--надом
+begin
+		insert into @Tarif(tarifId, rnum, summ)
+		select	distinct stss.A_ID, row_number() over (partition by sss.OUID order by si.A_CREATEDATE desc) rnum, sssp.A_AMOUNT
+		from	SPR_TARIF_SOC_SERV  stss
+					join SPR_SOC_SERV sss 
+						join SOCSERV_INDIVDPROGRAM si on sss.OUID = si.A_SOC_SERV						
+					on stss.A_SOC_SERV = sss.OUID
+				left join SPR_SOC_SERV_PERIOD sssp on sssp.A_SOC_SERV = stss.A_ID and sssp.A_STATUS = 10
+				and convert(date, sssp.A_START_DATE) <= convert(date, @dateContract)
+				and (convert(date, sssp.A_FIN_DATE) >= convert(date, @dateContract) or sssp.A_FIN_DATE is null)					
+		where	
+		--sss.ouid in (select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where A_PARENT in (
+		--							select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where	A_PARENT in (select ouid from SPR_SOC_SERV where A_CODE = 'socServDom2018'))
+		--							)
+		--		and 
+				sss.A_STATUS = 10
+				and stss.A_DISTRICT = @area
+				and si.A_INDIVID_PROGRAM = @id
+				and si.A_STATUS = 10
+				and stss.A_STATUS=10
+				and stss.A_DEP =  @org
+				
+				--and convert(date, stss.A_DATE_START_SERV) <= convert(date, @dateContract)
+				--and (convert(date, stss.A_DATE_FINISH_SERV) >= convert(date, @dateContract) or stss.A_DATE_FINISH_SERV is null)					
+				
+end
+
+if @docCode = 'serHalfStat'--п/с
+begin
+
+		insert into @Tarif(tarifId, rnum, summ)
+		select	distinct stss.A_ID, row_number() over (partition by sss.OUID order by si.A_CREATEDATE desc) rnum, sssp.A_AMOUNT
+		from	SPR_TARIF_SOC_SERV  stss
+					join SPR_SOC_SERV sss 
+						join SOCSERV_INDIVDPROGRAM si on sss.OUID = si.A_SOC_SERV						
+					on stss.A_SOC_SERV = sss.OUID
+				left join SPR_SOC_SERV_PERIOD sssp on sssp.A_SOC_SERV = stss.A_ID and sssp.A_STATUS = 10
+				and convert(date, sssp.A_START_DATE) <= convert(date, @dateContract)
+				and (convert(date, sssp.A_FIN_DATE) >= convert(date, @dateContract) or sssp.A_FIN_DATE is null)					
+		where	
+		--sss.ouid in (select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where A_PARENT in (
+		--							select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where	A_PARENT in (select ouid from SPR_SOC_SERV where A_CODE = 'socServPStaz2018'))
+		--							)
+		--		and 
+				sss.A_STATUS = 10
+				and stss.A_DISTRICT = @area
+				and si.A_INDIVID_PROGRAM = @id
+				and si.A_STATUS = 10
+				and stss.A_STATUS=10
+				and stss.A_DEP =  @org
+				
+				--and convert(date, stss.A_DATE_START_SERV) <= convert(date, @dateContract)
+				--and (convert(date, stss.A_DATE_FINISH_SERV) >= convert(date, @dateContract) or stss.A_DATE_FINISH_SERV is null)					
+				
+end
+
+if @docCode = 'servStat'--с
+begin
+		insert into @Tarif(tarifId, rnum, summ)
+		select	distinct stss.A_ID, row_number() over (partition by sss.OUID order by si.A_CREATEDATE desc) rnum, sssp.A_AMOUNT
+		from	SPR_TARIF_SOC_SERV  stss
+					join SPR_SOC_SERV sss 
+						join SOCSERV_INDIVDPROGRAM si on sss.OUID = si.A_SOC_SERV						
+					on stss.A_SOC_SERV = sss.OUID
+				left join SPR_SOC_SERV_PERIOD sssp on sssp.A_SOC_SERV = stss.A_ID and sssp.A_STATUS = 10
+				and convert(date, sssp.A_START_DATE) <= convert(date, @dateContract)
+				and (convert(date, sssp.A_FIN_DATE) >= convert(date, @dateContract) or sssp.A_FIN_DATE is null)					
+		where	
+		--sss.ouid in (select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where A_PARENT in (
+		--							select	ouid 
+		--							from	SPR_SOC_SERV 
+		--							where	A_PARENT in (select ouid from SPR_SOC_SERV where A_CODE = 'socServStaz2018'))
+		--							)
+		--		and 
+				sss.A_STATUS = 10
+				and stss.A_DISTRICT = @area
+				and si.A_INDIVID_PROGRAM = @id
+				and si.A_STATUS = 10
+				and stss.A_STATUS=10
+				and stss.A_DEP =  @org
+				
+				--and convert(date, stss.A_DATE_START_SERV) <= convert(date, @dateContract)
+				--and (convert(date, stss.A_DATE_FINISH_SERV) >= convert(date, @dateContract) or stss.A_DATE_FINISH_SERV is null)					
+				
+end
+
+delete from @Tarif
+where rnum>1
+
+insert into WM_SOC_SERV (	A_STATUS,	
+							A_EDITOWNER,	
+							TS,	
+							SYSTEMCLASS,	
+							GUID,	
+							A_CREATEDATE,	
+							A_CROWNER,	
+							PERSONOUID,	
+							A_CONTRACT,	
+							A_TARIF)
+select 10, @userId, GETDATE(), 10284180, NEWID(),GETDATE(), @userId, @personID, (select docID from @MyTableVar where typeDoc = 1), t.tarifId
+from @Tarif t
+
+
+insert into ESRN_SOC_SERV
+(GUID,	A_CROWNER,	A_TS,	A_STATUS,	A_EDITOR,	A_CREATEDATE, A_SERVDATE,	A_NUMPB,	A_STATUSPRIVELEGE,
+	A_SERV,	A_PERSONOUID,	A_ORGNAME, 	A_IPPSU, A_TYPE_ORG, A_ORG, A_TYPE_DEP, A_DEP, A_PERSON_CONTRACT, A_DEPNAME, A_DISTRICT, A_DEGREE, A_TOTAL_POINTS)				
+OUTPUT	inserted.OUID, 2 INTO @MyTableVar
+select	NEWID(),
+		@userId,
+		GETDATE(),
+		10,
+		@userId,
+		GETDATE(),
+		@dateContract,
+		@docNum,
+		13,
+		case		
+			when @docCode = 'servStat' then 2267/*(select  max(A_ID) from SPR_NPD_MSP_CAT  where A_MSP = 826 and A_STATUS = 10 and A_CATEGORY = @lk)*/
+			when @docCode = 'servHome' then 2268/*(select  max(A_ID) from SPR_NPD_MSP_CAT  where A_MSP = 806 and A_STATUS = 10 and A_CATEGORY = @lk)*/
+			when @docCode = 'serHalfStat' then 2266/*(select  max(A_ID) from SPR_NPD_MSP_CAT  where A_MSP = 827 and A_STATUS = 10 and A_CATEGORY = @lk)*/
+		END,
+		@personID,
+		@orgServ,
+		@id,
+		null,
+		null,
+		null,
+		null,
+		case when @persS is not null and @persS <> @personID then @persS else null end,
+		@org,
+		@area,
+		@A_DEGREE,
+		@A_TOTAL_POINTS
+
+insert into SPR_SOCSERV_PERIOD (GUID,	A_CROWNER,	A_TS,	A_STATUS,	A_EDITOR,	A_CREATEDATE,	STARTDATE,	A_SERV, A_LASTDATE)
+select	NEWID(), @userId,GETDATE(),10,@userId,GETDATE(),@dateContract, docID, @dateFinisch
+from	@MyTableVar 
+where	typeDoc = 2
+
+insert into SXLINK (ATTRA, ATTRB, RELATIONID, NUM)
+select docID, @id, (select MAX(RELATIONID)+1 from SXLINK), 0
+from	@MyTableVar 
+where	typeDoc = 2
+
+insert into WM_COND_SOC_SERV (GUID,	A_TS,	A_STATUS,	A_COND_SOC_SERV,	A_STARTDATE,	A_SOC_SERV, A_LASTDATE)
+select newid(),GETDATE(),10,@cond,@dateContract, docID, @dateFinisch
+from	@MyTableVar 
+where	typeDoc = 2
+
+insert into SPR_LINK_ESRN_SOC_SERV_PC (GUID,	FROMID,	TOID)
+select NEWID(),docID,@personID
+from	@MyTableVar 
+where	typeDoc = 2
+
+insert into WM_SOC_SERV_AGR(A_EDITOWNER, A_STATUS, A_CONTRACT,	TS,	SYSTEMCLASS,	GUID,	A_CREATEDATE,	A_CROWNER,	A_SOC_SERV,	ESRN_SOC_SERV, A_TARIF_SOC_SERV)
+OUTPUT	inserted.A_ID, 3 INTO @MyTableVar
+select 	@userId,10,(select docID from @MyTableVar where typeDoc = 1), GETDATE(),10284242,NEWID(),GETDATE(),@userId,t.tarifId,(select docID from @MyTableVar where typeDoc = 2), t.summ
+from @Tarif t
+
+insert into WM_COND_SOC_SERV_ONE(GUID,	A_TS,	A_STATUS,	A_SOC_SERV_AGR,	A_COND_SOC_SERV,	A_STARTDATE,	A_LASTDATE,	A_ISRECALCPERIOD)
+select NEWID(),GETDATE(),10, docID, @cond, @dateContract, @dateFinisch,	1
+from	@MyTableVar 
+where	typeDoc = 3
+
+if (@docCode = 'servHome') 
+begin
+insert into USE_HOME_SERV (	GUID,
+							A_SOC_SERV_IN_USON,	
+							A_DEP,		
+							A_CREATEDATE,	
+							A_CROWNER,
+							A_TS,	
+							A_EDITOR,
+							A_STATUS,	
+							A_SYSTEMCLASS,	
+							A_START_DATE,	
+							A_FINISH_DATE,
+							AREA_USON
+							)
+select NEWID(), docID, @org, GETDATE(),@userId,GETDATE(), @userId,10, 10338043,@dateContract, @dateFinisch,@areaUson
+from @MyTableVar 
+where	typeDoc = 2
+end
+else if (@docCode = 'servStat')
+begin
+insert into USE_BUNKS(	A_EDITOR,	
+						A_TS,
+						GUID,
+						A_CREATEDATE,
+						A_CROWNER,
+						A_SYSTEMCLASS,
+						A_START_DATE,
+						A_FINISH_DATE,
+						A_STATUS,	
+						A_SOC_SERV_IN_USON,
+						A_CITIZEN,	
+						IS_RECUMBENT,
+						A_BUNK)
+select @userId, GETDATE(),NEWID(),GETDATE(),@userId, 10293645, @dateContract, @dateFinisch,10, docID,@personID,0,@areaUson 
+from @MyTableVar 
+where	typeDoc = 2
+
+update spr_Bunks
+set A_CONDITION='engaged'
+where A_OUID = @areaUson
+
+end
+else if (@docCode = 'serHalfStat')
+begin 
+insert into USE_ROOMS(	GUID,	
+						A_CROWNER,
+						A_TS,	
+						A_STATUS,
+						A_EDITOR,
+						A_SYSTEMCLASS,
+						A_CREATEDATE,
+						A_START_DATE,
+						A_FINISH_DATE,
+						A_SOC_SERV_IN_USON,
+						A_ROOM)
+select NEWID(),@userId, GETDATE(),10, @userId, 10335949,GETDATE(), @dateContract, @dateFinisch, docID,@areaUson 
+from @MyTableVar 
+where	typeDoc = 2
+
+end
+
+
+		
+delete from @MyTableVar
+delete from @Tarif
+
+update	INDIVID_PROGRAM 
+set		/*A_CATEGORY = null,*/
+		A_ORG_SOC_CREATE = null,
+		A_DEP_CREATE = null,
+		A_DISTRICT = null,
+		A_COND_SOC_SERV = null,
+		DOCUMENTSNUMBER = null,
+		A_PERSON_CONTRACT = null,
+		A_DOCBASESTARTDATE = null,
+		A_DOCBASEFINISHDATE = null,
+		A_DISTRIB_HALF_STAT = null,
+		A_DISTRIB_HOME = null,
+		A_DISTRIB_STAT =null	
+where	A_OUID = @id
+select 'договор и назначение созданы' as A
+end
+else 
+begin
+	RAISERROR('договор и назначение не созданы по причине отсутствия услуг',16,1);
+	RETURN;
+end
+end
+else 
+begin
+	RAISERROR('договор и назначение не созданы. 
+Проверьте условие: "Дата начала действия основания" в договоре должна быть больше либо равна "Дата оформления" ИППСУ.
+Проверьте заполненость параметров:
+	- Форма социального обслуживания
+	- Условие оказания социальных услуг
+	- Учреждение
+	- Подразделение
+	- Распределение в подразделение (в зависимости от формы СО)
+	- Местность распространения услуг
+	- Дата начала действия основания',16,1);
+	RETURN;
+end
+end
+else 
+begin
+	RAISERROR('договор и назначение не созданы по причине пересечения периодов.',16,1);
+	RETURN;
+end
+end
+else
+begin
+	RAISERROR('ИППСУ должна иметь статус "Утверждено" или "Постоянное прекращение"',16,1);
+	RETURN;
+end

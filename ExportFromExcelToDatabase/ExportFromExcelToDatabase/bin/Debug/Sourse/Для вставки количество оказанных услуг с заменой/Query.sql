@@ -1,3 +1,6 @@
+DISABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
+DISABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
+DISABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Этап 0: Инициализация.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +65,7 @@ WHERE TYPE_SERV_CODE = '' OR
         OR COUNT_SERV_NORMAL = '0' AND COUNT_SERV_OVER = '' 
         OR COUNT_SERV_NORMAL = '' AND COUNT_SERV_OVER = '0'
         OR COUNT_SERV_NORMAL = '' AND COUNT_SERV_OVER = ''
+        OR COUNT_SERV_NORMAL = '0' AND COUNT_SERV_OVER = '0'
     )
 --Проверка исходных данных.
 IF ((SELECT LEN(@SNILS)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указан СНИЛС' END
@@ -76,6 +80,7 @@ IF ((SELECT ISDATE(@birthdate)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsErr
 IF ((SELECT ISDATE(@dateRegistration)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты оформления ИППСУ' END
 IF ((SELECT ISNUMERIC(@yearReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат года' END
 IF ((SELECT ISNUMERIC(@monthReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат месяца' END
+IF ((SELECT COUNT(*) FROM #DATA_FOR_INSERV) = 0) BEGIN SET @thereIsError = 1 SET @message = 'Нет не нулевых услуг' END
 --Конвертация исходных данных.
 IF (@thereIsError = 0) BEGIN
     SET @yearReport_INT = CONVERT(INT, @yearReport)
@@ -229,34 +234,23 @@ IF (@thereIsError = 0) BEGIN
     END
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 4: Проверка введенных данных.
+--Этап 4: Вставка стоимости и количество оказанных социальных услуг.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
-    --Проверка отсутствия уже введенных данных.
-    DECLARE @alreadyThereCount INT
-    SET @alreadyThereCount = (
-        SELECT 
-            COUNT(DISTINCT cosSocServ.A_ID)
-        FROM #FOUND_AGREGATION foundAgregation
-            INNER JOIN WM_COST_SOC_SERV cosSocServ
-                ON cosSocServ.A_AGR_SOC_SERV = foundAgregation.SOC_SERV_AGR_OUID
-                    AND cosSocServ.A_STATUS = 10
-                    AND cosSocServ.A_DATE_START = @startDate
-                    AND cosSocServ.A_DATE_LAST = @endDate
-        )
-    IF (@alreadyThereCount = @countTypeServForInsert) BEGIN 
-        SET @thereIsError = 1
-        SET @message = 'Данные уже есть за данный период'
-    END 
-    IF (@alreadyThereCount <> @countTypeServForInsert AND @alreadyThereCount <> 0) BEGIN 
-        SET @thereIsError = 1
-        SET @message = 'Частично данные уже есть за данный период'
-    END     
-END 
---//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 5: Вставка стоимости и количество оказанных социальных услуг.
---//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IF (@thereIsError = 0) BEGIN
+    --Удаление ранее вставленных данных.
+    UPDATE cost
+    SET cost.A_STATUS = 70,
+        cost.A_EDITOWNER = 10314303,
+        cost.TS = GETDATE()
+    FROM WM_COST_SOC_SERV cost
+        INNER JOIN WM_SOC_SERV_AGR AGR
+            ON AGR.A_ID = cost.A_AGR_SOC_SERV
+                AND AGR.A_STATUS = 10
+                AND AGR.ESRN_SOC_SERV = @identifiedSocServ
+    WHERE cost.A_STATUS = 10
+        AND YEAR(cost.A_DATE_START) = @yearReport_INT
+        AND MONTH(cost.A_DATE_START) = @monthReport_INT
+    --Вставка новых данных.
     INSERT INTO WM_COST_SOC_SERV(A_EMPLOYEE, A_EDITOWNER, A_STATUS, GUID, TS, SYSTEMCLASS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SUM_SOC_SERV_PERIOD, A_DATE_START, A_DATE_LAST, A_ACT_VOLUME, A_COMMENT, A_ACT_EXCESS_QUANT, A_COST_DOP_SOC_SERV, A_ACT_QUANT_NORM)
     SELECT
         CAST(NULL AS INT)       AS A_EMPLOYEE,              --Сотрудники.
@@ -279,9 +273,23 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION foundAgregation
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 6: Вставка суммы по услуге за календарный месяц.
+--Этап 5: Вставка суммы по услуге за календарный месяц.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
+    --Удаление ранее вставленных данных.
+    UPDATE cost
+    SET cost.A_STATUS = 70,
+        cost.A_EDITOWNER = 10314303,
+        cost.A_TS = GETDATE()
+    FROM WM_COST_SOC_SERV_MONTH cost
+        INNER JOIN WM_SOC_SERV_AGR AGR
+            ON AGR.A_ID = cost.A_AGR_SOC_SERV
+                AND AGR.A_STATUS = 10
+                AND AGR.ESRN_SOC_SERV = @identifiedSocServ
+    WHERE cost.A_STATUS = 10
+        AND cost.A_YEAR = @yearReport_INT
+        AND cost.A_MONTH = @monthReport_INT
+    --Вставка новых данных.
     INSERT INTO WM_COST_SOC_SERV_MONTH(A_YEAR, A_MONTH, A_SOC_SERV_MONTH, A_SUM_SOC_SERV_MONTH, A_NORM_EX, A_EDITOWNER, A_TS, A_GUID, A_STATUS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SYSTEMCLASS, A_FULL_COST, A_PERCENT_PART_PAY, A_SUM_NORM_EX, A_IS_PART_PAY, A_COND_SOC_SERV, A_NORMSOCSERV, A_ACT_EXCESS_QUANT)
     SELECT
         @yearReport_INT                     AS A_YEAR,              --Год.
@@ -318,7 +326,7 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION
 END  
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 7: Вставка стоимости всех оказанных услуг за календарный месяц 
+--Этап 6: Вставка стоимости всех оказанных услуг за календарный месяц 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Условия оказания социальных услуг.
@@ -333,6 +341,16 @@ IF (@thereIsError = 0) BEGIN
                 )
         )
     )
+    --Удаление ранее вставленных данных.
+    UPDATE WM_FACT_COST_SOC_SERV
+    SET A_STATUS = 70,
+        A_EDITOWNER = 10314303,
+        TS = GETDATE()
+    WHERE A_STATUS = 10
+        AND ESRN_SOC_SERV = @identifiedSocServ
+        AND A_YEAR = @yearReport_INT
+        AND A_MONTH = @monthReport_INT
+    --Вставка новых данных.
     INSERT INTO WM_FACT_COST_SOC_SERV(TS,SYSTEMCLASS,GUID,A_CREATEDATE,A_CROWNER,A_SERV,A_SUM_PERIOD,A_FACT_PAY,A_EDITOWNER,A_STATUS,A_PAY_DATE,A_YEAR,A_MONTH,A_FULL_COST_MONTH,A_SUM_PAY,A_PART_PAY,A_SUMM_EXT_SERV,A_SUM_NORM_EX,A_SUMM_DOG,ESRN_SOC_SERV,A_COND_SOC_SERV,A_COMMENT,A_SUM_PERIOD_BUDGET,A_FULL_COUNT,A_SOC_COUNT,A_SOC_COST_MONTH,A_DOP_COUNT,A_DOP_COST_MONTH,A_OTHER_COUNT,A_OTHER_COST_MONTH)
     SELECT
         GETDATE()                   AS TS,                  --Дата модификации
@@ -386,11 +404,14 @@ IF (@thereIsError = 0) BEGIN
     ) t
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 8: Завершение
+--Этап 7: Завершение
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Вывод результата.
 SELECT @thereIsError AS thereIsError, @message AS message
 --Удаление временных таблиц.
 IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
 IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
-IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END --Данные для вставки.
+IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END; --Данные для вставки.
+ENABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
+ENABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
+ENABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
