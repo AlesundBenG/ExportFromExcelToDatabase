@@ -447,6 +447,7 @@ namespace ExportFromExcelToDatabase
                             if (thereIsError == "0") {
                                 setCellValueDataGridView(dataGridViewProcess, i, "Status", "Запрос успешно выполнен");
                                 setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.LightGreen);
+                                setCellValueDataGridView(dataGridViewProcess, i, "Message", "");
                             }
                             else {
                                 setCellValueDataGridView(dataGridViewProcess, i, "Status", "Ошибка выполнения запроса");
