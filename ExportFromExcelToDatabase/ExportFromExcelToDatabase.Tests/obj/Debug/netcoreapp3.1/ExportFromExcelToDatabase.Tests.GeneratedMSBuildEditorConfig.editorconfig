@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = ExportFromExcelToDatabase.Tests
+build_property.ProjectDir = C:\Users\bpa\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\

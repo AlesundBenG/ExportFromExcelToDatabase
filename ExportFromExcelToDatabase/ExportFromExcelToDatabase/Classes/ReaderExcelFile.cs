@@ -17,16 +17,15 @@ namespace ExportFromExcelToDatabase.Classes
             set {
             }
         }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*Public методы*/
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /*Public методы*/
-
-        /// <summary>
-        /// Чтение файла.
-        /// </summary>
-        /// <param name="pathFile">Путь к файлу.</param>
-        /// <returns>Список листов, представленных в виде матрицы ячеек.</returns>
-        public ExcelFile readFile(string pathFile) {
+    /// <summary>
+    /// Чтение файла.
+    /// </summary>
+    /// <param name="pathFile">Путь к файлу.</param>
+    /// <returns>Список листов, представленных в виде матрицы ячеек.</returns>
+    public ExcelFile readFile(string pathFile) {
             //Запуск экселя.
             Application application = new Application();
             //Класс работы с файлом.

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {}
+    "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {
+    "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
         "projectName": "ExportFromExcelToDatabase.Tests",
-        "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
-        "packagesPath": "C:\\Users\\bnl\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
+        "projectPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+        "packagesPath": "C:\\Users\\bpa\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\bnl\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\bpa\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,9 +26,10 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
-                "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
+              "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
+                "projectPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
               }
             }
           }
@@ -41,18 +42,19 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "MSTest.TestAdapter": {
               "target": "Package",
-              "version": "[2.1.1, )"
+              "version": "[2.2.10, )"
             },
             "MSTest.TestFramework": {
               "target": "Package",
-              "version": "[2.1.1, )"
+              "version": "[2.2.10, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[16.7.1, )"
+              "version": "[17.3.2, )"
             },
             "coverlet.collector": {
               "target": "Package",
@@ -65,24 +67,44 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[3.1.10, 3.1.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[3.1.0, 3.1.0]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[3.1.0, 3.1.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
+    "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
       "restore": {
-        "projectUniqueName": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj",
+        "projectUniqueName": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj",
         "projectName": "ExportFromExcelToDatabase",
-        "projectPath": "C:\\Users\\bnl\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
+        "projectPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj",
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
       },
       "frameworks": {
         "net472": {}

@@ -435,6 +435,8 @@ namespace ExportFromExcelToDatabase
         /// Выполнение сгенерированных SQL-запросов.
         /// </summary>
         private void executeQuerySQL() {
+            setEnableButton(buttonStart, false);
+            setColorButton(buttonStart, Color.Orange);
             setTexLabel(labelCondition, "Выполнение запросов");
             resetProgressBar(progressBar);
             setMaxValueProgressBar(progressBar, _pathFiles.Length);
@@ -464,6 +466,8 @@ namespace ExportFromExcelToDatabase
                 }
                 incrementProgressBar(progressBar);
             }
+            setEnableButton(buttonStart, true);
+            setColorButton(buttonStart, Color.LightGreen);
             resetProgressBar(progressBar);
             setTexLabel(labelCondition, "");
         }
