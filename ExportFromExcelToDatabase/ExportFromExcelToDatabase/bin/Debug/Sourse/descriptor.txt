@@ -5,7 +5,7 @@
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Регистрационный номер поставщика в Реестре поставщиков:";
 	CODE: regNumOrganization;
-	OFFEST_COLUMN: 1;
+	OFFEST_COLUMN: 2;
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;

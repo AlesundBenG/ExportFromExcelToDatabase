@@ -1,6 +1,3 @@
---DISABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
---DISABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
---DISABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Этап 0: Инициализация.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +39,8 @@ CREATE TABLE #FOUND_AGREGATION (
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Этап 1: Установка входных параметров.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--Информация о поставщике услуг.
+DECLARE @regNumOrganization VARCHAR(10) = '#regNumOrganization#'
 --Информация о получателе.
 DECLARE @SNILS VARCHAR(256) SET @SNILS = '#SNILS#' --СНИЛС.
 DECLARE @name VARCHAR(256) SET @name = '#name#' --Имя.
@@ -51,7 +50,11 @@ DECLARE @birthdate VARCHAR(256) SET @birthdate = '#birthdate#' --Дата рож
 --Данные об индивидуальной программе получателя социальных услуг (ИППСУ).
 DECLARE @formSocServ VARCHAR(256) SET @formSocServ = '#formSocServ#' --Форма социального обслуживания.
 DECLARE @dateRegistration VARCHAR(256) SET @dateRegistration = '#dateRegistration#' --Дата оформления.
-DECLARE @numberDocumentIPRA VARCHAR(256) SET @numberDocumentIPRA = '#numberDocumentIPRA#' --Номер документа
+DECLARE @numberDocumentIPRA VARCHAR(256) SET @numberDocumentIPRA = '#numberDocumentIPRA#' --Номер документа.
+--Данные о договоре
+DECLARE @documentNumber VARCHAR(256) = '#documentNumber#' --Номер договора.
+DECLARE @documentStartDate VARCHAR(256) = '#documentStartDate#' --Дата договора.
+DECLARE @documentEndDate VARCHAR(256) =  '#documentEndDate#' --Дата окончания действия договора.
 --Период, за который предоставляются сведения.
 DECLARE @yearReport VARCHAR(256) SET @yearReport = '#yearReport#' --Год.
 DECLARE @monthReport VARCHAR(256) SET @monthReport = (SELECT A_CODE FROM SPR_MONTH WHERE A_NAME = '#monthReport#' OR CONVERT(VARCHAR, A_CODE) = '#monthReport#') --Месяц.
@@ -399,6 +402,3 @@ SELECT @thereIsError AS thereIsError, @message AS message
 IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
 IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
 IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END; --Данные для вставки.
---ENABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
---ENABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
---ENABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
