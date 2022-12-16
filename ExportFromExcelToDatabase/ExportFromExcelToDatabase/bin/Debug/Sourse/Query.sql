@@ -3,6 +3,7 @@
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Переменные.
 DECLARE @identifiedPerson INT --Идентифицированный человек.
+DECLARE @identifiedIPPSU INT --Идентифицированная индивидуальная программа (ИППСУ).
 DECLARE @identifiedSocServ INT --Идентифицированное социальное обслуживание.
 DECLARE @yearReport_INT INT --Год, конвертированный в число.
 DECLARE @monthReport_INT INT --Месяц, конвертированный в число.
@@ -12,12 +13,16 @@ DECLARE @thereIsError INT = 0 --Флаг наличия ошибки.
 DECLARE @message VARCHAR(256)= 'Успешно' --Сообщение.
 --Удаление временных таблиц.
 IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
+IF OBJECT_ID('tempdb..#FOUND_IPPSU') IS NOT NULL BEGIN DROP TABLE #FOUND_IPPSU END --Найденные индивидуальные программы (ИППСУ) по входным данным.
 IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
 IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END --Данные для вставки.
 IF OBJECT_ID('tempdb..#FOUND_AGREGATION') IS NOT NULL BEGIN DROP TABLE #FOUND_AGREGATION END --Найденные агрегации услуг.
 --Создание временных таблиц.
 CREATE TABLE #FOUND_PEOPLE (
     PERSONOUID INT, --Идентификатор личного дела.
+)
+CREATE TABLE #FOUND_IPPSU (
+    IPPSU_OUID INT, --Идентификатор индивидуальной программы (ИППСУ).
 )
 CREATE TABLE #FOUND_SOC_SERV (
     SOC_SERV_OUID INT, --Идентификатор социального обслуживания.
@@ -133,10 +138,47 @@ IF (@thereIsError = 0) BEGIN
     END 
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 3: Идентификация социального обслуживания.
+--Этап 3: Идентификация индивидуальной программы (И ППСУ).
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
-    --Выбор назначений на социальной обслуживание.
+    --Выбор ИППСУ, удовлетворяющих условиям.
+    INSERT #FOUND_IPPSU (IPPSU_OUID)
+    SELECT DISTINCT
+        individProgram.A_OUID AS IPPSU_OUID
+    FROM INDIVID_PROGRAM individProgram --Индивидуальная программа.
+    ----Документ индивидуальной программы.
+        INNER JOIN WM_ACTDOCUMENTS docuemnt
+            ON docuemnt.OUID = individProgram.A_DOC
+                AND docuemnt.A_STATUS = 10
+                AND docuemnt.PERSONOUID = @identifiedPerson
+                AND docuemnt.DOCUMENTSNUMBER = @numberDocumentIPRA
+    ----Форма социального обслуживания.
+        INNER JOIN SPR_FORM_SOCSERV formSocServ
+            ON formSocServ.A_OUID = individProgram.A_FORM_SOCSERV
+                AND formSocServ.A_NAME = @formSocServ
+    WHERE individProgram.PERSONOUID = @identifiedPerson
+        AND individProgram.A_STATUS = 10
+    --Подсчет ИППСУ.
+    DECLARE @countFoundIPPSU INT
+    SET @countFoundIPPSU = (SELECT COUNT(*) FROM #FOUND_IPPSU)
+    --Результат 3 этапа.
+    IF (@countFoundIPPSU > 1) BEGIN
+        SET @thereIsError = 1
+        SET @message = 'Найдено более одной ИППСУ, удовлетворяющий условиям'
+    END
+    ELSE IF (@countFoundIPPSU = 0) BEGIN
+        SET @thereIsError = 1
+        SET @message = 'Не найдена ИППСУ, удовлетворяющий условиям'
+    END
+    ELSE BEGIN
+        SET @identifiedIPPSU = (SELECT TOP 1 IPPSU_OUID FROM #FOUND_IPPSU)
+    END 
+END 
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--Этап 4: Идентификация социального обслуживания.
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IF (@thereIsError = 0) BEGIN
+        --Выбор назначений на социальной обслуживание.
     INSERT #FOUND_SOC_SERV(SOC_SERV_OUID)
     SELECT DISTINCT
         socServ.OUID AS SOC_SERV_OUID
@@ -150,24 +192,12 @@ IF (@thereIsError = 0) BEGIN
                     OR @yearReport_INT = YEAR(period.STARTDATE) AND @monthReport_INT >= MONTH(period.STARTDATE) --Или равен начальному, но месяц позже начала.
                     OR @yearReport_INT = YEAR(period.A_LASTDATE) AND @monthReport_INT <= ISNULL(MONTH(period.A_LASTDATE), 12) --Или равен конечному, но месяц раньше конца.
                 )
-    ----Индивидуальная программа.
-        INNER JOIN INDIVID_PROGRAM individProgram
-            ON individProgram.A_OUID = socServ.A_IPPSU
-                AND individProgram.A_STATUS = 10 --Статус индивидуальной программы в БД "Действует".
-    ----Действующие документы.
-        INNER JOIN WM_ACTDOCUMENTS actDocuments
-            ON actDocuments.OUID = individProgram.A_DOC
-                AND actDocuments.A_STATUS = 10 --Статус документа в БД "Действует".
-                AND actDocuments.DOCUMENTSNUMBER = @numberDocumentIPRA --Номер документа совпадает с требуемым.
-    ----Форма социального обслуживания.
-        INNER JOIN SPR_FORM_SOCSERV formSocServ
-            ON formSocServ.A_OUID = individProgram.A_FORM_SOCSERV
-                AND formSocServ.A_NAME = @formSocServ --Совпадает с формой отчета.
     ----Органы социальной защиты.
         INNER JOIN SPR_ORG_BASE organization
             ON organization.OUID = socServ.A_ORGNAME
     WHERE socServ.A_STATUS = 10 --Статус назначения в БД "Действует".
         AND socServ.A_PERSONOUID = @identifiedPerson --Льготодержатель - идентифицированный человек.
+        AND socServ.A_IPPSU = @identifiedIPPSU
     --Подсчет назначений.
     DECLARE @countFoundSocServ INT
     SET @countFoundSocServ = (SELECT COUNT(*) FROM #FOUND_SOC_SERV)
@@ -176,7 +206,7 @@ IF (@thereIsError = 0) BEGIN
         SET @thereIsError = 1
         SET @message = 'Найдено более одного социального обслуживания, удовлетворяющего условиям'
     END
-    ELSE IF (@countFoundSocServ = 0) BEGIN
+    ELSE IF (@countFoundSocServ = 0)  BEGIN
         SET @thereIsError = 1
         SET @message = 'Не найдено социальное обслуживание, удовлетворяющего условиям'
     END
@@ -185,7 +215,7 @@ IF (@thereIsError = 0) BEGIN
     END 
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 4: Идентификация агрегаций по услугам.
+--Этап 5: Идентификация агрегаций по услугам.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Выбор агрегации по услуге.
@@ -230,14 +260,14 @@ IF (@thereIsError = 0) BEGIN
     SET @countTypeServForInsert = (SELECT COUNT(*) FROM #DATA_FOR_INSERV)
     DECLARE @countFoundTypeServ INT
     SET @countFoundTypeServ = (SELECT COUNT(*) FROM #FOUND_AGREGATION)
-    --Результат 4 этапа.
+    --Результат 5 этапа.
     IF (@countTypeServForInsert <> @countFoundTypeServ) BEGIN 
         SET @thereIsError = 1
         SET @message = 'Не все услуги были найдены в социальном обслуживании'
     END
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 4: Проверка введенных данных.
+--Этап 6: Проверка введенных данных.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Проверка отсутствия уже введенных данных.
@@ -262,7 +292,7 @@ IF (@thereIsError = 0) BEGIN
     END     
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 5: Вставка стоимости и количество оказанных социальных услуг.
+--Этап 7: Вставка стоимости и количество оказанных социальных услуг.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     INSERT INTO WM_COST_SOC_SERV(A_EMPLOYEE, A_EDITOWNER, A_STATUS, GUID, TS, SYSTEMCLASS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SUM_SOC_SERV_PERIOD, A_DATE_START, A_DATE_LAST, A_ACT_VOLUME, A_COMMENT, A_ACT_EXCESS_QUANT, A_COST_DOP_SOC_SERV, A_ACT_QUANT_NORM)
@@ -287,7 +317,7 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION foundAgregation
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 6: Вставка суммы по услуге за календарный месяц.
+--Этап 8: Вставка суммы по услуге за календарный месяц.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     INSERT INTO WM_COST_SOC_SERV_MONTH(A_YEAR, A_MONTH, A_SOC_SERV_MONTH, A_SUM_SOC_SERV_MONTH, A_NORM_EX, A_EDITOWNER, A_TS, A_GUID, A_STATUS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SYSTEMCLASS, A_FULL_COST, A_PERCENT_PART_PAY, A_SUM_NORM_EX, A_IS_PART_PAY, A_COND_SOC_SERV, A_NORMSOCSERV, A_ACT_EXCESS_QUANT)
@@ -326,7 +356,7 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION
 END  
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 7: Вставка стоимости всех оказанных услуг за календарный месяц 
+--Этап 9: Вставка стоимости всех оказанных услуг за календарный месяц 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Условия оказания социальных услуг.
@@ -394,7 +424,7 @@ IF (@thereIsError = 0) BEGIN
     ) t
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 8: Завершение
+--Этап 10: Завершение
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Вывод результата.
 SELECT @thereIsError AS thereIsError, @message AS message
