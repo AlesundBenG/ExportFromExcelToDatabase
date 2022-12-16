@@ -209,6 +209,48 @@ IF (@thereIsError = 0) BEGIN
     ELSE IF (@countFoundSocServ = 0)  BEGIN
         SET @thereIsError = 1
         SET @message = 'Не найдено социальное обслуживание, удовлетворяющего условиям'
+        --Выбор организации.
+        DECLARE @organizationForInsert INT = (
+            SELECT DISTINCT organization.OUID
+            FROM LINK_INDIVIDPROGRAM_SPRORGUSON program_link_organization
+            ----Учреждения социального обслуживания.
+                INNER JOIN SPR_ORG_USON organization
+                    ON organization.OUID = program_link_organization.A_TOID
+                        AND organization.A_REG_NUM = @regNumOrganization
+            ----Базовый класс организаций.
+                INNER JOIN SPR_ORG_BASE organizationInfo
+                    ON organizationInfo.OUID = organization.OUID
+                        AND organizationInfo.A_STATUS = 10
+            WHERE program_link_organization.A_FROMID = @identifiedIPPSU
+        )
+        --Выбор подразделения.
+        DECLARE @departamentForInsert INT = (
+            SELECT DISTINCT departament.OUID
+            FROM SPR_DEP departament --Подразделения.
+            ----Базовый класс подразделения.
+                INNER JOIN SPR_ORG_BASE departamentInfo
+                    ON departamentInfo.OUID = departament.OUID
+                        AND departamentInfo.A_STATUS = 10
+            ----Индивидуальная программа.
+                INNER JOIN INDIVID_PROGRAM individProgram
+                    ON individProgram.A_OUID = @identifiedIPPSU
+            WHERE  departament.A_UPPER_DEP = @organizationForInsert
+                AND (individProgram.A_FORM_SOCSERV= 1 AND departament.A_TYPE_DEP IN (1, 2, 3, 4, 5, 6, 8, 10, 20, 21) --Полустационар.
+                    OR individProgram.A_FORM_SOCSERV = 2 AND departament.A_TYPE_DEP in (7, 11, 12) --На дому.
+                    OR individProgram.A_FORM_SOCSERV = 4 AND departament.A_TYPE_DEP in (10, 13, 17) --Стационар.
+                )
+        )
+        --Выбор условия оказания услуг.
+        DECLARE @conditionForInsert VARCHAR(4) = 'free'
+        --Вставка значений для создания СО и договора.
+        UPDATE INDIVID_PROGRAM
+        SET A_ORG_SOC_CREATE    = @organizationForInsert,
+            A_DEP_CREATE        = @departamentForInsert,
+            A_COND_SOC_SERV     = @conditionForInsert,
+            DOCUMENTSNUMBER     = @documentNumber,
+            A_DOCBASESTARTDATE  = CONVERT(DATE, @documentStartDate),
+            A_DOCBASEFINISHDATE = CONVERT(DATE, @documentEndDate)
+        WHERE A_OUID = @identifiedIPPSU
     END
     ELSE BEGIN
         SET @identifiedSocServ = (SELECT TOP 1 SOC_SERV_OUID FROM #FOUND_SOC_SERV)
