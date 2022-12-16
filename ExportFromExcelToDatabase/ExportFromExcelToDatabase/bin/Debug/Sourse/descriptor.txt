@@ -108,6 +108,33 @@
 </singleValue>
 <singleValue>
 	SHEET_NUMBER: 1;
+	SECTION_NAME: "Местность распространения договора";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Номер документа";
+	CODE: additionalDocumentNumber;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Местность распространения договора";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата документа";
+	CODE: additionalDocumentStartDate;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Местность распространения договора";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата окончания действия";
+	CODE: additionalDocumentEndDate;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
 	SECTION_NAME: "Период за который предоставляются сведения";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;

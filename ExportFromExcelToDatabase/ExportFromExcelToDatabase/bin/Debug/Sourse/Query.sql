@@ -56,10 +56,14 @@ DECLARE @birthdate VARCHAR(256) SET @birthdate = '#birthdate#' --Дата рож
 DECLARE @formSocServ VARCHAR(256) SET @formSocServ = '#formSocServ#' --Форма социального обслуживания.
 DECLARE @dateRegistration VARCHAR(256) SET @dateRegistration = '#dateRegistration#' --Дата оформления.
 DECLARE @numberDocumentIPRA VARCHAR(256) SET @numberDocumentIPRA = '#numberDocumentIPRA#' --Номер документа.
---Данные о договоре
+--Данные о договоре.
 DECLARE @documentNumber VARCHAR(256) = '#documentNumber#' --Номер договора.
 DECLARE @documentStartDate VARCHAR(256) = '#documentStartDate#' --Дата договора.
 DECLARE @documentEndDate VARCHAR(256) =  '#documentEndDate#' --Дата окончания действия договора.
+--Данные дополнительного соглашения к договору.
+DECLARE @additionalDocumentNumber VARCHAR(256) = '#additionalDocumentNumber#' --Номер договора.
+DECLARE @additionalDocumentStartDate VARCHAR(256) = '#additionalDocumentStartDate#' --Дата договора.
+DECLARE @additionalDocumentEndDate VARCHAR(256) =  '#additionalDocumentEndDate#' --Дата окончания действия договора.
 --Период, за который предоставляются сведения.
 DECLARE @yearReport VARCHAR(256) SET @yearReport = '#yearReport#' --Год.
 DECLARE @monthReport VARCHAR(256) SET @monthReport = (SELECT A_CODE FROM SPR_MONTH WHERE A_NAME = '#monthReport#' OR CONVERT(VARCHAR, A_CODE) = '#monthReport#') --Месяц.
@@ -248,8 +252,16 @@ IF (@thereIsError = 0) BEGIN
             A_DEP_CREATE        = @departamentForInsert,
             A_COND_SOC_SERV     = @conditionForInsert,
             DOCUMENTSNUMBER     = @documentNumber,
-            A_DOCBASESTARTDATE  = CONVERT(DATE, @documentStartDate),
-            A_DOCBASEFINISHDATE = CONVERT(DATE, @documentEndDate)
+            A_DOCBASESTARTDATE  = CASE 
+                WHEN CONVERT(DATE, @documentStartDate) < CONVERT(DATE, @additionalDocumentStartDate) 
+                THEN CONVERT(DATE, @additionalDocumentStartDate) 
+                ELSE CONVERT(DATE, @documentStartDate)
+            END,
+            A_DOCBASEFINISHDATE = CASE
+                WHEN CONVERT(DATE, @documentEndDate) > CONVERT(DATE, @additionalDocumentEndDate)
+                THEN CONVERT(DATE, @additionalDocumentEndDate)
+                ELSE CONVERT(DATE, @documentEndDate)
+            END
         WHERE A_OUID = @identifiedIPPSU
     END
     ELSE BEGIN
