@@ -1,5 +1,14 @@
 <singleValue>
 	SHEET_NUMBER: 1;
+	SECTION_NAME: "Поставщик социальных услуг:";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Регистрационный номер поставщика в Реестре поставщиков:";
+	CODE: regNumOrganization;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
 	SECTION_NAME: "Данные о получателе социальных услуг (ПСУ)";
 	SECTION_BOTTOM_LEFT: 1;
 	SECTION_BOTTOM_RIGHT: 1;
@@ -68,6 +77,33 @@
 	SECTION_BOTTOM_RIGHT: 1;
 	FIELD: "Форма социального обслуживания";
 	CODE: formSocServ;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о договоре (доп.соглашении)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Номер договора";
+	CODE: documentNumber;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о договоре (доп.соглашении)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата договора";
+	CODE: documentStartDate;
+	OFFEST_COLUMN: 1;
+</singleValue>
+<singleValue>
+	SHEET_NUMBER: 1;
+	SECTION_NAME: "Данные о договоре (доп.соглашении)";
+	SECTION_BOTTOM_LEFT: 1;
+	SECTION_BOTTOM_RIGHT: 1;
+	FIELD: "Дата окончания действия договора";
+	CODE: documentEndDate;
 	OFFEST_COLUMN: 1;
 </singleValue>
 <singleValue>

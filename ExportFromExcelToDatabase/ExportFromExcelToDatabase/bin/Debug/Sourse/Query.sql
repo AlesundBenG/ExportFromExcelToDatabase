@@ -1,6 +1,6 @@
-DISABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
-DISABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
-DISABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
+--DISABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
+--DISABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
+--DISABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Этап 0: Инициализация.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,6 +399,6 @@ SELECT @thereIsError AS thereIsError, @message AS message
 IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
 IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
 IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END; --Данные для вставки.
-ENABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
-ENABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
-ENABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
+--ENABLE TRIGGER trg_soc_serv_update_count_sumss  ON WM_COST_SOC_SERV;
+--ENABLE TRIGGER trg_soc_serv_update_count_sum    ON WM_COST_SOC_SERV_MONTH;
+--ENABLE TRIGGER trg_soc_serv_update_count_sums   ON WM_FACT_COST_SOC_SERV;
