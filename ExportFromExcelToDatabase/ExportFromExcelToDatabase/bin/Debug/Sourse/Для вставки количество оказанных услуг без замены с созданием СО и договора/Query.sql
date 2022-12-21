@@ -213,6 +213,105 @@ IF (@thereIsError = 0) BEGIN
     ELSE IF (@countFoundSocServ = 0)  BEGIN
         SET @thereIsError = 1
         SET @message = 'Не найдено социальное обслуживание, удовлетворяющего условиям'
+        --Выбор организации.
+        DECLARE @organizationForInsert INT = (
+            SELECT DISTINCT organization.OUID
+            FROM LINK_INDIVIDPROGRAM_SPRORGUSON program_link_organization
+            ----Учреждения социального обслуживания.
+                INNER JOIN SPR_ORG_USON organization
+                    ON organization.OUID = program_link_organization.A_TOID
+                        AND organization.A_REG_NUM = @regNumOrganization
+            ----Базовый класс организаций.
+                INNER JOIN SPR_ORG_BASE organizationInfo
+                    ON organizationInfo.OUID = organization.OUID
+                        AND organizationInfo.A_STATUS = 10
+            WHERE program_link_organization.A_FROMID = @identifiedIPPSU
+        )
+        --Выбор подразделения.
+        DECLARE @departamentForInsert INT = (
+            SELECT DISTINCT departament.OUID
+            FROM SPR_DEP departament --Подразделения.
+            ----Базовый класс подразделения.
+                INNER JOIN SPR_ORG_BASE departamentInfo
+                    ON departamentInfo.OUID = departament.OUID
+                        AND departamentInfo.A_STATUS = 10
+            ----Индивидуальная программа.
+                INNER JOIN INDIVID_PROGRAM individProgram
+                    ON individProgram.A_OUID = @identifiedIPPSU
+            WHERE  departament.A_UPPER_DEP = @organizationForInsert
+                AND (individProgram.A_FORM_SOCSERV= 1 AND departament.A_TYPE_DEP IN (1, 2, 3, 4, 5, 6, 8, 10, 20, 21) --Полустационар.
+                    OR individProgram.A_FORM_SOCSERV = 2 AND departament.A_TYPE_DEP in (7, 11, 12) --На дому.
+                    OR individProgram.A_FORM_SOCSERV = 4 AND departament.A_TYPE_DEP in (10, 13, 17) --Стационар.
+                )
+        )
+        --Выбор условия оказания услуг.
+        DECLARE @conditionForInsert VARCHAR(4) = 'free'
+        --Выбор распределений.
+        DECLARE @areaForInsert INT = (
+            SELECT DISTINCT area.OUID
+            FROM SPR_AREA_USON area --Участки обслуживания надомного подразделения
+            WHERE area.A_DEPUSON = @departamentForInsert
+        )
+        DECLARE @roomForInsert INT = (
+            SELECT room.A_OUID
+            FROM SPR_ROOMS room --Комнаты
+            WHERE room.A_SPR_DEP_STATIONAR = @departamentForInsert
+        )
+        DECLARE @bunkForInsert INT = (
+            SELECT bunks.A_OUID
+            FROM SPR_CHAMBERS chambers --Палаты
+            ----Койко-места
+                INNER JOIN SPR_BUNKS bunks 
+                    ON bunks.A_CHAMBER = chambers.A_OUID
+                        AND bunks.A_CONDITION ='freely'
+            WHERE chambers.A_SPR_DEP_STATIONAR = @departamentForInsert
+        )
+        --Выбор области распространения.
+        DECLARE @districtForInsert INT = (
+            SELECT DISTINCT direct.A_OUID
+            FROM SPR_TARIF_SOC_SERV tarif
+                INNER JOIN SPR_DIRECT direct 
+                    ON direct.A_OUID = tarif.A_DISTRICT
+                WHERE tarif.A_DEP = @departamentForInsert
+                    AND tarif.A_STATUS = 10
+                    AND (tarif.A_DATE_FINISH_SERV IS NULL OR CONVERT(DATE, tarif.A_DATE_FINISH_SERV) >= CONVERT(DATE, GETDATE()))
+        )
+        --Вставка значений для создания СО и договора.
+        UPDATE INDIVID_PROGRAM
+        SET A_ORG_SOC_CREATE    = @organizationForInsert,
+            A_DEP_CREATE        = @departamentForInsert,
+            A_COND_SOC_SERV     = @conditionForInsert,
+            A_DISTRIB_HOME      = @areaForInsert,
+            A_DISTRIB_HALF_STAT = @roomForInsert,
+            A_DISTRIB_STAT      = @bunkForInsert,
+            A_DISTRICT          = @districtForInsert,
+            DOCUMENTSNUMBER     = @documentNumber,
+            A_DOCBASESTARTDATE  = CASE 
+                WHEN CONVERT(DATE, @documentStartDate) < CONVERT(DATE, @additionalDocumentStartDate) AND @additionalDocumentStartDate <> ''
+                THEN CONVERT(DATE, @additionalDocumentStartDate) 
+                ELSE CONVERT(DATE, @documentStartDate)
+            END,
+            A_DOCBASEFINISHDATE = CASE
+                WHEN CONVERT(DATE, @documentEndDate) > CONVERT(DATE, @additionalDocumentEndDate) AND @additionalDocumentEndDate <> ''
+                THEN CONVERT(DATE, @additionalDocumentEndDate)
+                ELSE CONVERT(DATE, @documentEndDate)
+            END
+        WHERE A_OUID = @identifiedIPPSU
+        --Получение запроса по созданию СО и договора.
+        DECLARE @qureyForCreateSocServ VARCHAR(MAX) = (
+            SELECT
+                query.SQLSTATEMENT
+            FROM SX_OBJ_QUERY query
+                INNER JOIN SXOBJ queryInfo
+                    ON queryInfo.OUID = query.OUID
+            WHERE query.OUID = 11434611
+                AND query.NAME = 'Запрос на создание договора и назначения по индивидуальной программе'
+        )
+        --Вставка входных параметров в запрос.
+        SET @qureyForCreateSocServ = REPLACE(@qureyForCreateSocServ, '#objectID#', CONVERT(VARCHAR, @identifiedIPPSU))
+        SET @qureyForCreateSocServ = REPLACE(@qureyForCreateSocServ, '#curAccount#', '10314303')
+        --Исполнение запроса по созданию СО и договора.
+        EXEC SP_EXECUTESQL @qureyForCreateSocServ 
     END
     ELSE BEGIN
         SET @identifiedSocServ = (SELECT TOP 1 SOC_SERV_OUID FROM #FOUND_SOC_SERV)
@@ -388,8 +487,8 @@ IF (@thereIsError = 0) BEGIN
         CAST(NULL AS INT)           AS A_EDITOWNER,         --Изменил
         10                          AS A_STATUS,            --Статус
         CAST(NULL AS DATE)          AS A_PAY_DATE,          --Дата оплаты
-        @yearReport_INT                 AS A_YEAR,              --Год
-        @monthReport_INT                AS A_MONTH,             --Месяц
+        @yearReport_INT             AS A_YEAR,              --Год
+        @monthReport_INT            AS A_MONTH,             --Месяц
         0                           AS A_FULL_COST_MONTH,   --Полная стоимость оказанных услуг, руб.
         0                           AS A_SUM_PAY,           --Оплачено гражданином, руб.
         0                           AS A_PART_PAY,          --Остаток к оплате, руб.
