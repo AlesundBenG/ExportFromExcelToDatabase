@@ -246,19 +246,53 @@ IF (@thereIsError = 0) BEGIN
         )
         --Выбор условия оказания услуг.
         DECLARE @conditionForInsert VARCHAR(4) = 'free'
+        --Выбор распределений.
+        DECLARE @areaForInsert INT = (
+            SELECT DISTINCT area.OUID
+            FROM SPR_AREA_USON area --Участки обслуживания надомного подразделения
+            WHERE area.A_DEPUSON = @departamentForInsert
+        )
+        DECLARE @roomForInsert INT = (
+            SELECT room.A_OUID
+            FROM SPR_ROOMS room --Комнаты
+            WHERE room.A_SPR_DEP_STATIONAR = @departamentForInsert
+        )
+        DECLARE @bunkForInsert INT = (
+            SELECT bunks.A_OUID
+            FROM SPR_CHAMBERS chambers --Палаты
+            ----Койко-места
+                INNER JOIN SPR_BUNKS bunks 
+                    ON bunks.A_CHAMBER = chambers.A_OUID
+                        AND bunks.A_CONDITION ='freely'
+            WHERE chambers.A_SPR_DEP_STATIONAR = @departamentForInsert
+        )
+        --Выбор области распространения.
+        DECLARE @districtForInsert INT = (
+            SELECT DISTINCT direct.A_OUID
+            FROM SPR_TARIF_SOC_SERV tarif
+                INNER JOIN SPR_DIRECT direct 
+                    ON direct.A_OUID = tarif.A_DISTRICT
+                WHERE tarif.A_DEP = @departamentForInsert
+                    AND tarif.A_STATUS = 10
+                    AND (tarif.A_DATE_FINISH_SERV IS NULL OR CONVERT(DATE, tarif.A_DATE_FINISH_SERV) >= CONVERT(DATE, GETDATE()))
+        )
         --Вставка значений для создания СО и договора.
         UPDATE INDIVID_PROGRAM
         SET A_ORG_SOC_CREATE    = @organizationForInsert,
             A_DEP_CREATE        = @departamentForInsert,
             A_COND_SOC_SERV     = @conditionForInsert,
+            A_DISTRIB_HOME      = @areaForInsert,
+            A_DISTRIB_HALF_STAT = @roomForInsert,
+            A_DISTRIB_STAT      = @bunkForInsert,
+            A_DISTRICT          = @districtForInsert,
             DOCUMENTSNUMBER     = @documentNumber,
             A_DOCBASESTARTDATE  = CASE 
-                WHEN CONVERT(DATE, @documentStartDate) < CONVERT(DATE, @additionalDocumentStartDate) 
+                WHEN CONVERT(DATE, @documentStartDate) < CONVERT(DATE, @additionalDocumentStartDate) AND @additionalDocumentStartDate <> ''
                 THEN CONVERT(DATE, @additionalDocumentStartDate) 
                 ELSE CONVERT(DATE, @documentStartDate)
             END,
             A_DOCBASEFINISHDATE = CASE
-                WHEN CONVERT(DATE, @documentEndDate) > CONVERT(DATE, @additionalDocumentEndDate)
+                WHEN CONVERT(DATE, @documentEndDate) > CONVERT(DATE, @additionalDocumentEndDate) AND @additionalDocumentEndDate <> ''
                 THEN CONVERT(DATE, @additionalDocumentEndDate)
                 ELSE CONVERT(DATE, @documentEndDate)
             END
