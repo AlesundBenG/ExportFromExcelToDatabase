@@ -459,7 +459,7 @@ IF (@thereIsError = 0) BEGIN
                 )
         )
     )
-    INSERT INTO WM_FACT_COST_SOC_SERV(TS,SYSTEMCLASS,GUID,A_CREATEDATE,A_CROWNER,A_SERV,A_SUM_PERIOD,A_FACT_PAY,A_EDITOWNER,A_STATUS,A_PAY_DATE,A_YEAR,A_MONTH,A_FULL_COST_MONTH,A_SUM_PAY,A_PART_PAY,A_SUMM_EXT_SERV,A_SUM_NORM_EX,A_SUMM_DOG,ESRN_SOC_SERV,A_COND_SOC_SERV,A_COMMENT,A_SUM_PERIOD_BUDGET,A_FULL_COUNT,A_SOC_COUNT,A_SOC_COST_MONTH,A_DOP_COUNT,A_DOP_COST_MONTH,A_OTHER_COUNT,A_OTHER_COST_MONTH)
+    INSERT INTO WM_FACT_COST_SOC_SERV(TS,SYSTEMCLASS,GUID,A_CREATEDATE,A_CROWNER,A_SERV,A_SUM_PERIOD,A_FACT_PAY,A_EDITOWNER,A_STATUS,A_PAY_DATE,A_YEAR,A_MONTH,A_FULL_COST_MONTH,A_SUM_PAY,A_PART_PAY,A_SUMM_EXT_SERV,A_SUM_NORM_EX,A_SUMM_DOG,ESRN_SOC_SERV,A_COND_SOC_SERV,A_COMMENT,A_SUM_PERIOD_BUDGET,A_FULL_COUNT,A_SOC_COUNT,A_SOC_COUNT_NORM,A_SOC_COUNT_EXCESS,A_SOC_COST_MONTH,A_DOP_COUNT,A_DOP_COST_MONTH,A_OTHER_COUNT,A_OTHER_COST_MONTH)
     SELECT
         GETDATE()                   AS TS,                  --Дата модификации
         10284266                    AS SYSTEMCLASS,         --Класс объекта
@@ -472,8 +472,8 @@ IF (@thereIsError = 0) BEGIN
         CAST(NULL AS INT)           AS A_EDITOWNER,         --Изменил
         10                          AS A_STATUS,            --Статус
         CAST(NULL AS DATE)          AS A_PAY_DATE,          --Дата оплаты
-        @yearReport_INT                 AS A_YEAR,              --Год
-        @monthReport_INT                AS A_MONTH,             --Месяц
+        @yearReport_INT             AS A_YEAR,              --Год
+        @monthReport_INT            AS A_MONTH,             --Месяц
         0                           AS A_FULL_COST_MONTH,   --Полная стоимость оказанных услуг, руб.
         0                           AS A_SUM_PAY,           --Оплачено гражданином, руб.
         0                           AS A_PART_PAY,          --Остаток к оплате, руб.
@@ -484,8 +484,10 @@ IF (@thereIsError = 0) BEGIN
         @condition                  AS A_COND_SOC_SERV,     --Условие оказания социальных услуг
         CAST(NULL AS VARCHAR)       AS A_COMMENT,           --Комментарий
         0                           AS A_SUM_PERIOD_BUDGET, --Всего к оплате из средств бюджета
-        SUM(t.TOTAL_COUNT_NORMAL)   AS A_FULL_COUNT,        --Количество оказанных услуг
-        SUM(t.TOTAL_COUNT_NORMAL)   AS A_SOC_COUNT,         --Количество оказанных соц. услуг
+        SUM(t.TOTAL_COUNT)          AS A_FULL_COUNT,        --Количество оказанных услуг
+        SUM(t.TOTAL_COUNT)          AS A_SOC_COUNT,         --Количество оказанных соц. услуг
+        SUM(t.TOTAL_COUNT_NORMAL)   AS A_SOC_COUNT_NORM,    --Количество оказанных соц. услуг в рамках норматива
+        SUM(t.TOTAL_COUNT_OVER)     AS A_SOC_COUNT_EXCESS,  --Количество оказанных соц. услуг сверх норматива
         0                           AS A_SOC_COST_MONTH,    --Полная стоимость оказанных соц. услуг, руб.
         CAST(NULL AS INT)           AS A_DOP_COUNT,         --Количество оказанных доп. услуг
         CAST(NULL AS FLOAT)         AS A_DOP_COST_MONTH,    --Полная стоимость оказанных доп. услуг, руб.
@@ -493,8 +495,11 @@ IF (@thereIsError = 0) BEGIN
         CAST(NULL AS FLOAT)         AS A_OTHER_COST_MONTH   --Полная стоимость оказанных иных услуг, руб.
     FROM (
         SELECT 
-            socServAGR.A_ID                     AS SOC_SERV_AGR_OUID,
-            SUM(costSocServMonth.A_NORMSOCSERV) AS TOTAL_COUNT_NORMAL
+            socServAGR.A_ID                                 AS SOC_SERV_AGR_OUID,
+            SUM(costSocServMonth.A_NORMSOCSERV) + 
+                SUM(costSocServMonth.A_ACT_EXCESS_QUANT)    AS TOTAL_COUNT,
+            SUM(costSocServMonth.A_NORMSOCSERV)             AS TOTAL_COUNT_NORMAL,
+            SUM(costSocServMonth.A_ACT_EXCESS_QUANT)        AS TOTAL_COUNT_OVER
         FROM ESRN_SOC_SERV socServ --Назначение социального обслуживания.
         ----Агрегация по социальной услуге.
             INNER JOIN WM_SOC_SERV_AGR socServAGR 
