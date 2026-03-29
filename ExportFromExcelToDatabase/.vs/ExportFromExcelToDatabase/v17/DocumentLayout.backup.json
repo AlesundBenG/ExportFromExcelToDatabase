@@ -1,0 +1,153 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formshowingdatafromfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formshowingdatafromfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formshowingquerysql.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formshowingquerysql.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formlogging.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formlogging.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|c:\\users\\batas\\documents\\github\\exportfromexceltodatabase\\exportfromexceltodatabase\\exportfromexceltodatabase\\forms\\formlogging.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6BD929D7-1DAE-46CD-9D77-E55986891E03}|ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj|solutionrelative:exportfromexceltodatabase\\forms\\formlogging.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FormShowingDataFromFile.cs",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormShowingDataFromFile.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormShowingDataFromFile.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormShowingDataFromFile.cs",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormShowingDataFromFile.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAwwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:49:17.366Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FormShowingQuerySQL.cs",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormShowingQuerySQL.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormShowingQuerySQL.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormShowingQuerySQL.cs",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormShowingQuerySQL.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:49:08.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FormSetting.cs",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAwwB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:48:56.071Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FormSetting.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormSetting.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormSetting.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormSetting.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:48:47.415Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FormMain.cs",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAiwIYBAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:46:46.543Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FormMain.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormMain.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormMain.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormMain.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:44:00.648Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "FormLogging.cs",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAQwDQAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:42:08.83Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FormLogging.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "RelativeDocumentMoniker": "ExportFromExcelToDatabase\\Forms\\FormLogging.cs",
+              "ToolTip": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\Forms\\FormLogging.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "ExportFromExcelToDatabase\\Forms\\FormLogging.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-12T18:42:04.562Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

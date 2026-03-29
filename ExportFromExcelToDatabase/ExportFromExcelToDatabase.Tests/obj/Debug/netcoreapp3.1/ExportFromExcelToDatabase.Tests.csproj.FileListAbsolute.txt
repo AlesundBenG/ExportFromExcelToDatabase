@@ -88,7 +88,6 @@ C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatab
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\bin\Debug\netcoreapp3.1\ExportFromExcelToDatabase.exe
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\bin\Debug\netcoreapp3.1\ExportFromExcelToDatabase.pdb
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\bin\Debug\netcoreapp3.1\ExportFromExcelToDatabase.exe.config
-C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.csprojAssemblyReference.cache
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.AssemblyInfoInputs.cache
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.AssemblyInfo.cs
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.csproj.CoreCompileInputs.cache
@@ -96,3 +95,6 @@ C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatab
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.dll
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.pdb
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.genruntimeconfig.cache
+C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\bin\Debug\netcoreapp3.1\Microsoft.TestPlatform.AdapterUtilities.dll
+C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.csproj.AssemblyReference.cache
+C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase.Tests\obj\Debug\netcoreapp3.1\ExportFromExcelToDatabase.Tests.GeneratedMSBuildEditorConfig.editorconfig

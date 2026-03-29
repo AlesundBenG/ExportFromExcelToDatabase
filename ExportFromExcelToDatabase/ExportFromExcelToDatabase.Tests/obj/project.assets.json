@@ -6355,24 +6355,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\bpa\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\batas\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
       "projectName": "ExportFromExcelToDatabase.Tests",
-      "projectPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
-      "packagesPath": "C:\\Users\\bpa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
+      "projectPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\ExportFromExcelToDatabase.Tests.csproj",
+      "packagesPath": "C:\\Users\\batas\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.Tests\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\bpa\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\batas\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6380,15 +6375,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
-              "projectPath": "C:\\Users\\bpa\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
+            "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj": {
+              "projectPath": "C:\\Users\\batas\\Documents\\GitHub\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase\\ExportFromExcelToDatabase.csproj"
             }
           }
         }
@@ -6397,7 +6391,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "netcoreapp3.1": {
@@ -6450,7 +6450,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

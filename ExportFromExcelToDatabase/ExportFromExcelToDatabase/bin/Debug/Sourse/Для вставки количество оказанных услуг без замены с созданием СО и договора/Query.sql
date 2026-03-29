@@ -2,21 +2,24 @@
 --Этап 0: Инициализация.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Переменные.
-DECLARE @identifiedPerson INT --Идентифицированный человек.
-DECLARE @identifiedIPPSU INT --Идентифицированная индивидуальная программа (ИППСУ).
-DECLARE @identifiedSocServ INT --Идентифицированное социальное обслуживание.
-DECLARE @yearReport_INT INT --Год, конвертированный в число.
-DECLARE @monthReport_INT INT --Месяц, конвертированный в число.
-DECLARE @startDate DATE --Дата -начала периода.
-DECLARE @endDate DATE --Дата конца периода.
-DECLARE @thereIsError INT = 0 --Флаг наличия ошибки.
-DECLARE @message VARCHAR(256)= 'Успешно' --Сообщение.
+DECLARE @identifiedPerson   INT  --Идентифицированный человек.
+DECLARE @identifiedIPPSU    INT  --Идентифицированная индивидуальная программа (ИППСУ).
+DECLARE @identifiedSocServ  INT  --Идентифицированное социальное обслуживание.
+DECLARE @yearReport_INT     INT  --Год, конвертированный в число.
+DECLARE @monthReport_INT    INT  --Месяц, конвертированный в число.
+DECLARE @startDate          DATE --Дата -начала периода.
+DECLARE @endDate            DATE --Дата конца периода.
+DECLARE @contractStartDate  DATE --Дата начала действия договора (Для создания назначения).
+DECLARE @contractEndDate    DATE --Дата окончания действия договора (Для создания назначения).
+DECLARE @thereIsError       INT = 0 --Флаг наличия ошибки.
+DECLARE @message            VARCHAR(256)= '' --Сообщение.
+DECLARE @triedCreateSocServ BIT = 0 --Была совершена попытка создания назначения
 --Удаление временных таблиц.
-IF OBJECT_ID('tempdb..#FOUND_PEOPLE') IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE END --Найденные люди по входным данным.
-IF OBJECT_ID('tempdb..#FOUND_IPPSU') IS NOT NULL BEGIN DROP TABLE #FOUND_IPPSU END --Найденные индивидуальные программы (ИППСУ) по входным данным.
-IF OBJECT_ID('tempdb..#FOUND_SOC_SERV') IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV END --Найденные социальные обслуживания по входным данным.
-IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV END --Данные для вставки.
-IF OBJECT_ID('tempdb..#FOUND_AGREGATION') IS NOT NULL BEGIN DROP TABLE #FOUND_AGREGATION END --Найденные агрегации услуг.
+IF OBJECT_ID('tempdb..#FOUND_PEOPLE')    IS NOT NULL BEGIN DROP TABLE #FOUND_PEOPLE     END --Найденные люди по входным данным.
+IF OBJECT_ID('tempdb..#FOUND_IPPSU')     IS NOT NULL BEGIN DROP TABLE #FOUND_IPPSU      END --Найденные индивидуальные программы (ИППСУ) по входным данным.
+IF OBJECT_ID('tempdb..#FOUND_SOC_SERV')  IS NOT NULL BEGIN DROP TABLE #FOUND_SOC_SERV   END --Найденные социальные обслуживания по входным данным.
+IF OBJECT_ID('tempdb..#DATA_FOR_INSERV') IS NOT NULL BEGIN DROP TABLE #DATA_FOR_INSERV  END --Данные для вставки.
+IF OBJECT_ID('tempdb..#FOUND_AGREGATION')IS NOT NULL BEGIN DROP TABLE #FOUND_AGREGATION END --Найденные агрегации услуг.
 --Создание временных таблиц.
 CREATE TABLE #FOUND_PEOPLE (
     PERSONOUID INT, --Идентификатор личного дела.
@@ -28,10 +31,10 @@ CREATE TABLE #FOUND_SOC_SERV (
     SOC_SERV_OUID INT, --Идентификатор социального обслуживания.
 )
 CREATE TABLE #DATA_FOR_INSERV (
-    TYPE_SERV_CODE VARCHAR(256), --Код услуги
-    TYPE_SERV_NAME VARCHAR(256), --Наименование услуги
-    COUNT_SERV_NORMAL INT, --Количество оказанных услуг в месяц в рамках норматива
-    COUNT_SERV_OVER INT --Количество оказанных услуг в месяц сверх норматива
+    TYPE_SERV_CODE    VARCHAR(256), --Код услуги
+    TYPE_SERV_NAME    VARCHAR(256), --Наименование услуги
+    COUNT_SERV_NORMAL INT,          --Количество оказанных услуг в месяц в рамках норматива
+    COUNT_SERV_OVER   INT           --Количество оказанных услуг в месяц сверх норматива
 )
 CREATE TABLE #FOUND_AGREGATION (
     TYPE_SERV_CODE VARCHAR(256), --Код услуги
@@ -47,25 +50,25 @@ CREATE TABLE #FOUND_AGREGATION (
 --Информация о поставщике услуг.
 DECLARE @regNumOrganization VARCHAR(10) = '#regNumOrganization#'
 --Информация о получателе.
-DECLARE @SNILS VARCHAR(256) SET @SNILS = '#SNILS#' --СНИЛС.
-DECLARE @name VARCHAR(256) SET @name = '#name#' --Имя.
-DECLARE @surname VARCHAR(256) SET @surname = '#surname#' --Фамилия.
-DECLARE @secondname VARCHAR(256) SET @secondname = '#secondname#' --Отчество.
-DECLARE @birthdate VARCHAR(256) SET @birthdate = '#birthdate#' --Дата рождения.
+DECLARE @SNILS      VARCHAR(256) SET @SNILS = '#SNILS#' --СНИЛС.
+DECLARE @name       VARCHAR(256) SET @name = RTRIM(LTRIM('#name#')) --Имя.
+DECLARE @surname    VARCHAR(256) SET @surname = RTRIM(LTRIM('#surname#')) --Фамилия.
+DECLARE @secondname VARCHAR(256) SET @secondname = RTRIM(LTRIM('#secondname#')) --Отчество.
+DECLARE @birthdate  VARCHAR(256) SET @birthdate = '#birthdate#' --Дата рождения.
 --Данные об индивидуальной программе получателя социальных услуг (ИППСУ).
-DECLARE @formSocServ VARCHAR(256) SET @formSocServ = '#formSocServ#' --Форма социального обслуживания.
-DECLARE @dateRegistration VARCHAR(256) SET @dateRegistration = '#dateRegistration#' --Дата оформления.
+DECLARE @formSocServ        VARCHAR(256) SET @formSocServ = '#formSocServ#' --Форма социального обслуживания.
+DECLARE @dateRegistration   VARCHAR(256) SET @dateRegistration = '#dateRegistration#' --Дата оформления.
 DECLARE @numberDocumentIPRA VARCHAR(256) SET @numberDocumentIPRA = '#numberDocumentIPRA#' --Номер документа.
 --Данные о договоре.
-DECLARE @documentNumber VARCHAR(256) = '#documentNumber#' --Номер договора.
+DECLARE @documentNumber    VARCHAR(256) = '#documentNumber#' --Номер договора.
 DECLARE @documentStartDate VARCHAR(256) = '#documentStartDate#' --Дата договора.
-DECLARE @documentEndDate VARCHAR(256) =  '#documentEndDate#' --Дата окончания действия договора.
+DECLARE @documentEndDate   VARCHAR(256) =  '#documentEndDate#' --Дата окончания действия договора.
 --Данные дополнительного соглашения к договору.
-DECLARE @additionalDocumentNumber VARCHAR(256) = '#additionalDocumentNumber#' --Номер договора.
+DECLARE @additionalDocumentNumber    VARCHAR(256) = '#additionalDocumentNumber#' --Номер договора.
 DECLARE @additionalDocumentStartDate VARCHAR(256) = '#additionalDocumentStartDate#' --Дата договора.
-DECLARE @additionalDocumentEndDate VARCHAR(256) =  '#additionalDocumentEndDate#' --Дата окончания действия договора.
+DECLARE @additionalDocumentEndDate   VARCHAR(256) =  '#additionalDocumentEndDate#' --Дата окончания действия договора.
 --Период, за который предоставляются сведения.
-DECLARE @yearReport VARCHAR(256) SET @yearReport = '#yearReport#' --Год.
+DECLARE @yearReport  VARCHAR(256) SET @yearReport = '#yearReport#' --Год.
 DECLARE @monthReport VARCHAR(256) SET @monthReport = (SELECT A_CODE FROM SPR_MONTH WHERE A_NAME = '#monthReport#' OR CONVERT(VARCHAR, A_CODE) = '#monthReport#') --Месяц.
 --Данные об услугах.
 INSERT INTO #DATA_FOR_INSERV (TYPE_SERV_CODE, TYPE_SERV_NAME, COUNT_SERV_NORMAL, COUNT_SERV_OVER)
@@ -79,20 +82,30 @@ WHERE TYPE_SERV_CODE = '' OR
         OR COUNT_SERV_NORMAL = '' AND COUNT_SERV_OVER = ''
         OR COUNT_SERV_NORMAL = '0' AND COUNT_SERV_OVER = '0'
     )
---Проверка исходных данных.
-IF ((SELECT LEN(@SNILS)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указан СНИЛС' END
-IF ((SELECT LEN(@name)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указано имя' END
-IF ((SELECT LEN(@surname)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указана фамилия' END
-IF ((SELECT LEN(@secondname)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указано отчество' END
-IF ((SELECT LEN(@birthdate)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указана дата рождения' END
-IF ((SELECT LEN(@formSocServ)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указана форма социального обслуживания' END
-IF ((SELECT LEN(@dateRegistration)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указана дата оформления документа ИППСУ' END
-IF ((SELECT LEN(@numberDocumentIPRA)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не указан номер документа ИППСУ' END
-IF ((SELECT ISDATE(@birthdate)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты дня рождения' END
-IF ((SELECT ISDATE(@dateRegistration)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты оформления ИППСУ' END
-IF ((SELECT ISNUMERIC(@yearReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат года' END
-IF ((SELECT ISNUMERIC(@monthReport)) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат месяца' END
-IF ((SELECT COUNT(*) FROM #DATA_FOR_INSERV) = 0) BEGIN SET @thereIsError = 1 SET @message = 'Нет не нулевых услуг' END
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--Этап 2: Проверка входных параметров.
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IF (LEN(@SNILS) = 0)                                        BEGIN SET @thereIsError = 1 SET @message = 'Не указан СНИЛС' END
+ELSE IF (LEN(@name) = 0)                                    BEGIN SET @thereIsError = 1 SET @message = 'Не указано имя' END
+ELSE IF (LEN(@surname) = 0)                                 BEGIN SET @thereIsError = 1 SET @message = 'Не указана фамилия' END
+ELSE IF (LEN(@secondname) = 0)                              BEGIN SET @thereIsError = 1 SET @message = 'Не указано отчество' END
+ELSE IF (LEN(@birthdate) = 0)                               BEGIN SET @thereIsError = 1 SET @message = 'Не указана дата рождения' END
+ELSE IF (LEN(@formSocServ) = 0)                             BEGIN SET @thereIsError = 1 SET @message = 'Не указана форма социального обслуживания' END
+ELSE IF (LEN(@dateRegistration) = 0)                        BEGIN SET @thereIsError = 1 SET @message = 'Не указана дата оформления документа ИППСУ' END
+ELSE IF (LEN(@numberDocumentIPRA) = 0)                      BEGIN SET @thereIsError = 1 SET @message = 'Не указан номер документа ИППСУ' END
+ELSE IF (ISDATE(@birthdate) = 0)                            BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты дня рождения' END
+ELSE IF (ISDATE(@dateRegistration) = 0)                     BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты оформления ИППСУ' END
+ELSE IF (ISDATE(@documentStartDate) = 0 
+            AND LEN(@documentStartDate) > 0)                BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты начала договора' END
+ELSE IF (ISDATE(@documentEndDate) = 0 
+            AND LEN(@documentEndDate) > 0)                  BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты окончания договора' END
+ELSE IF (ISDATE(@additionalDocumentStartDate) = 0 
+            AND LEN(@additionalDocumentStartDate) > 0)      BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты начала дополнения договора' END
+ELSE IF (ISDATE(@additionalDocumentEndDate) = 0 
+            AND LEN(@additionalDocumentEndDate) > 0)        BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат даты окончания дополнения договора' END
+ELSE IF (ISNUMERIC(@yearReport) = 0 AND @thereIsError = 0)  BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат года' END
+ELSE IF (ISNUMERIC(@monthReport) = 0 AND @thereIsError = 0) BEGIN SET @thereIsError = 1 SET @message = 'Не верный формат месяца' END
+ELSE IF ((SELECT COUNT(*) FROM #DATA_FOR_INSERV) = 0)       BEGIN SET @thereIsError = 1 SET @message = 'Нет не нулевых услуг' END
 --Конвертация исходных данных.
 IF (@thereIsError = 0) BEGIN
     SET @yearReport_INT = CONVERT(INT, @yearReport)
@@ -100,8 +113,22 @@ IF (@thereIsError = 0) BEGIN
     SET @startDate = CAST(@yearReport + '-' + @monthReport + '-01' AS DATE)
     SET @endDate = DATEADD(MONTH, ((YEAR(@startDate) - 1900) * 12) + MONTH(@startDate), -1)
 END
+--Период действия договора.
+IF (@thereIsError = 0) BEGIN
+    SET @contractStartDate = dbo.fs_getMaxDate(@documentStartDate, @additionalDocumentStartDate, 0) --NULL считается минимальным значением.
+    SET @contractEndDate = dbo.fs_getMaxDate(@documentEndDate, @additionalDocumentEndDate, 0) --NULL считается минимальным значением.
+    IF (@contractStartDate IS NULL OR @contractEndDate IS NULL) BEGIN
+        SET @thereIsError = 1
+        SET @message = dbo.fs_concatenateString(@message, 'Не определен период действия договора', '; ')
+    END
+    ELSE IF NOT (@yearReport_INT * 100 + @monthReport_INT BETWEEN YEAR(@contractStartDate) * 100 + MONTH(@contractStartDate) AND YEAR(@contractEndDate) * 100 + MONTH(@contractEndDate)) 
+    BEGIN
+        SET @thereIsError = 1
+        SET @message = dbo.fs_concatenateString(@message, 'Год и месяц услуги не входит в указанный период договора', '; ')
+    END
+END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 2: Идентификация человека.
+--Этап 3: Идентификация человека.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Выбор людей, удовлетворяющих условиям.
@@ -131,18 +158,18 @@ IF (@thereIsError = 0) BEGIN
     --Результат 2 этапа.
     IF (@countFoundPeople > 1) BEGIN
         SET @thereIsError = 1
-        SET @message = 'Найдено более одного человека, удовлетворяющего условиям'
+        SET @message = dbo.fs_concatenateString(@message, 'Найдено более одного человека, удовлетворяющего условиям', '; ')
     END
     ELSE IF (@countFoundPeople = 0) BEGIN
         SET @thereIsError = 1
-        SET @message = 'Не найден человек, удовлетворяющий условиям'
+        SET @message = dbo.fs_concatenateString(@message, 'Не найден человек, удовлетворяющий условиям', '; ')
     END
     ELSE BEGIN
         SET @identifiedPerson = (SELECT TOP 1 PERSONOUID FROM #FOUND_PEOPLE)
     END 
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 3: Идентификация индивидуальной программы (И ППСУ).
+--Этап 4: Идентификация индивидуальной программы (ИППСУ).
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Выбор ИППСУ, удовлетворяющих условиям.
@@ -168,21 +195,21 @@ IF (@thereIsError = 0) BEGIN
     --Результат 3 этапа.
     IF (@countFoundIPPSU > 1) BEGIN
         SET @thereIsError = 1
-        SET @message = 'Найдено более одной ИППСУ, удовлетворяющий условиям'
+        SET @message = dbo.fs_concatenateString(@message, 'Найдено более одной ИППСУ, удовлетворяющий условиям', '; ')
     END
     ELSE IF (@countFoundIPPSU = 0) BEGIN
         SET @thereIsError = 1
-        SET @message = 'Не найдена ИППСУ, удовлетворяющий условиям'
+        SET @message = dbo.fs_concatenateString(@message, 'Не найдена ИППСУ, удовлетворяющий условиям', '; ')
     END
     ELSE BEGIN
         SET @identifiedIPPSU = (SELECT TOP 1 IPPSU_OUID FROM #FOUND_IPPSU)
     END 
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 4: Идентификация социального обслуживания.
+--Этап 5: Идентификация социального обслуживания.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IF (@thereIsError = 0) BEGIN
-        --Выбор назначений на социальной обслуживание.
+WHILE(@thereIsError = 0 AND @identifiedSocServ IS NULL) BEGIN 
+    --Выбор назначений на социальной обслуживание.
     INSERT #FOUND_SOC_SERV(SOC_SERV_OUID)
     SELECT DISTINCT
         socServ.OUID AS SOC_SERV_OUID
@@ -208,11 +235,10 @@ IF (@thereIsError = 0) BEGIN
     --Результат 3 этапа.
     IF (@countFoundSocServ > 1) BEGIN
         SET @thereIsError = 1
-        SET @message = 'Найдено более одного социального обслуживания, удовлетворяющего условиям'
+        SET @message = dbo.fs_concatenateString(@message, 'Найдено более одного социального обслуживания, удовлетворяющего условиям', '; ')
     END
-    ELSE IF (@countFoundSocServ = 0)  BEGIN
-        SET @thereIsError = 1
-        SET @message = 'Не найдено социальное обслуживание, удовлетворяющего условиям'
+    ELSE IF (@countFoundSocServ = 0 AND @triedCreateSocServ = 0)  BEGIN
+        SET @triedCreateSocServ = 1
         --Выбор организации.
         DECLARE @organizationForInsert INT = (
             SELECT DISTINCT organization.OUID
@@ -286,19 +312,11 @@ IF (@thereIsError = 0) BEGIN
             A_DISTRIB_STAT      = @bunkForInsert,
             A_DISTRICT          = @districtForInsert,
             DOCUMENTSNUMBER     = @documentNumber,
-            A_DOCBASESTARTDATE  = CASE 
-                WHEN CONVERT(DATE, @documentStartDate) < CONVERT(DATE, @additionalDocumentStartDate) AND @additionalDocumentStartDate <> ''
-                THEN CONVERT(DATE, @additionalDocumentStartDate) 
-                ELSE CONVERT(DATE, @documentStartDate)
-            END,
-            A_DOCBASEFINISHDATE = CASE
-                WHEN CONVERT(DATE, @documentEndDate) > CONVERT(DATE, @additionalDocumentEndDate) AND @additionalDocumentEndDate <> ''
-                THEN CONVERT(DATE, @additionalDocumentEndDate)
-                ELSE CONVERT(DATE, @documentEndDate)
-            END
+            A_DOCBASESTARTDATE  = @contractStartDate,
+            A_DOCBASEFINISHDATE = @contractEndDate
         WHERE A_OUID = @identifiedIPPSU
         --Получение запроса по созданию СО и договора.
-        DECLARE @qureyForCreateSocServ VARCHAR(MAX) = (
+        DECLARE @qureyForCreateSocServ NVARCHAR(MAX) = (
             SELECT
                 query.SQLSTATEMENT
             FROM SX_OBJ_QUERY query
@@ -312,13 +330,18 @@ IF (@thereIsError = 0) BEGIN
         SET @qureyForCreateSocServ = REPLACE(@qureyForCreateSocServ, '#curAccount#', '10314303')
         --Исполнение запроса по созданию СО и договора.
         EXEC SP_EXECUTESQL @qureyForCreateSocServ 
+        SET @message = dbo.fs_concatenateString(@message, 'Создан договор и назначение', '; ')
+    END 
+    ELSE IF (@countFoundSocServ = 0 AND @triedCreateSocServ = 1)  BEGIN
+        SET @thereIsError = 1
+        SET @message = dbo.fs_concatenateString(@message, 'Не найдено созданное социальное обслуживание', '; ')
     END
     ELSE BEGIN
         SET @identifiedSocServ = (SELECT TOP 1 SOC_SERV_OUID FROM #FOUND_SOC_SERV)
     END 
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 5: Идентификация агрегаций по услугам.
+--Этап 6: Идентификация агрегаций по услугам.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Выбор агрегации по услуге.
@@ -366,11 +389,26 @@ IF (@thereIsError = 0) BEGIN
     --Результат 5 этапа.
     IF (@countTypeServForInsert <> @countFoundTypeServ) BEGIN 
         SET @thereIsError = 1
-        SET @message = 'Не все услуги были найдены в социальном обслуживании'
+        --Формирование строки с ненайденными услугами.
+        DECLARE @notFoundTypeServ VARCHAR (MAX) = (
+            SELECT
+                STUFF((
+                    SELECT 
+                        '; ' + forInsert.TYPE_SERV_NAME
+                    FROM #DATA_FOR_INSERV forInsert --Услуги для вставки.
+                    ----Найденные услуги.
+                        LEFT JOIN #FOUND_AGREGATION found
+                            ON found.TYPE_SERV_CODE = forInsert.TYPE_SERV_CODE
+                    WHERE found.SOC_SERV_AGR_OUID IS NULL
+                    FOR XML PATH ('')
+                    ), 1, 1, ''
+                ) AS LIST_SERV_NAME     
+        )
+        SET @message = dbo.fs_concatenateString(@message, 'Не все услуги были найдены в социальном обслуживании (' + @notFoundTypeServ + ')', '; ')
     END
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 6: Проверка введенных данных.
+--Этап 7: Проверка введенных данных.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Проверка отсутствия уже введенных данных.
@@ -387,15 +425,15 @@ IF (@thereIsError = 0) BEGIN
         )
     IF (@alreadyThereCount = @countTypeServForInsert) BEGIN 
         SET @thereIsError = 1
-        SET @message = 'Данные уже есть за данный период'
+        SET @message = dbo.fs_concatenateString(@message, 'Данные уже есть за данный период', '; ')
     END 
     IF (@alreadyThereCount <> @countTypeServForInsert AND @alreadyThereCount <> 0) BEGIN 
         SET @thereIsError = 1
-        SET @message = 'Частично данные уже есть за данный период'
+        SET @message = dbo.fs_concatenateString(@message, 'Частично данные уже есть за данный период', '; ')
     END     
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 7: Вставка стоимости и количество оказанных социальных услуг.
+--Этап 8: Вставка стоимости и количество оказанных социальных услуг.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     INSERT INTO WM_COST_SOC_SERV(A_EMPLOYEE, A_EDITOWNER, A_STATUS, GUID, TS, SYSTEMCLASS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SUM_SOC_SERV_PERIOD, A_DATE_START, A_DATE_LAST, A_ACT_VOLUME, A_COMMENT, A_ACT_EXCESS_QUANT, A_COST_DOP_SOC_SERV, A_ACT_QUANT_NORM)
@@ -420,7 +458,7 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION foundAgregation
 END 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 8: Вставка суммы по услуге за календарный месяц.
+--Этап 9: Вставка суммы по услуге за календарный месяц.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     INSERT INTO WM_COST_SOC_SERV_MONTH(A_YEAR, A_MONTH, A_SOC_SERV_MONTH, A_SUM_SOC_SERV_MONTH, A_NORM_EX, A_EDITOWNER, A_TS, A_GUID, A_STATUS, A_CREATEDATE, A_CROWNER, A_AGR_SOC_SERV, A_SYSTEMCLASS, A_FULL_COST, A_PERCENT_PART_PAY, A_SUM_NORM_EX, A_IS_PART_PAY, A_COND_SOC_SERV, A_NORMSOCSERV, A_ACT_EXCESS_QUANT)
@@ -459,7 +497,7 @@ IF (@thereIsError = 0) BEGIN
     FROM #FOUND_AGREGATION
 END  
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 9: Вставка стоимости всех оказанных услуг за календарный месяц 
+--Этап 10: Вставка стоимости всех оказанных услуг за календарный месяц 
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IF (@thereIsError = 0) BEGIN
     --Условия оказания социальных услуг.
@@ -525,9 +563,10 @@ IF (@thereIsError = 0) BEGIN
             AND socServ.OUID = @identifiedSocServ --Требуемое назначение.
         GROUP BY socServAGR.A_ID
     ) t
+    SET @message = dbo.fs_concatenateString(@message, 'Успешно', '; ')
 END
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
---Этап 10: Завершение
+--Этап 11: Завершение
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Вывод результата.
 SELECT @thereIsError AS thereIsError, @message AS message

@@ -445,16 +445,17 @@ namespace ExportFromExcelToDatabase
                     try {
                         List<DataTable> result = _executorQuerySQL.executeComamnd(_metadataFiles[i].queryForFile);
                         if (result.Count > 0) {
-                            string thereIsError = result[0].Rows[0]["thereIsError"].ToString();
+                            string thereIsError = result[result.Count - 1].Rows[0]["thereIsError"].ToString();
+                            string message = result[result.Count - 1].Rows[0]["message"].ToString();
                             if (thereIsError == "0") {
                                 setCellValueDataGridView(dataGridViewProcess, i, "Status", "Запрос успешно выполнен");
                                 setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.LightGreen);
-                                setCellValueDataGridView(dataGridViewProcess, i, "Message", "");
+                                setCellValueDataGridView(dataGridViewProcess, i, "Message", message);
                             }
                             else {
                                 setCellValueDataGridView(dataGridViewProcess, i, "Status", "Ошибка выполнения запроса");
                                 setCellColorDataGridView(dataGridViewProcess, i, "Status", Color.Red);
-                                setCellValueDataGridView(dataGridViewProcess, i, "Message", result[0].Rows[0]["message"].ToString());
+                                setCellValueDataGridView(dataGridViewProcess, i, "Message", message);
                             }
                         }
                     }

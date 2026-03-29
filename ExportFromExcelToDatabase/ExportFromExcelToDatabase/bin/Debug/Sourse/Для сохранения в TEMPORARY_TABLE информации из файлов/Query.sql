@@ -40,6 +40,7 @@ CREATE TABLE #FOUND_AGREGATION (
 --Этап 1: Установка входных параметров.
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --Информация о получателе.
+DECLARE @systemFileName VARCHAR(256) = '#systemFileName#'
 DECLARE @organization VARCHAR(256) SET @organization = '#organization#'
 DECLARE @SNILS VARCHAR(256) SET @SNILS = '#SNILS#' --СНИЛС.
 DECLARE @name VARCHAR(256) SET @name = '#name#' --Имя.
@@ -63,19 +64,19 @@ VALUES
 INSERT INTO TEMPORARY_TABLE (VARCHAR_1, VARCHAR_2, VARCHAR_3, VARCHAR_4, VARCHAR_5, VARCHAR_6, VARCHAR_7, VARCHAR_8, VARCHAR_9, VARCHAR_10, VARCHAR_11, VARCHAR_12, VARCHAR_13, VARCHAR_14, VARCHAR_15)
 SELECT
     GETDATE()                           AS VARCHAR_1,
-    @organization                       AS VARCHAR_2,
-    @yearReport                         AS VARCHAR_3,
-    @monthReport                        AS VARCHAR_4,
-    @SNILS                              AS VARCHAR_5,
-    @surname                            AS VARCHAR_6,
-    @name                               AS VARCHAR_7,
-    @secondname                         AS VARCHAR_8,
-    @birthdate                          AS VARCHAR_9,
-    @formSocServ                        AS VARCHAR_10,
-    TYPE_SERV_CODE                      AS VARCHAR_11,
-    TYPE_SERV_NAME                      AS VARCHAR_12,
-    CONVERT(VARCHAR, COUNT_SERV_NORMAL) AS VARCHAR_13,
-    CONVERT(VARCHAR, COUNT_SERV_OVER)   AS VARCHAR_14,
+    @systemFileName                     AS VARCHAR_2,
+    @organization                       AS VARCHAR_3,
+    @yearReport                         AS VARCHAR_4,
+    @monthReport                        AS VARCHAR_5,
+    @SNILS                              AS VARCHAR_6,
+    @surname                            AS VARCHAR_7,
+    @name                               AS VARCHAR_8,
+    @secondname                         AS VARCHAR_9,
+    @birthdate                          AS VARCHAR_10,
+    @formSocServ                        AS VARCHAR_11,
+    TYPE_SERV_CODE                      AS VARCHAR_12,
+    TYPE_SERV_NAME                      AS VARCHAR_13,
+    CONVERT(VARCHAR, COUNT_SERV_NORMAL) AS VARCHAR_14,
     'Реестр по услугам'                 AS VARCHAR_15
 FROM #DATA_FOR_INSERV
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

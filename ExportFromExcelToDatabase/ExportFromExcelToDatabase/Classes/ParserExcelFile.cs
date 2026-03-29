@@ -103,6 +103,7 @@ namespace ExportFromExcelToDatabase.Classes
                 singleValue = new List<Token>(),
                 table = new List<DataTable>()
             };
+            setSystemValue(result, file);
             for (int i = 0; i < descriptors.Count; i++) {
                 switch (descriptors[i].NameObject) {
                     case "singleValue":
@@ -181,6 +182,16 @@ namespace ExportFromExcelToDatabase.Classes
             return null;
         }
 
+        /// <summary>
+        /// Установка системных данных.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="file"></param>
+        public void setSystemValue(ParserResult result, ExcelFile file) {
+            //Наименование файла.
+            string fileName = file.PathFile.Substring(file.PathFile.LastIndexOf('\\') + 1);
+            result.singleValue.Add(new Token("systemFileName", fileName));
+        }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*Privat методы*/

@@ -1,7 +1,6 @@
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\bin\Debug\ExportFromExcelToDatabase.exe.config
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\bin\Debug\ExportFromExcelToDatabase.exe
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\bin\Debug\ExportFromExcelToDatabase.pdb
-C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csprojAssemblyReference.cache
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.Properties.Resources.resources
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.GenerateResource.cache
 C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.CoreCompileInputs.cache
@@ -40,3 +39,5 @@ C:\Users\bpa\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabas
 C:\Users\bpa\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.CoreCompileInputs.cache
 C:\Users\bpa\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.exe
 C:\Users\bpa\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.pdb
+C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportFromExcelToDatabase.csproj.AssemblyReference.cache
+C:\Users\batas\Documents\GitHub\ExportFromExcelToDatabase\ExportFromExcelToDatabase\ExportFromExcelToDatabase\obj\Debug\ExportToDatabaseFromFile.FormLogging.resources
